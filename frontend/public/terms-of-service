@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI4Pi - Terms of Service</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2em;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      margin-bottom: 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Terms of Service</h1>
+  <p>Last Updated: [Date]</p>
+
+  <h2>1. Acceptance of Terms</h2>
+  <p>
+    By accessing or using AI4Pi (the "Service"), you agree to be bound by these Terms of Service ("Terms"). 
+    If you do not agree with any part of these Terms, you must not use the Service.
+  </p>
+
+  <h2>2. Changes to Terms</h2>
+  <p>
+    We reserve the right to modify these Terms at any time. Any changes will be effective immediately upon posting.
+    Your continued use of the Service after changes have been posted constitutes acceptance of the modified Terms.
+  </p>
+
+  <h2>3. Eligibility</h2>
+  <p>
+    You must be at least 18 years old (or the age of majority in your jurisdiction) to use this Service. 
+    By using the Service, you represent and warrant that you meet this requirement.
+  </p>
+
+  <h2>4. Use of Service</h2>
+  <p>
+    You agree to use the Service only for lawful purposes and in accordance with these Terms. 
+    You must not use the Service in any way that could damage or impair the Service, or interfere with anyone else’s use of the Service.
+  </p>
+
+  <h2>5. Intellectual Property</h2>
+  <p>
+    All content, features, and functionality of the Service (including text, graphics, logos, and software) 
+    are owned by or licensed to us and are protected by intellectual property laws. 
+    You may not reproduce, distribute, or create derivative works without our prior written permission.
+  </p>
+
+  <h2>6. Disclaimer of Warranties</h2>
+  <p>
+    The Service is provided on an "as is" and "as available" basis without warranties of any kind. 
+    We do not guarantee that the Service will be uninterrupted, error-free, or secure.
+  </p>
+
+  <h2>7. Limitation of Liability</h2>
+  <p>
+    To the maximum extent permitted by law, we shall not be liable for any indirect, incidental, special, or consequential damages 
+    arising from or related to your use of the Service.
+  </p>
+
+  <h2>8. Governing Law</h2>
+  <p>
+    These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction]. 
+    Any disputes shall be resolved exclusively in the courts located in [Your Jurisdiction].
+  </p>
+
+  <h2>9. Contact Us</h2>
+  <p>
+    If you have any questions about these Terms, please contact us at <a href="mailto:support@ai4pi.com">support@ai4pi.com</a>.
+  </p>
+
+  <p><em>Note: This template is provided for informational purposes only and does not constitute legal advice.</em></p>
+</body>
+</html>
