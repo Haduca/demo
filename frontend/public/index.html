@@ -2,67 +2,56 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>AI4Pi Minimal Login</title>
+  <title>AI4Pi - Login</title>
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
-    /* Soft pastel gradient */
     body {
       margin: 0; 
-      min-height: 100vh; 
+      height: 100vh; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
       justify-content: center;
-      background: linear-gradient(135deg, #ffd6e8, #fce8cb, #d2f5cb, #cce6f6, #e5ccff);
-      background-size: 400% 400%;
-      animation: pastelShift 12s ease infinite;
+      background: linear-gradient(135deg, #e3fdfd, #ffe6fa);
       font-family: sans-serif;
     }
-    @keyframes pastelShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    h1 {
-      margin-bottom: 1em; 
-      color: #333;
-    }
+    h1 { margin: 0.5em; }
     img {
-      max-width: 200px; 
-      border-radius: 8px; 
+      max-width: 200px;
+      border-radius: 8px;
       margin-bottom: 1em;
     }
     button {
-      padding: 0.6em 1.2em; 
-      border: none; 
-      border-radius: 6px; 
-      font-size: 1em; 
-      background: #333; 
-      color: #fff; 
-      cursor: pointer; 
-      transition: background 0.3s;
+      margin: 0.5em;
+      padding: 0.6em 1.2em;
+      border: none;
+      border-radius: 6px;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
     }
-    button:hover {
-      background: #555;
-    }
+    button:hover { background: #555; }
   </style>
 </head>
 <body>
   <h1>AI4Pi</h1>
-  <!-- Placeholder cat image; replace src with your cat pic if you have a URL -->
-  <img src="https://placekitten.com/300/300" alt="Cute cat">
+  <!-- Replace with your cat image if you have a URL; this one is from Pixabay -->
+  <img src="https://cdn.pixabay.com/photo/2015/05/31/12/59/cat-791407_1280.jpg" alt="Cute Cat">
   
   <button onclick="loginWithPi()">Login</button>
+  <button onclick="goGuest()">Unregistered</button>
 
   <script>
-    /* Set this to true for Testnet (sandbox), or false for Production (Mainnet) */
+    // Change to false if you're ready for Mainnet (Production)
     const SANDBOX_MODE = true;
 
+    // Initialize Pi SDK
     window.onload = () => {
       Pi.init({ version: "2.0", sandbox: SANDBOX_MODE });
     };
 
+    // Login with Pi
     function loginWithPi() {
       Pi.authenticate(["username"], (auth) => {
         if (!auth.user) return alert("Login failed.");
@@ -70,6 +59,11 @@
       }, (err) => {
         alert("Login error: " + err);
       });
+    }
+
+    // Go to the guest page without logging in
+    function goGuest() {
+      window.location.href = "guest.html";
     }
   </script>
 </body>
