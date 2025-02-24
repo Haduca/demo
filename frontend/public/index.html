@@ -2,63 +2,73 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>AI4Pi Mini</title>
+  <title>AI4Pi Minimal Login</title>
+  <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
-    /* Simple rainbow background */
+    /* Soft pastel gradient */
     body {
       margin: 0; 
-      height: 100vh; 
+      min-height: 100vh; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
       justify-content: center;
-      background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
-      color: #fff; 
+      background: linear-gradient(135deg, #ffd6e8, #fce8cb, #d2f5cb, #cce6f6, #e5ccff);
+      background-size: 400% 400%;
+      animation: pastelShift 12s ease infinite;
       font-family: sans-serif;
     }
+    @keyframes pastelShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    h1 {
+      margin-bottom: 1em; 
+      color: #333;
+    }
+    img {
+      max-width: 200px; 
+      border-radius: 8px; 
+      margin-bottom: 1em;
+    }
     button {
-      margin: 0.5em; 
-      padding: 0.8em 1.2em; 
+      padding: 0.6em 1.2em; 
       border: none; 
       border-radius: 6px; 
-      cursor: pointer; 
       font-size: 1em; 
-      background: rgba(0,0,0,0.3);
-      color: #fff;
+      background: #333; 
+      color: #fff; 
+      cursor: pointer; 
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #555;
     }
   </style>
 </head>
 <body>
   <h1>AI4Pi</h1>
+  <!-- Placeholder cat image; replace src with your cat pic if you have a URL -->
+  <img src="https://placekitten.com/300/300" alt="Cute cat">
+  
   <button onclick="loginWithPi()">Login</button>
-  <button onclick="payWithPi()">Pay 3.14 Pi</button>
 
   <script>
-    // Set to 'true' if you're testing in Testnet (Pi Browser sandbox).
-    // Set to 'false' if you're in Production/Mainnet.
+    /* Set this to true for Testnet (sandbox), or false for Production (Mainnet) */
     const SANDBOX_MODE = true;
 
-    // Initialize Pi SDK
     window.onload = () => {
       Pi.init({ version: "2.0", sandbox: SANDBOX_MODE });
     };
 
-    // Login with Pi
     function loginWithPi() {
       Pi.authenticate(["username"], (auth) => {
-        if (!auth.user) return alert("Login failed");
+        if (!auth.user) return alert("Login failed.");
         alert("Welcome, " + auth.user.username);
       }, (err) => {
         alert("Login error: " + err);
-      });
-    }
-
-    // Pay 3.14 Pi
-    function payWithPi() {
-      Pi.createPayment({ amount: 3.14, memo: "AI4Pi" }, {
-        onSuccessfulPayment: (paymentId, txid) => alert("Payment success! TxID: " + txid),
-        onError: (err) => alert("Payment error: " + err),
       });
     }
   </script>
