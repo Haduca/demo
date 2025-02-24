@@ -2,24 +2,24 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>AI4Pi - Login</title>
+  <title>AI4Pi - Single Page</title>
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     body {
-      margin: 0; 
-      height: 100vh; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center;
-      background: linear-gradient(135deg, #e3fdfd, #ffe6fa);
+      margin: 0; padding: 2em;
       font-family: sans-serif;
+      background: #f9f7f1; /* soft pastel */
     }
-    h1 { margin: 0.5em; }
+    h1 { margin-bottom: 0.5em; }
     img {
-      max-width: 200px;
-      border-radius: 8px;
+      max-width: 200px; 
+      border-radius: 8px; 
+      display: block; 
+      margin: 0 auto 1em;
+    }
+    .buttons {
+      text-align: center;
       margin-bottom: 1em;
     }
     button {
@@ -31,19 +31,50 @@
       color: #fff;
       cursor: pointer;
     }
-    button:hover { background: #555; }
+    button:hover {
+      background: #555;
+    }
+    #guestSection {
+      display: none;
+      border: 1px solid #ccc;
+      padding: 1em;
+      margin-top: 1em;
+    }
+    #chatBox {
+      height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      margin-bottom: 0.5em;
+    }
+    #chatInput {
+      width: 80%;
+      padding: 0.4em;
+    }
   </style>
 </head>
 <body>
-  <h1>AI4Pi</h1>
-  <!-- Replace with your cat image if you have a URL; this one is from Pixabay -->
+  <h1 style="text-align:center;">AI4Pi</h1>
+  <!-- Public domain cat image (Pixabay) -->
   <img src="https://cdn.pixabay.com/photo/2015/05/31/12/59/cat-791407_1280.jpg" alt="Cute Cat">
   
-  <button onclick="loginWithPi()">Login</button>
-  <button onclick="goGuest()">Unregistered</button>
+  <div class="buttons">
+    <button onclick="loginWithPi()">Login</button>
+    <button onclick="toggleGuest()">Unregistered</button>
+  </div>
+
+  <!-- Guest Chat Section (hidden by default) -->
+  <div id="guestSection">
+    <h2>Guest Chat</h2>
+    <div id="chatBox">
+      <p><strong>AI4Pi Bot:</strong> Hello, guest! How can I help you?</p>
+    </div>
+    <input id="chatInput" type="text" placeholder="Type your message...">
+    <button onclick="sendGuestMessage()">Send</button>
+  </div>
 
   <script>
-    // Change to false if you're ready for Mainnet (Production)
+    // Switch to false if you're ready for Production (Mainnet)
     const SANDBOX_MODE = true;
 
     // Initialize Pi SDK
@@ -51,7 +82,7 @@
       Pi.init({ version: "2.0", sandbox: SANDBOX_MODE });
     };
 
-    // Login with Pi
+    // Pi Login
     function loginWithPi() {
       Pi.authenticate(["username"], (auth) => {
         if (!auth.user) return alert("Login failed.");
@@ -61,9 +92,31 @@
       });
     }
 
-    // Go to the guest page without logging in
-    function goGuest() {
-      window.location.href = "guest.html";
+    // Show/Hide Guest Chat
+    function toggleGuest() {
+      const guestSection = document.getElementById("guestSection");
+      guestSection.style.display = 
+        (guestSection.style.display === "none") ? "block" : "none";
+    }
+
+    // Simple placeholder chat for unregistered users
+    function sendGuestMessage() {
+      const input = document.getElementById("chatInput");
+      const chatBox = document.getElementById("chatBox");
+      if (!input.value.trim()) return;
+
+      // Display user message
+      const userMsg = document.createElement("p");
+      userMsg.innerHTML = "<strong>You:</strong> " + input.value;
+      chatBox.appendChild(userMsg);
+
+      // Placeholder AI response
+      const botMsg = document.createElement("p");
+      botMsg.innerHTML = "<strong>AI4Pi Bot:</strong> I'm just a placeholder, but I'm here to chat!";
+      chatBox.appendChild(botMsg);
+
+      input.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
   </script>
 </body>
