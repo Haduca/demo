@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AI4Pi - Guest Chat</title>
+  <style>
+    body {
+      margin: 0; 
+      padding: 2em; 
+      background: #fdfdfd; 
+      font-family: sans-serif;
+    }
+    h1 { margin-bottom: 1em; }
+    .chat-box {
+      border: 1px solid #ccc;
+      padding: 1em;
+      height: 300px;
+      overflow-y: auto;
+      margin-bottom: 1em;
+    }
+    .input-area {
+      display: flex;
+      gap: 0.5em;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 0.5em;
+    }
+    .input-area button {
+      padding: 0.5em 1em;
+      border: none;
+      border-radius: 4px;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Guest Chat</h1>
+  <p>Here you can try chatting with AI without logging in.</p>
+
+  <!-- Placeholder Chat UI (not a real AI backend yet) -->
+  <div class="chat-box" id="chatBox">
+    <p><strong>AI4Pi Bot:</strong> Hello, Guest! How can I help you today?</p>
+  </div>
+  <div class="input-area">
+    <input id="userInput" type="text" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    // Simple placeholder function (no real AI backend)
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chatBox = document.getElementById("chatBox");
+      if (!input.value.trim()) return;
+
+      // Display user message
+      const userMsg = document.createElement("p");
+      userMsg.innerHTML = "<strong>You:</strong> " + input.value;
+      chatBox.appendChild(userMsg);
+
+      // Placeholder AI response
+      const aiMsg = document.createElement("p");
+      aiMsg.innerHTML = "<strong>AI4Pi Bot:</strong> I'm just a placeholder for now.";
+      chatBox.appendChild(aiMsg);
+
+      input.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight; // auto-scroll
+    }
+  </script>
+</body>
+</html>
