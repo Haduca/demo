@@ -2,28 +2,32 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>AI4Pi - Single Page</title>
+  <title>AI4Pi All-in-One</title>
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     body {
-      margin: 0; padding: 2em;
+      margin: 0; 
+      padding: 1em; 
       font-family: sans-serif;
-      background: #f9f7f1; /* soft pastel */
+      background: #f8f3e7; /* Soft pastel */
     }
-    h1 { margin-bottom: 0.5em; }
-    img {
-      max-width: 200px; 
-      border-radius: 8px; 
-      display: block; 
-      margin: 0 auto 1em;
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 0.5em;
+    }
+    .ascii-cat {
+      text-align: center;
+      white-space: pre; /* preserve spacing in ASCII art */
+      font-family: monospace;
+      margin-bottom: 1em;
     }
     .buttons {
       text-align: center;
       margin-bottom: 1em;
     }
     button {
-      margin: 0.5em;
+      margin: 0.3em;
       padding: 0.6em 1.2em;
       border: none;
       border-radius: 6px;
@@ -34,47 +38,62 @@
     button:hover {
       background: #555;
     }
-    #guestSection {
-      display: none;
-      border: 1px solid #ccc;
-      padding: 1em;
-      margin-top: 1em;
+    /* Chat boxes */
+    .chat-section {
+      display: none; 
+      border: 1px solid #ccc; 
+      padding: 1em; 
+      margin: 1em 0;
     }
-    #chatBox {
-      height: 200px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      padding: 0.5em;
+    .chat-box {
+      height: 200px; 
+      overflow-y: auto; 
+      border: 1px solid #ccc; 
+      padding: 0.5em; 
       margin-bottom: 0.5em;
+      background: #fff;
     }
-    #chatInput {
-      width: 80%;
+    .chat-input {
+      width: 80%; 
       padding: 0.4em;
     }
   </style>
 </head>
 <body>
-  <h1 style="text-align:center;">AI4Pi</h1>
-  <!-- Public domain cat image (Pixabay) -->
-  <img src="https://cdn.pixabay.com/photo/2015/05/31/12/59/cat-791407_1280.jpg" alt="Cute Cat">
-  
+  <h1>AI4Pi 🐱</h1>
+  <div class="ascii-cat">
+    |\---/|<br>
+    | o_o |  Meow!<br>
+     \_^_/ 
+  </div>
   <div class="buttons">
     <button onclick="loginWithPi()">Login</button>
-    <button onclick="toggleGuest()">Unregistered</button>
+    <button onclick="toggleSection('guestSection')">Unregistered</button>
+    <button onclick="toggleSection('aiSection')">Generative AI</button>
   </div>
 
-  <!-- Guest Chat Section (hidden by default) -->
-  <div id="guestSection">
+  <!-- Unregistered Chat Section -->
+  <div id="guestSection" class="chat-section">
     <h2>Guest Chat</h2>
-    <div id="chatBox">
+    <div class="chat-box" id="guestChatBox">
       <p><strong>AI4Pi Bot:</strong> Hello, guest! How can I help you?</p>
     </div>
-    <input id="chatInput" type="text" placeholder="Type your message...">
+    <input id="guestInput" class="chat-input" type="text" placeholder="Type your message...">
     <button onclick="sendGuestMessage()">Send</button>
   </div>
 
+  <!-- Generative AI Section -->
+  <div id="aiSection" class="chat-section">
+    <h2>AI Chat</h2>
+    <div class="chat-box" id="aiChatBox">
+      <p><strong>AI4Pi Bot:</strong> Hi there! Ask me something, and I'll try to respond.</p>
+    </div>
+    <input id="aiInput" class="chat-input" type="text" placeholder="Ask the AI...">
+    <button onclick="sendAI()">Send</button>
+  </div>
+
   <script>
-    // Switch to false if you're ready for Production (Mainnet)
+    /* Switch to false if you’re on Production/Mainnet */
     const SANDBOX_MODE = true;
 
     // Initialize Pi SDK
@@ -84,36 +103,59 @@
 
     // Pi Login
     function loginWithPi() {
-      Pi.authenticate(["username"], (auth) => {
+      Pi.authenticate(["username"], auth => {
         if (!auth.user) return alert("Login failed.");
         alert("Welcome, " + auth.user.username);
-      }, (err) => {
+      }, err => {
         alert("Login error: " + err);
       });
     }
 
-    // Show/Hide Guest Chat
-    function toggleGuest() {
-      const guestSection = document.getElementById("guestSection");
-      guestSection.style.display = 
-        (guestSection.style.display === "none") ? "block" : "none";
+    // Show/Hide sections
+    function toggleSection(id) {
+      const section = document.getElementById(id);
+      // Hide if open, show if closed
+      section.style.display = (section.style.display === "none") ? "block" : "none";
     }
 
-    // Simple placeholder chat for unregistered users
+    // Simple placeholder unregistered chat
     function sendGuestMessage() {
-      const input = document.getElementById("chatInput");
-      const chatBox = document.getElementById("chatBox");
+      const input = document.getElementById("guestInput");
+      const chatBox = document.getElementById("guestChatBox");
       if (!input.value.trim()) return;
 
-      // Display user message
       const userMsg = document.createElement("p");
       userMsg.innerHTML = "<strong>You:</strong> " + input.value;
       chatBox.appendChild(userMsg);
 
-      // Placeholder AI response
       const botMsg = document.createElement("p");
-      botMsg.innerHTML = "<strong>AI4Pi Bot:</strong> I'm just a placeholder, but I'm here to chat!";
+      botMsg.innerHTML = "<strong>AI4Pi Bot:</strong> I'm just a placeholder in guest mode!";
       chatBox.appendChild(botMsg);
+
+      input.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Very basic "AI" placeholder
+    async function sendAI() {
+      const input = document.getElementById("aiInput");
+      const chatBox = document.getElementById("aiChatBox");
+      if (!input.value.trim()) return;
+
+      // Show user's question
+      const userMsg = document.createElement("p");
+      userMsg.innerHTML = "<strong>You:</strong> " + input.value;
+      chatBox.appendChild(userMsg);
+
+      // === Replace this with your real AI endpoint / logic ===
+      // For demonstration, we just create a fake "generative" response.
+      const placeholderResponse = "I'm a placeholder AI. I'd say something clever if I had a real LLM API.";
+      // =======================================================
+
+      // Show AI response
+      const aiMsg = document.createElement("p");
+      aiMsg.innerHTML = "<strong>AI4Pi Bot:</strong> " + placeholderResponse;
+      chatBox.appendChild(aiMsg);
 
       input.value = "";
       chatBox.scrollTop = chatBox.scrollHeight;
