@@ -1,73 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AI4Pi React App</title>
+<head>
+  <meta charset="UTF-8" />
+  <title>AI4Pi Minimal</title>
+  <!-- Pi Network SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
+<body>
+  <h1>Welcome to AI4Pi</h1>
+  <button onclick="loginWithPi()">Login with Pi</button>
+  <button onclick="payWithPi()">Pay 3.14 Pi</button>
 
-    <!-- Pi Network SDK -->
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script>
+    // Change sandbox to 'true' if you're testing in the Pi Browser on Testnet.
+    // Change sandbox to 'false' if you're ready for Production/Mainnet.
+    window.onload = function() {
+      Pi.init({ version: "2.0", sandbox: true });
+    };
 
-    <script>
-      // Initialize Pi SDK when the page loads
-      window.onload = function() {
-        // For testing on the Pi Testnet, set sandbox: true
-        // If you are ready for Mainnet, set sandbox: false
-        Pi.init({ version: "2.0", sandbox: true });
+    // Pi Login
+    function loginWithPi() {
+      Pi.authenticate(["username"], function(authData) {
+        if (!authData.user) {
+          alert("Login failed. No user data returned.");
+          return;
+        }
+        alert("Welcome, " + authData.user.username);
+      }, function(error) {
+        console.error("Authentication error:", error);
+        alert("Login failed. Please try again.");
+      });
+    }
+
+    // Pi Payment
+    function payWithPi() {
+      const payment = {
+        amount: 3.14,
+        memo: "AI4Pi Test Payment",
+        metadata: { testKey: "testValue" }
       };
 
-      // Simple Pi Authentication
-      function loginWithPi() {
-        Pi.authenticate(["username"], function(authData) {
-          if (!authData.user) {
-            alert("Login failed. No user data returned.");
-            return;
-          }
-          alert("Welcome, " + authData.user.username);
-        }, function(error) {
-          console.error("Authentication error:", error);
-          alert("Login failed. Please try again.");
-        });
-      }
-
-      // Simple Pi Payment
-      function payWithPi() {
-        const payment = {
-          amount: 3.14,                // How much Pi to pay
-          memo: "AI4Pi Test Payment",  // Note for the payment
-          metadata: { testKey: "testValue" } // Additional info
-        };
-
-        Pi.createPayment(payment, {
-          onReadyForServerApproval: function(paymentId) {
-            console.log("Payment ID for server approval:", paymentId);
-          },
-          onReadyForServerCompletion: function(paymentId, txid) {
-            console.log("Payment ready for completion:", paymentId, txid);
-          },
-          onSuccessfulPayment: function(paymentId, txid) {
-            console.log("Payment successful:", paymentId, txid);
-            alert("Payment successful! TxID: " + txid);
-          },
-          onError: function(error, payment) {
-            console.error("Payment error:", error);
-            alert("Payment error: " + error);
-          },
-          onPaymentCancel: function(paymentId) {
-            console.log("Payment cancelled:", paymentId);
-          }
-        });
-      }
-    </script>
-  </head>
-  <body>
-    <h1 style="text-align: center;">Welcome to AI4Pi</h1>
-    <div style="text-align: center;">
-      <button onclick="loginWithPi()">Login with Pi</button>
-      <button onclick="payWithPi()">Pay 3.14 Pi</button>
-    </div>
-
-    <!-- React Root - Optional if you want to build a React App later -->
-    <div id="root"></div>
-  </body>
+      Pi.createPayment(payment, {
+        onReadyForServerApproval: function(paymentId) {
+          console.log("Payment ID for server approval:", paymentId);
+        },
+        onReadyForServerCompletion: function(paymentId, txid) {
+          console.log("Payment ready for completion:", paymentId, txid);
+        },
+        onSuccessfulPayment: function(paymentId, txid) {
+          console.log("Payment successful:", paymentId, txid);
+          alert("Payment successful! TxID: " + txid);
+        },
+        onError: function(error, payment) {
+          console.error("Payment error:", error);
+          alert("Payment error: " + error);
+        },
+        onPaymentCancel: function(paymentId) {
+          console.log("Payment cancelled:", paymentId);
+        }
+      });
+    }
+  </script>
+</body>
 </html>
