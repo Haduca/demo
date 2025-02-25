@@ -4,44 +4,42 @@
     <style>
         body { font-family: sans-serif; text-align: center; background: #f0f0f0; }
         .c { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: auto; }
-        .b { border: 2px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; display: flex; flex-direction: column; }
-        .messages { flex-grow: 1; overflow-y: auto; }
-        input, button { margin-top: 5px; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background: #333; color: white; cursor: pointer; } button:hover { background: #555; }
+        .wall { border: 2px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; display: flex; flex-direction: column-reverse; }
+        .messages { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column-reverse; }
         .text-box { display: flex; margin-top: 5px; }
-        input { flex-grow: 1; }
+        input { flex-grow: 1; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 5px; border-radius: 5px; border: 1px solid #ccc; background: #333; color: white; cursor: pointer; } 
+        button:hover { background: #555; }
     </style>
 </head>
 <body>
     <h2 id="t"></h2>
     <h3>💰 Pi: <span id="p">0.000000</span> (Drip: 0.002000/10s)</h3>
     <div class="c">
-        <div class="b">
+        <div class="wall">
             <b>AI</b>
             <div class="messages" id="ai"></div>
             <div class="text-box">
                 <input id="aiI"><button onclick="s('ai')">Send</button>
             </div>
         </div>
-        <div class="b">
+        <div class="wall">
             <b>Motivation</b>
             <div class="messages" id="mo"></div>
             <div class="text-box">
                 <input id="moI"><button onclick="s('mo')">Submit</button>
             </div>
         </div>
-        <div class="b">
+        <div class="wall">
             <b>Solutions</b>
             <div class="messages" id="so"></div>
             <div class="text-box">
                 <input id="soI"><button onclick="s('so')">Submit</button>
             </div>
         </div>
-        <div class="b">
+        <div class="wall">
             <b>Math</b>
-            <div id="ma">
-                Solve: <span id="mQ">0+0</span>
-            </div>
+            <div id="mQ">Solve: <span>0+0</span></div>
             <div class="messages" id="ma"></div>
             <div class="text-box">
                 <input id="maI"><button onclick="s('ma')">Submit</button>
@@ -49,14 +47,13 @@
         </div>
     </div>
     <script>
-        const $ = id => document.getElementById(id), b = ["ai", "mo", "so", "ma"];
+        const $ = id => document.getElementById(id), walls = ["ai", "mo", "so", "ma"];
         setInterval(() => $("t").innerText = new Date().toLocaleTimeString(), 1000);
         let p = 0; setInterval(() => $("p").innerText = (p += .002).toFixed(6), 10000);
 
         function s(wallId) {
-            let wall = $(wallId);
+            let messages = $(wallId);
             let input = $(wallId + "I");
-            let messages = wall.querySelector(".messages");
             let newText = `<p><b>You:</b> ${input.value}</p>`;
 
             // Add new text at the top
@@ -72,9 +69,8 @@
         }
 
         setInterval(() => {
-            let wallId = b[Math.random() * 4 | 0];
-            let wall = $(wallId);
-            let messages = wall.querySelector(".messages");
+            let wallId = walls[Math.random() * 4 | 0];
+            let messages = $(wallId);
             let newText = `<p><b>${wallId.toUpperCase()}:</b> ${Math.random().toString(36).slice(2, 5).toUpperCase()}</p>`;
 
             // Add AI-generated text at the top
