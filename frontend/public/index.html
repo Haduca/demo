@@ -108,6 +108,16 @@ const generateMathProblem = () => {
 };
 setInterval(generateMathProblem, 10000);
 
+// Bots Respond to Each Other
+setInterval(() => {
+  let chatBox = document.getElementById("chatBox");
+  let responses = ["Interesting!", "Tell me more!", "That sounds fun!"];
+  if (chatBox.innerHTML.includes("AI4Pi Bot:")) {
+    let response = responses[Math.floor(Math.random() * responses.length)];
+    chatBox.innerHTML += `<p><strong>Motivation Bot:</strong> ${response}</p>`;
+  }
+}, 9000);
+
 document.getElementById("submitMath").onclick = () => {
   const input = document.getElementById("mathInput"), answer = parseInt(input.value.trim());
   if (answer === currentAnswer) {
