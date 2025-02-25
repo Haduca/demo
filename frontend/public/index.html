@@ -58,9 +58,9 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            /* Reverse the order of messages to show newest on top */
-            flex-direction: column-reverse;
+            /* Reverse the order to ensure new messages appear at the bottom */
             height: 180px;
+            margin-bottom: 10px;
         }
 
         .bot-name {
@@ -138,14 +138,6 @@
         }
         setInterval(updateClock, 1000);
 
-        // Bot List
-        const bots = [
-            { name: "AI4Pi Bot", wallId: "chatWall", balanceId: "aiPiBalance" },
-            { name: "Motivation Bot", wallId: "motivationWall", balanceId: "motivationPiBalance" },
-            { name: "Pi Solutions Bot", wallId: "feedbackWall", balanceId: "feedbackPiBalance" },
-            { name: "Math Bot", wallId: "mathWall", balanceId: "mathPiBalance" }
-        ];
-
         // Pi Drip Mechanism
         let piBalance = 0.000000, dripRate = 0.002000;
         setInterval(() => {
@@ -153,31 +145,7 @@
             document.getElementById("piBalance").innerText = piBalance.toFixed(6);
         }, 10000);
 
-        // Function to Send Random Single Character Response on a Different Wall
-        function sendBotMessage(bot) {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            const randomChar = chars[Math.floor(Math.random() * chars.length)];
-
-            // Select a random wall that is not its own
-            let availableWalls = bots.filter(b => b.wallId !== bot.wallId);
-            let targetBot = availableWalls[Math.floor(Math.random() * availableWalls.length)];
-
-            document.getElementById(targetBot.wallId).querySelector(".message-container").innerHTML += `<p><b>${bot.name}:</b> ${randomChar}</p>`;
-
-            // Scroll to show newest message
-            let messageContainer = document.getElementById(targetBot.wallId).querySelector(".message-container");
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
-
-        // Random Bot Response Every 1 Second
-        function randomBotResponse() {
-            const bot = bots[Math.floor(Math.random() * bots.length)];
-            sendBotMessage(bot);
-        }
-
-        setInterval(randomBotResponse, 1000); // 1 second response
-
-        // User Messages
+        // Send User Messages
         function sendAiPiMessage() {
             const message = document.getElementById("aiPiInput").value;
             document.getElementById("aiPiMessages").innerHTML = `<p><b>You:</b> ${message}</p>` + document.getElementById("aiPiMessages").innerHTML;
@@ -206,6 +174,18 @@
             document.getElementById("mathMessages").scrollTop = document.getElementById("mathMessages").scrollHeight;
         }
 
+        // Random Bot Responses
+        function randomBotResponse() {
+            const botNames = ["AI4Pi Bot", "Motivation Bot", "Pi Solutions Bot", "Math Bot"];
+            const randomBot = botNames[Math.floor(Math.random() * botNames.length)];
+
+            let randomMessage = Math.random().toString(36).substring(7).toUpperCase();
+            const messageHTML = `<p><b>${randomBot}:</b> ${randomMessage}</p>`;
+            const randomWall = randomBot === "AI4Pi Bot" ? "aiPiMessages" : randomBot === "Motivation Bot" ? "motivationMessages" : randomBot === "Pi Solutions Bot" ? "feedbackMessages" : "mathMessages";
+
+            document.getElementById(randomWall).innerHTML = messageHTML + document.getElementById(randomWall).innerHTML;
+        }
+        setInterval(randomBotResponse, 1000); // Bot responds every second
     </script>
 </body>
 </html>
