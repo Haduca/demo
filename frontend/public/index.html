@@ -1,32 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>AI4Pi Bot Network</title>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
-  body { display:grid; grid-template-rows:auto auto 1fr; height:100vh; padding:1em; gap:.5em; background:#f4f4f4; }
-  .clock { text-align:center; font-size:1.4em; font-weight:bold; padding:.5em; color:#333; transition: 0.3s ease-in-out; }
-  .grid { display:grid; grid-template-columns:repeat(2, 1fr); grid-template-rows:repeat(2, 1fr); gap:.5em; height:100%; }
-  .container { display:flex; flex-direction:column; padding:1em; border:5px solid; background:#fff; border-radius:8px; flex-grow:1; justify-content:space-between; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);}
-  .activeBot { border: 5px solid #ff6347; }
-  .box { flex-grow:1; overflow-y:auto; padding:.5em; font-size:small; background:#fff; border-radius:4px; }
-  h4 { margin-bottom:.5em; text-align:center; font-size:1.2em; }
-  button { margin:.3em 0; padding:.5em; border:none; background:#333; color:#fff; cursor:pointer; border-radius:4px; }
-  button:hover { background:#555; }
-  input { width:100%; padding:.3em; margin-top:.5em; }
-  .rainbow:nth-child(1) { border-image: linear-gradient(45deg, #FF4D4D, #FFAA00, #FFDC00) 1; }
-  .rainbow:nth-child(2) { border-image: linear-gradient(45deg, #FFAA00, #FFD700, #66CC66) 1; }
-  .rainbow:nth-child(3) { border-image: linear-gradient(45deg, #66CC66, #00AEEF, #0033CC) 1; }
-  .rainbow:nth-child(4) { border-image: linear-gradient(45deg, #6699FF, #0033CC, #8A2BE2) 1; }
-  #coinDrip { text-align:center; padding:0.5em; font-size:1.2em; font-weight:bold; color:#DAA520; }
-  .sparkle { color:#ff0000; font-size:1.5em; text-shadow:0 0 10px #ffcc00, 0 0 20px #ffcc00; }
-  .botName { font-size:1.1em; font-weight:bold; text-align:center; }
-  .botBalance { font-size:1em; text-align:center; color:#000; }
-</style>
+  <meta charset="UTF-8">
+  <title>AI4Pi Bot Network</title>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
+    body { display:grid; grid-template-rows:auto auto 1fr; height:100vh; padding:1em; gap:.5em; background:#f4f4f4; }
+    .clock { text-align:center; font-size:1.4em; font-weight:bold; padding:.5em; color:#333; transition: 0.3s ease-in-out; }
+    .grid { display:grid; grid-template-columns:repeat(2, 1fr); grid-template-rows:repeat(2, 1fr); gap:.5em; height:100%; }
+    .container { display:flex; flex-direction:column; padding:1em; border:5px solid; background:#fff; border-radius:8px; flex-grow:1; justify-content:space-between; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);}
+    .activeBot { border: 5px solid #ff6347; }
+    .box { flex-grow:1; overflow-y:auto; padding:.5em; font-size:small; background:#fff; border-radius:4px; line-height:1.3;}
+    h4 { margin-bottom:.5em; text-align:center; font-size:1.2em; font-weight:bold; }
+    button { margin:.3em 0; padding:.5em; border:none; background:#333; color:#fff; cursor:pointer; border-radius:4px; }
+    button:hover { background:#555; }
+    input { width:100%; padding:.3em; margin-top:.5em; }
+    .rainbow:nth-child(1) { border-image: linear-gradient(45deg, #FF4D4D, #FFAA00, #FFDC00) 1; }
+    .rainbow:nth-child(2) { border-image: linear-gradient(45deg, #FFAA00, #FFD700, #66CC66) 1; }
+    .rainbow:nth-child(3) { border-image: linear-gradient(45deg, #66CC66, #00AEEF, #0033CC) 1; }
+    .rainbow:nth-child(4) { border-image: linear-gradient(45deg, #6699FF, #0033CC, #8A2BE2) 1; }
+    #coinDrip { text-align:center; padding:0.5em; font-size:1.2em; font-weight:bold; color:#DAA520; }
+    .sparkle { color:#ff0000; font-size:1.5em; text-shadow:0 0 10px #ffcc00, 0 0 20px #ffcc00; }
+    .botName { font-size:1.1em; font-weight:bold; text-align:center; margin-top:.5em; }
+    .botBalance { font-size:.9em; text-align:center; color:#000; margin-top:10px; }
+    .controlBtns { position:absolute; top:10px; left:10px; display:flex; flex-direction:column; }
+    .controlBtns button { padding:0.5em; margin:.2em; font-size:.8em; }
+  </style>
 </head>
 <body>
+
+<!-- Control Buttons -->
+<div class="controlBtns">
+  <button id="loginBtn">Login with Pi</button>
+  <button id="payBtn">Pay 3.14 Pi</button>
+</div>
 
 <!-- Clock Display -->
 <div class="clock" id="clock">Loading time...</div>
@@ -73,44 +81,44 @@
 </div>
 
 <script>
-let piBalance = 0.000000, dripRate = 0.002000;
-let bots = [
-  { name: "AI4Pi Bot", balance: 0.000000, wallId: "chatBox", elementId: "aiPiBalance" },
-  { name: "Motivation Bot", balance: 0.000000, wallId: "gratitudeBox", elementId: "motivationPiBalance" },
-  { name: "Pi Solutions Bot", balance: 0.000000, wallId: "feedbackBox", elementId: "feedbackPiBalance" },
-  { name: "Math Bot", balance: 0.000000, wallId: "mathBox", elementId: "mathPiBalance" }
-];
+  let piBalance = 0.000000, dripRate = 0.002000;
+  let bots = [
+    { name: "AI4Pi Bot", balance: 0.000000, wallId: "chatBox", elementId: "aiPiBalance" },
+    { name: "Motivation Bot", balance: 0.000000, wallId: "gratitudeBox", elementId: "motivationPiBalance" },
+    { name: "Pi Solutions Bot", balance: 0.000000, wallId: "feedbackBox", elementId: "feedbackPiBalance" },
+    { name: "Math Bot", balance: 0.000000, wallId: "mathBox", elementId: "mathPiBalance" }
+  ];
 
-// Update Clock
-setInterval(() => {
-  document.getElementById("clock").innerText = new Date().toLocaleTimeString();
-}, 1000);
+  // Update Clock
+  setInterval(() => {
+    document.getElementById("clock").innerText = new Date().toLocaleTimeString();
+  }, 1000);
 
-// Pi Drip Mechanism
-setInterval(() => {
-  piBalance += dripRate;
-  document.getElementById("piBalance").innerText = piBalance.toFixed(6);
-  let activeBot = bots[Math.floor(Math.random() * bots.length)];
-  activeBot.balance += dripRate / bots.length;
-  document.getElementById(activeBot.elementId).innerText = activeBot.balance.toFixed(6);
-}, 10000);
+  // Pi Drip Mechanism
+  setInterval(() => {
+    piBalance += dripRate;
+    document.getElementById("piBalance").innerText = piBalance.toFixed(6);
+    let activeBot = bots[Math.floor(Math.random() * bots.length)];
+    activeBot.balance += dripRate / bots.length;
+    document.getElementById(activeBot.elementId).innerText = activeBot.balance.toFixed(6);
+  }, 10000);
 
-// Bots Respond to Each Other & Rotate
-setInterval(() => {
-  let activeBot = bots[Math.floor(Math.random() * bots.length)];
-  let targetBot = bots.filter(b => b.name !== activeBot.name)[Math.floor(Math.random() * (bots.length - 1))];
+  // Bots Interact with Each Other & Users
+  setInterval(() => {
+    let activeBot = bots[Math.floor(Math.random() * bots.length)];
+    let targetBot = bots.filter(b => b.name !== activeBot.name)[Math.floor(Math.random() * (bots.length - 1))];
+    
+    document.getElementById(activeBot.wallId).innerHTML += `<p>${activeBot.name}: "What do you think, ${targetBot.name}?"</p>`;
+    setTimeout(() => {
+      document.getElementById(targetBot.wallId).innerHTML += `<p>${targetBot.name}: "I think that's a great point, ${activeBot.name}!"</p>`;
+    }, 2000);
+  }, Math.floor(Math.random() * (15000 - 8000) + 8000));
 
-  document.getElementById(activeBot.wallId).innerHTML += `<p>${activeBot.name}: "What do you think, ${targetBot.name}?"</p>`;
-  setTimeout(() => {
-    document.getElementById(targetBot.wallId).innerHTML += `<p>${targetBot.name}: "I think that's a great point, ${activeBot.name}!"</p>`;
-  }, 2000);
-}, Math.floor(Math.random() * (15000 - 8000) + 8000));
-
-// Math Bot Problem Generator
-setInterval(() => {
-  let num1 = Math.floor(Math.random() * 10) + 1, num2 = Math.floor(Math.random() * 10) + 1;
-  document.getElementById("mathProblem").innerText = `${num1} + ${num2}`;
-}, 10000);
+  // Math Bot Problem Generator
+  setInterval(() => {
+    let num1 = Math.floor(Math.random() * 10) + 1, num2 = Math.floor(Math.random() * 10) + 1;
+    document.getElementById("mathProblem").innerText = `${num1} + ${num2}`;
+  }, 10000);
 </script>
 
 </body>
