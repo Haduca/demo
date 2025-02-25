@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI4Pi Chat</title>
     <style>
-        /* Layout Fix for Equal Chat Sections */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -51,6 +50,15 @@
             border-radius: 10px;
             height: 250px;
             overflow-y: auto;
+            position: relative;
+        }
+
+        .message-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            height: 180px; /* Fixed height */
         }
 
         .bot-name {
@@ -93,28 +101,28 @@
     <div class="chat-container">
         <div class="chat-box" id="chatWall">
             <div class="bot-name">AI4Pi Bot (Pi: <span id="aiPiBalance">0.000000</span>)</div>
-            <div id="aiPiMessages"></div>
+            <div class="message-container" id="aiPiMessages"></div>
             <input type="text" id="aiPiInput" placeholder="Say something..." />
             <button onclick="sendAiPiMessage()">Send</button>
         </div>
 
         <div class="chat-box" id="motivationWall">
             <div class="bot-name">Motivation Bot (Pi: <span id="motivationPiBalance">0.000000</span>)</div>
-            <div id="motivationMessages"></div>
+            <div class="message-container" id="motivationMessages"></div>
             <input type="text" id="motivationInput" placeholder="What are you thankful for?" />
             <button onclick="sendMotivationMessage()">Submit</button>
         </div>
 
         <div class="chat-box" id="feedbackWall">
             <div class="bot-name">Pi Solutions Bot (Pi: <span id="feedbackPiBalance">0.000000</span>)</div>
-            <div id="feedbackMessages"></div>
+            <div class="message-container" id="feedbackMessages"></div>
             <input type="text" id="feedbackInput" placeholder="Share your thoughts..." />
             <button onclick="sendFeedbackMessage()">Submit</button>
         </div>
 
         <div class="chat-box" id="mathWall">
             <div class="bot-name">Math Bot (Pi: <span id="mathPiBalance">0.000000</span>)</div>
-            <div id="mathMessages">Solve: <span id="mathProblem">0 + 0</span></div>
+            <div class="message-container" id="mathMessages">Solve: <span id="mathProblem">0 + 0</span></div>
             <input type="text" id="mathInput" placeholder="Answer..." />
             <button onclick="sendMathMessage()">Submit</button>
         </div>
@@ -148,41 +156,47 @@
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             const randomChar = chars[Math.floor(Math.random() * chars.length)];
             document.getElementById(bot.wallId).innerHTML += `<p><b>${bot.name}:</b> ${randomChar}</p>`;
+
+            // Keep newest text in view
+            let messageContainer = document.getElementById(bot.wallId).querySelector(".message-container");
+            messageContainer.scrollTop = messageContainer.scrollHeight;
         }
 
-        // Random Number Generator Function for Bot Response
+        // Random Bot Response Every 1 Second
         function randomBotResponse() {
             const bot = bots[Math.floor(Math.random() * bots.length)];
-            const wall = Math.floor(Math.random() * bots.length);
-            sendBotMessage(bots[wall]);
+            sendBotMessage(bot);
         }
 
-        // Call randomBotResponse every second
         setInterval(randomBotResponse, 1000); // 1 second response
 
-        // Sending User Messages
+        // User Messages
         function sendAiPiMessage() {
             const message = document.getElementById("aiPiInput").value;
-            document.getElementById("chatWall").innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById("aiPiMessages").innerHTML += `<p><b>You:</b> ${message}</p>`;
             document.getElementById("aiPiInput").value = "";
+            document.getElementById("aiPiMessages").scrollTop = document.getElementById("aiPiMessages").scrollHeight;
         }
 
         function sendMotivationMessage() {
             const message = document.getElementById("motivationInput").value;
-            document.getElementById("motivationWall").innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById("motivationMessages").innerHTML += `<p><b>You:</b> ${message}</p>`;
             document.getElementById("motivationInput").value = "";
+            document.getElementById("motivationMessages").scrollTop = document.getElementById("motivationMessages").scrollHeight;
         }
 
         function sendFeedbackMessage() {
             const message = document.getElementById("feedbackInput").value;
-            document.getElementById("feedbackWall").innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById("feedbackMessages").innerHTML += `<p><b>You:</b> ${message}</p>`;
             document.getElementById("feedbackInput").value = "";
+            document.getElementById("feedbackMessages").scrollTop = document.getElementById("feedbackMessages").scrollHeight;
         }
 
         function sendMathMessage() {
             const message = document.getElementById("mathInput").value;
-            document.getElementById("mathWall").innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById("mathMessages").innerHTML += `<p><b>You:</b> ${message}</p>`;
             document.getElementById("mathInput").value = "";
+            document.getElementById("mathMessages").scrollTop = document.getElementById("mathMessages").scrollHeight;
         }
 
     </script>
