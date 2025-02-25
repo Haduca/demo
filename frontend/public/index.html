@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI4Pi</title>
+<title>AI4Pi Bot Network</title>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
@@ -70,7 +70,7 @@
 
 <script>
 const SANDBOX=true, dripRate=0.01, mathBonus=0.05;
-let user=null, piBalance=0, currentAnswer=0, lastWinner=null, lastBotPost="";
+let user=null, piBalance=0, currentAnswer=0, lastWinner=null, lastBotPost="", botsQueue = [];
 
 onload=()=>Pi.init({ version:"2.0", sandbox:SANDBOX });
 
@@ -99,7 +99,7 @@ document.getElementById("sendPi").onclick = () => {
     onPaymentCancel:p=>alert(`Transaction cancelled.`) });
 };
 
-// Bots Rotate Between Walls
+// Bots Rotate Between Walls and Ask Questions
 const botMessages = [
   { bot: "AI4Pi Bot", messages: ["What's your favorite color?", "What is your dream job?"], wall: "chatBox" },
   { bot: "Motivation Bot", messages: ["Stay positive!", "Your only limit is your mind."], wall: "gratitudeBox" },
