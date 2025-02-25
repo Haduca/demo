@@ -5,44 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI4Pi - Bot Network</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f0f0f0; }
+        body { font-family: sans-serif; text-align: center; background: black; color: white; }
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
-        .wall { border: 2px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; display: flex; flex-direction: column-reverse; }
-        .messages { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column-reverse; }
+        
+        /* Walls */
+        .wall { border-radius: 8px; padding: 10px; height: 200px; overflow-y: auto; display: flex; flex-direction: column-reverse; background: black; border: 2px solid white; }
+
+        /* Text Box */
         .text-box { display: flex; margin-top: 5px; }
-        input { flex-grow: 1; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
-        button { padding: 5px; border-radius: 5px; border: 1px solid #ccc; background: #333; color: white; cursor: pointer; }
-        button:hover { background: #555; }
+        input { flex-grow: 1; padding: 5px; border-radius: 5px; border: 1px solid white; background: black; color: white; }
+        button { padding: 5px; border-radius: 5px; border: 1px solid white; background: white; color: black; cursor: pointer; }
+        button:hover { background: grey; }
+
+        /* Top Buttons */
         .top-buttons { margin-bottom: 10px; }
     </style>
-    <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Check if a backup version exists in localStorage
-    if (!localStorage.getItem("backupIndex")) {
-        localStorage.setItem("backupIndex", document.documentElement.innerHTML);
-    }
-});
-
-// Function to trigger a rollback manually
-function rollbackVersion() {
-    let backup = localStorage.getItem("backupIndex");
-    if (backup) {
-        document.open();
-        document.write(backup);
-        document.close();
-        alert("🔄 Rollback Successful: The last working version has been restored.");
-    } else {
-        alert("⚠️ No backup found. Cannot rollback.");
-    }
-}
-
-// Auto-Rollback if a failure is detected
-window.onerror = function () {
-    alert("⚠️ Error Detected! Rolling back to the last working version...");
-    rollbackVersion();
-};
-</script>
-
 </head>
 <body>
 
@@ -56,30 +33,30 @@ window.onerror = function () {
     </div>
 
     <div class="container">
-        <div class="wall">
+        <div class="wall" id="ai">
             <b>AI</b>
-            <div class="messages" id="ai"></div>
+            <div class="messages"></div>
             <div class="text-box">
                 <input id="aiI"><button onclick="sendMessage('ai')">Send</button>
             </div>
         </div>
-        <div class="wall">
+        <div class="wall" id="mo">
             <b>Motivation</b>
-            <div class="messages" id="mo"></div>
+            <div class="messages"></div>
             <div class="text-box">
                 <input id="moI"><button onclick="sendMessage('mo')">Submit</button>
             </div>
         </div>
-        <div class="wall">
+        <div class="wall" id="so">
             <b>Solutions</b>
-            <div class="messages" id="so"></div>
+            <div class="messages"></div>
             <div class="text-box">
                 <input id="soI"><button onclick="sendMessage('so')">Submit</button>
             </div>
         </div>
-        <div class="wall">
+        <div class="wall" id="ma">
             <b>Math</b>
-            <div class="messages" id="ma"></div>
+            <div class="messages"></div>
             <div class="text-box">
                 <input id="maI"><button onclick="sendMessage('ma')">Submit</button>
             </div>
@@ -102,7 +79,7 @@ window.onerror = function () {
 
         // Send messages & remove oldest text when limit is reached
         function sendMessage(wallId) {
-            let messages = $(wallId);
+            let messages = $("#" + wallId).querySelector(".messages");
             let input = $(wallId + "I");
             let newText = `<p><b>You:</b> ${input.value}</p>`;
 
@@ -118,7 +95,7 @@ window.onerror = function () {
         // Bot AI Responses (Each wall gets periodic bot interactions)
         setInterval(() => {
             let wallId = walls[Math.random() * walls.length | 0];
-            let messages = $(wallId);
+            let messages = $("#" + wallId).querySelector(".messages");
             let botResponse = `<p><b>${wallId.toUpperCase()} Bot:</b> ${generateBotResponse()}</p>`;
 
             messages.insertAdjacentHTML("afterbegin", botResponse);
@@ -151,7 +128,7 @@ window.onerror = function () {
         function piAction() {
             alert("🔄 Testnet Pi Interaction simulated!");
         }
-<button onclick="rollbackVersion()">🔄 Rollback to Last Working Version</button>
+    </script>
 
-    </body>
+</body>
 </html>
