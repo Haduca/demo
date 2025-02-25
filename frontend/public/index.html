@@ -16,6 +16,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             overflow-y: scroll;
             max-height: 200px;
+            border: 2px solid transparent;
         }
 
         .bot-wall input {
@@ -41,18 +42,17 @@
             font-weight: bold;
         }
 
+        .highlight-border {
+            border: 5px solid gold;
+            box-shadow: 0 0 10px rgba(255, 223, 0, 0.8);
+        }
+
         .button {
             margin-top: 10px;
             padding: 10px;
             font-size: 1em;
             border-radius: 5px;
             cursor: pointer;
-        }
-
-        /* Border Color Animation for Drip Highlight */
-        .highlight-border {
-            border: 5px solid gold;
-            box-shadow: 0 0 10px rgba(255, 223, 0, 0.8);
         }
     </style>
 </head>
@@ -106,10 +106,10 @@
         let botInterval = null;
 
         const bots = [
-            { name: 'AI4Pi Bot', balance: 0, messages: ['What is your dream job?'], wall: 'aiPiMessages' },
-            { name: 'Motivation Bot', balance: 0, messages: ['What is your favorite color?'], wall: 'motivationMessages' },
-            { name: 'Pi Solutions Bot', balance: 0, messages: ['What is your favorite thing about Pi?'], wall: 'feedbackMessages' },
-            { name: 'Math Bot', balance: 0, messages: ['Solve 8 + 3'], wall: 'mathMessages' }
+            { name: 'AI4Pi Bot', balance: 0, messages: ['What is your dream job?', 'What is your favorite color?'], wall: 'aiPiMessages' },
+            { name: 'Motivation Bot', balance: 0, messages: ['What is your favorite color?', 'How are you feeling today?'], wall: 'motivationMessages' },
+            { name: 'Pi Solutions Bot', balance: 0, messages: ['What is your favorite thing about Pi?', 'How do you use Pi in your daily life?'], wall: 'feedbackMessages' },
+            { name: 'Math Bot', balance: 0, messages: ['Solve 8 + 3', 'Solve 12 - 4'], wall: 'mathMessages' }
         ];
 
         // Randomly send bot messages at intervals
