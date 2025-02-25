@@ -1,89 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi Chat</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; display: flex; flex-direction: column; align-items: center; }
-        #clock, #coinDrip { font-size: 1.2em; color: #555; margin-top: 10px; }
-        #coinDrip { color: #DAA520; font-weight: bold; }
-        .chat-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 90%; max-width: 1200px; margin-top: 10px; }
-        .chat-box { display: flex; flex-direction: column; border: 2px solid #ccc; padding: 5px; height: 250px; overflow-y: auto; }
-        .message-container { flex-grow: 1; overflow-y: auto; font-size: 0.9em; }
-        .bot-name { font-weight: bold; text-align: center; font-size: 1em; }
-        input, button { padding: 5px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background: #333; color: white; cursor: pointer; }
-        button:hover { background: #555; }
-    </style>
-</head>
-<body>
-    <div id="clock"></div>
-    <div id="coinDrip">💰 Pi Earnings: <span id="piBalance">0.000000</span> Pi (Drip: <span id="dripRate">0.002000</span> Pi/10s)</div>
-
-    <div class="chat-container">
-        <div class="chat-box" id="aiPiBox">
-            <div class="bot-name">AI4Pi Bot</div>
-            <div class="message-container" id="aiPiMessages"></div>
-            <input type="text" id="aiPiInput" placeholder="Say something..." />
-            <button onclick="sendMessage('aiPi')">Send</button>
-        </div>
-
-        <div class="chat-box" id="motivationBox">
-            <div class="bot-name">Motivation Bot</div>
-            <div class="message-container" id="motivationMessages"></div>
-            <input type="text" id="motivationInput" placeholder="What are you thankful for?" />
-            <button onclick="sendMessage('motivation')">Submit</button>
-        </div>
-
-        <div class="chat-box" id="feedbackBox">
-            <div class="bot-name">Pi Solutions Bot</div>
-            <div class="message-container" id="feedbackMessages"></div>
-            <input type="text" id="feedbackInput" placeholder="Share your thoughts..." />
-            <button onclick="sendMessage('feedback')">Submit</button>
-        </div>
-
-        <div class="chat-box" id="mathBox">
-            <div class="bot-name">Math Bot</div>
-            <div class="message-container" id="mathMessages">Solve: <span id="mathProblem">0 + 0</span></div>
-            <input type="text" id="mathInput" placeholder="Answer..." />
-            <button onclick="sendMessage('math')">Submit</button>
-        </div>
-    </div>
-
-    <script>
-        const updateClock = () => document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-        setInterval(updateClock, 1000);
-
-        let piBalance = 0.000000, dripRate = 0.002000;
+// Create an inline Web Worker using Blob API
+const workerScript = `
+self.onmessage = function (e) {
+    if (e.data.type === "startBotLoop") {
         setInterval(() => {
-            piBalance += dripRate;
-            document.getElementById("piBalance").innerText = piBalance.toFixed(6);
-        }, 10000);
-
-        const sendMessage = (bot) => {
-            const message = document.getElementById(bot + "Input").value;
-            const messageContainer = document.getElementById(bot + "Messages");
-            const newMessage = `<p><b>You:</b> ${message}</p>`;
-            messageContainer.innerHTML = newMessage + messageContainer.innerHTML;
-            document.getElementById(bot + "Input").value = "";
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-        };
-
-        const randomBotResponse = () => {
             const bots = ["AI4Pi Bot", "Motivation Bot", "Pi Solutions Bot", "Math Bot"];
             const randomBot = bots[Math.floor(Math.random() * bots.length)];
             const response = Math.random().toString(36).substring(2, 3).toUpperCase();
-            const randomWall = {
-                "AI4Pi Bot": "aiPiMessages",
-                "Motivation Bot": "motivationMessages",
-                "Pi Solutions Bot": "feedbackMessages",
-                "Math Bot": "mathMessages"
-            }[randomBot];
-            document.getElementById(randomWall).innerHTML = `<p><b>${randomBot}:</b> ${response}</p>` + document.getElementById(randomWall).innerHTML;
-        };
+            self.postMessage({ bot: randomBot, response: response });
+        }, 1000);
+    }
 
-        setInterval(randomBotResponse, 1000);
-    </script>
-</body>
-</html>
+    if (e.data.type === "startPiDrip") {
+        let piBalance = 0.000000;
+        const dripRate = 0.002000;
+        setInterval(() => {
+            piBalance += dripRate;
+            self.postMessage({ type: "updatePiBalance", balance: piBalance.toFixed(6) });
+        }, 10000);
+    }
+};
+`;
+
+// Convert script into a Blob and create a worker
+const workerBlob = new Blob([workerScript], { type: "application/javascript" });
+const worker = new Worker(URL.createObjectURL(workerBlob));
+
+// Start Web Worker Tasks
+worker.postMessage({ type: "startBotLoop" });
+worker.postMessage({ type: "startPiDrip" });
+
+// Handle Worker Messages
+worker.onmessage = function (e) {
+    if (e.data.type === "updatePiBalance") {
+        document.getElementById("piBalance").innerText = e.data.balance;
+    } else {
+        const botWalls = {
+            "AI4Pi Bot": "aiPiMessages",
+            "Motivation Bot": "motivationMessages",
+            "Pi Solutions Bot": "feedbackMessages",
+            "Math Bot": "mathMessages"
+        };
+        document.getElementById(botWalls[e.data.bot]).innerHTML = `<p><b>${e.data.bot}:</b> ${e.data.response}</p>` + document.getElementById(botWalls[e.data.bot]).innerHTML;
+    }
+};
