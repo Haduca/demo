@@ -1,24 +1,24 @@
 // Create an inline Web Worker using Blob API
 const workerScript = `
-self.onmessage = function (e) {
-    if (e.data.type === "startBotLoop") {
-        setInterval(() => {
-            const bots = ["AI4Pi Bot", "Motivation Bot", "Pi Solutions Bot", "Math Bot"];
-            const randomBot = bots[Math.floor(Math.random() * bots.length)];
-            const response = Math.random().toString(36).substring(2, 3).toUpperCase();
-            self.postMessage({ bot: randomBot, response: response });
-        }, 1000);
-    }
+    self.onmessage = function (e) {
+        if (e.data.type === "startBotLoop") {
+            setInterval(() => {
+                const bots = ["AI4Pi Bot", "Motivation Bot", "Pi Solutions Bot", "Math Bot"];
+                const randomBot = bots[Math.floor(Math.random() * bots.length)];
+                const response = Math.random().toString(36).substring(2, 3).toUpperCase();
+                self.postMessage({ type: "botResponse", bot: randomBot, response: response });
+            }, 1000);
+        }
 
-    if (e.data.type === "startPiDrip") {
-        let piBalance = 0.000000;
-        const dripRate = 0.002000;
-        setInterval(() => {
-            piBalance += dripRate;
-            self.postMessage({ type: "updatePiBalance", balance: piBalance.toFixed(6) });
-        }, 10000);
-    }
-};
+        if (e.data.type === "startPiDrip") {
+            let piBalance = 0.000000;
+            const dripRate = 0.002000;
+            setInterval(() => {
+                piBalance += dripRate;
+                self.postMessage({ type: "updatePiBalance", balance: piBalance.toFixed(6) });
+            }, 10000);
+        }
+    };
 `;
 
 // Convert script into a Blob and create a worker
@@ -33,13 +33,18 @@ worker.postMessage({ type: "startPiDrip" });
 worker.onmessage = function (e) {
     if (e.data.type === "updatePiBalance") {
         document.getElementById("piBalance").innerText = e.data.balance;
-    } else {
+    } else if (e.data.type === "botResponse") {
         const botWalls = {
             "AI4Pi Bot": "aiPiMessages",
             "Motivation Bot": "motivationMessages",
             "Pi Solutions Bot": "feedbackMessages",
             "Math Bot": "mathMessages"
         };
-        document.getElementById(botWalls[e.data.bot]).innerHTML = `<p><b>${e.data.bot}:</b> ${e.data.response}</p>` + document.getElementById(botWalls[e.data.bot]).innerHTML;
+
+        if (botWalls[e.data.bot]) {
+            document.getElementById(botWalls[e.data.bot]).innerHTML = 
+                `<p><b>${e.data.bot}:</b> ${e.data.response}</p>` + 
+                document.getElementById(botWalls[e.data.bot]).innerHTML;
+        }
     }
 };
