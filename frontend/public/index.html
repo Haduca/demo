@@ -1,70 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI4Pi Chat</title>
-  <!-- Load Pi SDK -->
+  <meta charset="UTF-8">
+  <title>AI4Pi Test</title>
+  <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
-    body { font-family: sans-serif; text-align: center; margin: 2em; }
-    button { margin: 0.5em; padding: 0.7em 1em; }
-    #chatArea { display: none; margin-top: 2em; }
-    #chatBox { border: 1px solid #ccc; padding: 1em; height: 200px; overflow-y: auto; text-align: left; }
-    #chatInput { width: 70%; padding: 0.5em; }
+    body {
+      font-family: sans-serif; 
+      text-align: center; 
+      margin-top: 2em;
+    }
+    button {
+      margin: 0.5em; 
+      padding: 0.7em 1em; 
+      border: none; 
+      border-radius: 4px; 
+      background: #333; 
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover { background: #555; }
+
+    /* Modal styling */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 999; 
+      left: 0; 
+      top: 0; 
+      width: 100%; 
+      height: 100%; 
+      overflow: auto; 
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+      background: #fff;
+      margin: 10% auto;
+      padding: 1em;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      text-align: left;
+    }
+    .close {
+      float: right;
+      font-size: 1.2em;
+      cursor: pointer;
+      color: #999;
+    }
+    .close:hover { color: #666; }
+
+    /* Chat box */
+    #chatBox {
+      border: 1px solid #ccc; 
+      height: 200px; 
+      overflow-y: auto; 
+      padding: 0.5em; 
+      margin-bottom: 0.5em;
+    }
+    #chatInput {
+      width: 70%; 
+      padding: 0.4em;
+    }
   </style>
 </head>
 <body>
-  <h1>AI4Pi Chat</h1>
-  
-  <!-- Login Section -->
-  <div id="loginSection">
-    <button onclick="login()">Login with Pi</button>
+  <h1>AI4Pi Test</h1>
+  <button onclick="loginWithPi()">Login with Pi</button>
+  <button onclick="payWithPi()">Pay 3.14 Pi</button>
+
+  <!-- Modal for AI Chat -->
+  <div id="chatModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>AI Chat</h2>
+      <div id="chatBox"></div>
+      <input id="chatInput" type="text" placeholder="Type a message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
   </div>
-  
-  <!-- Chat Area (hidden until login) -->
-  <div id="chatArea">
-    <div id="chatBox"></div>
-    <input id="chatInput" type="text" placeholder="Type your message..." />
-    <button onclick="sendChat()">Send</button>
-  </div>
-  
+
   <script>
-    // Set sandbox mode: true for Testnet/Development, false for Production
+    // Toggle sandbox: true if your domain is in Testnet/Development, false if Production.
     const SANDBOX_MODE = true;
+
+    // Initialize Pi SDK when page loads
     window.onload = function() {
       Pi.init({ version: "2.0", sandbox: SANDBOX_MODE });
     };
 
-    // Function to log in via Pi
-    function login() {
+    // Open the chat modal
+    function openModal() {
+      document.getElementById("chatModal").style.display = "block";
+    }
+    // Close the chat modal
+    function closeModal() {
+      document.getElementById("chatModal").style.display = "none";
+    }
+
+    // Show new message in chat box
+    function addChatMessage(sender, text) {
+      const chatBox = document.getElementById("chatBox");
+      const p = document.createElement("p");
+      p.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatBox.appendChild(p);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Send a user message, simulate AI reply
+    function sendMessage() {
+      const input = document.getElementById("chatInput");
+      const msg = input.value.trim();
+      if (!msg) return;
+      addChatMessage("You", msg);
+      input.value = "";
+      // Fake AI response after 1 second
+      setTimeout(() => {
+        addChatMessage("AI", "I'm just a placeholder AI. You said: " + msg);
+      }, 1000);
+    }
+
+    // Pi Login
+    function loginWithPi() {
+      alert("Initiating Pi login...");
       Pi.authenticate(["username"], function(auth) {
-        if (!auth.user) { alert("Login failed"); return; }
+        if (!auth.user) {
+          alert("Login failed: no user data.");
+          return;
+        }
         alert("Welcome, " + auth.user.username);
-        document.getElementById("loginSection").style.display = "none";
-        document.getElementById("chatArea").style.display = "block";
-        addMessage("System", "You are now logged in. Start chatting!");
+        // Once logged in, open the chat modal
+        openModal();
       }, function(err) {
         alert("Login error: " + err);
       });
     }
 
-    // Append a new message to the chat box
-    function addMessage(sender, text) {
-      const p = document.createElement("p");
-      p.innerHTML = "<strong>" + sender + ":</strong> " + text;
-      document.getElementById("chatBox").appendChild(p);
-      document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
-    }
-
-    // Send a chat message and simulate an AI response
-    function sendChat() {
-      const input = document.getElementById("chatInput");
-      const text = input.value.trim();
-      if (!text) return;
-      addMessage("You", text);
-      input.value = "";
-      // Simulate an AI reply after 1 second
-      setTimeout(() => { addMessage("AI", "Echo: " + text); }, 1000);
+    // Pi Payment
+    function payWithPi() {
+      alert("Initiating Pi payment...");
+      const payment = {
+        amount: 3.14,
+        memo: "AI4Pi Payment",
+        metadata: { test: "someData" }
+      };
+      Pi.createPayment(payment, {
+        onReadyForServerApproval: (paymentId) => { console.log("Payment ID:", paymentId); },
+        onReadyForServerCompletion: (paymentId, txid) => { console.log("Ready for completion:", paymentId, txid); },
+        onSuccessfulPayment: (paymentId, txid) => { alert("Payment successful! TxID: " + txid); },
+        onError: (err) => { alert("Payment error: " + err); },
+        onPaymentCancel: (paymentId) => { alert("Payment cancelled: " + paymentId); }
+      });
     }
   </script>
 </body>
