@@ -2,57 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AI4Pi Test</title>
-  <!-- Load the Pi SDK -->
+  <title>AI4Pi Chat</title>
+  <!-- Load Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 3em; }
-    button { margin: 1em; padding: 0.6em 1em; font-size: 1em; }
+    body { font-family: sans-serif; text-align: center; margin: 2em; }
+    button { margin: 0.5em; padding: 0.7em 1em; }
+    #chatArea { display: none; margin-top: 2em; }
+    #chatBox { border: 1px solid #ccc; padding: 1em; height: 200px; overflow-y: auto; text-align: left; }
+    #chatInput { width: 70%; padding: 0.5em; }
   </style>
 </head>
 <body>
-  <h1>AI4Pi Test</h1>
-  <button onclick="loginWithPi()">Login with Pi</button>
-  <button onclick="payWithPi()">Pay 3.14 Pi</button>
+  <h1>AI4Pi Chat</h1>
+  
+  <!-- Login Section -->
+  <div id="loginSection">
+    <button onclick="login()">Login with Pi</button>
+  </div>
+  
+  <!-- Chat Area (hidden until login) -->
+  <div id="chatArea">
+    <div id="chatBox"></div>
+    <input id="chatInput" type="text" placeholder="Type your message..." />
+    <button onclick="sendChat()">Send</button>
+  </div>
+  
   <script>
-    // Set sandbox mode: true for Testnet/Development; false for Production.
+    // Set sandbox mode: true for Testnet/Development, false for Production
     const SANDBOX_MODE = true;
-    // Initialize Pi SDK on page load.
-    window.onload = () => { 
-      Pi.init({ version: "2.0", sandbox: SANDBOX_MODE }); 
-      // Optional: Confirm the SDK loaded.
-      alert("Pi SDK loaded: " + (typeof window.Pi !== "undefined"));
+    window.onload = function() {
+      Pi.init({ version: "2.0", sandbox: SANDBOX_MODE });
     };
 
-    // Function to trigger Pi login.
-    function loginWithPi() {
-      alert("Initiating Pi login...");
-      Pi.authenticate(["username"], (auth) => {
-        if(auth.user) {
-          alert("Login successful: " + auth.user.username);
-        } else {
-          alert("Login failed: No user data returned.");
-        }
-      }, (err) => { 
+    // Function to log in via Pi
+    function login() {
+      Pi.authenticate(["username"], function(auth) {
+        if (!auth.user) { alert("Login failed"); return; }
+        alert("Welcome, " + auth.user.username);
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("chatArea").style.display = "block";
+        addMessage("System", "You are now logged in. Start chatting!");
+      }, function(err) {
         alert("Login error: " + err);
       });
     }
 
-    // Function to trigger Pi payment.
-    function payWithPi() {
-      alert("Initiating Pi payment...");
-      const payment = {
-        amount: 3.14,
-        memo: "AI4Pi Payment",
-        metadata: { test: "debug" }
-      };
-      Pi.createPayment(payment, {
-        onReadyForServerApproval: (paymentId) => { console.log("Payment ID:", paymentId); },
-        onReadyForServerCompletion: (paymentId, txid) => { console.log("Ready for completion:", paymentId, txid); },
-        onSuccessfulPayment: (paymentId, txid) => { alert("Payment successful! TxID: " + txid); },
-        onError: (err) => { alert("Payment error: " + err); },
-        onPaymentCancel: (paymentId) => { alert("Payment cancelled: " + paymentId); }
-      });
+    // Append a new message to the chat box
+    function addMessage(sender, text) {
+      const p = document.createElement("p");
+      p.innerHTML = "<strong>" + sender + ":</strong> " + text;
+      document.getElementById("chatBox").appendChild(p);
+      document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+    }
+
+    // Send a chat message and simulate an AI response
+    function sendChat() {
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage("You", text);
+      input.value = "";
+      // Simulate an AI reply after 1 second
+      setTimeout(() => { addMessage("AI", "Echo: " + text); }, 1000);
     }
   </script>
 </body>
