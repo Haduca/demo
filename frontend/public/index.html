@@ -74,7 +74,7 @@
             align-items: center;
             border: 2px solid black;
             background: white;
-            padding: 5px;
+            padding: 10px;
             border-radius: 3px;
             width: 100%;
             height: 100%;
@@ -102,19 +102,11 @@
             text-align: center;
         }
 
-        button {
-            padding: 5px;
-            border-radius: 3px;
-            border: 1px solid black;
-            background: black;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
+        /* Allow input to submit on Enter key press */
+        input:focus {
+            outline: none;
         }
 
-        button:hover {
-            background: gray;
-        }
     </style>
 </head>
 <body>
@@ -135,28 +127,28 @@
             <b>AI</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="aiI"><button onclick="sendMessage('ai')">Send</button>
+                <input id="aiI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('ai')">
             </div>
         </div>
         <div class="wall" id="mo">
             <b>Motivation</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="moI"><button onclick="sendMessage('mo')">Submit</button>
+                <input id="moI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('mo')">
             </div>
         </div>
         <div class="wall" id="so">
             <b>Solutions</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="soI"><button onclick="sendMessage('so')">Submit</button>
+                <input id="soI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('so')">
             </div>
         </div>
         <div class="wall" id="ma">
             <b>Math</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="maI"><button onclick="sendMessage('ma')">Submit</button>
+                <input id="maI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('ma')">
             </div>
         </div>
     </div>
