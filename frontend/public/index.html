@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Fixed Quadrant Layout</title>
+    <title>AI4Pi - Fully Fixed Screen</title>
     <style>
-        /* Ensure the entire screen is used */
+        /* Lock screen size */
         html, body {
             font-family: sans-serif;
             text-align: center;
@@ -13,31 +13,27 @@
             color: black;
             margin: 0;
             padding: 0;
-            height: 100%;
-            width: 100%;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; /* Prevents unwanted scrolling */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
         }
 
-        /* Container for structured 2x2 quadrant layout */
+        /* Container for the fixed 2x2 quadrant layout */
         .app-container {
             display: grid;
             width: 100vw;
             height: 100vh;
-            padding: 5px;
-            box-sizing: border-box;
-        }
-
-        /* Enforce 2x2 Grid on All Devices */
-        .app-container {
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 5px;
+            box-sizing: border-box;
         }
 
-        /* Walls remain evenly divided */
+        /* Each wall remains fixed in its quadrant */
         .wall {
             display: flex;
             flex-direction: column;
@@ -46,12 +42,11 @@
             background: white;
             padding: 5px;
             border-radius: 3px;
-            overflow-y: auto;
             width: 100%;
             height: 100%;
         }
 
-        /* Ensure Text Box Stays Inside Walls */
+        /* Lock text boxes inside walls */
         .text-box {
             display: flex;
             gap: 5px;
