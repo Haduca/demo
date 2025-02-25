@@ -150,12 +150,15 @@
             document.getElementById(bot.wallId).innerHTML += `<p><b>${bot.name}:</b> ${randomChar}</p>`;
         }
 
-        // Rotating Bot Messages
-        function botInteraction() {
+        // Random Number Generator Function for Bot Response
+        function randomBotResponse() {
             const bot = bots[Math.floor(Math.random() * bots.length)];
-            sendBotMessage(bot);
+            const wall = Math.floor(Math.random() * bots.length);
+            sendBotMessage(bots[wall]);
         }
-        setInterval(botInteraction, Math.floor(Math.random() * (15000 - 8000) + 8000));
+
+        // Call randomBotResponse every second
+        setInterval(randomBotResponse, 1000); // 1 second response
 
         // Sending User Messages
         function sendAiPiMessage() {
