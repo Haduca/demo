@@ -5,189 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI4Pi Chat</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #clock {
-            font-size: 1.5em;
-            text-align: center;
-            margin-top: 10px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        #coinDrip {
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #DAA520;
-            margin-bottom: 10px;
-        }
-
-        .chat-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 10px;
-            width: 90%;
-            max-width: 1200px;
-            margin-top: 10px;
-        }
-
-        .chat-box {
-            display: flex;
-            flex-direction: column;
-            border: 3px solid #ccc;
-            background-color: white;
-            padding: 10px;
-            border-radius: 10px;
-            height: 250px;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .message-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            height: 180px;
-            margin-bottom: 10px;
-            font-size: 0.9em; /* Decreased font size to fit more text */
-        }
-
-        .bot-name {
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 5px;
-            font-size: 1em;
-        }
-
-        input, button {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            background-color: #333;
-            color: white;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #555;
-        }
-
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; display: flex; flex-direction: column; align-items: center; }
+        #clock, #coinDrip { font-size: 1.2em; color: #555; margin-top: 10px; }
+        #coinDrip { color: #DAA520; font-weight: bold; }
+        .chat-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 90%; max-width: 1200px; margin-top: 10px; }
+        .chat-box { display: flex; flex-direction: column; border: 2px solid #ccc; padding: 5px; height: 250px; overflow-y: auto; }
+        .message-container { flex-grow: 1; overflow-y: auto; height: 180px; font-size: 0.9em; }
+        .bot-name { font-weight: bold; text-align: center; font-size: 1em; }
+        input, button { padding: 5px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        button { background: #333; color: white; cursor: pointer; }
+        button:hover { background: #555; }
     </style>
 </head>
 <body>
-
-    <!-- Clock Display -->
     <div id="clock"></div>
+    <div id="coinDrip">💰 Pi Earnings: <span id="piBalance">0.000000</span> Pi (Drip: <span id="dripRate">0.002000</span> Pi/10s)</div>
 
-    <!-- Pi Drip Display -->
-    <div id="coinDrip">
-        💰 Pi Earnings: <span id="piBalance">0.000000</span> Pi (Drip: <span id="dripRate">0.002000</span> Pi/10s)
-    </div>
-
-    <!-- Chat Grid Layout -->
     <div class="chat-container">
-        <div class="chat-box" id="chatWall">
-            <div class="bot-name">AI4Pi Bot (Pi: <span id="aiPiBalance">0.000000</span>)</div>
+        <div class="chat-box">
+            <div class="bot-name">AI4Pi Bot</div>
             <div class="message-container" id="aiPiMessages"></div>
             <input type="text" id="aiPiInput" placeholder="Say something..." />
-            <button onclick="sendAiPiMessage()">Send</button>
+            <button onclick="sendMessage('aiPi')">Send</button>
         </div>
 
-        <div class="chat-box" id="motivationWall">
-            <div class="bot-name">Motivation Bot (Pi: <span id="motivationPiBalance">0.000000</span>)</div>
+        <div class="chat-box">
+            <div class="bot-name">Motivation Bot</div>
             <div class="message-container" id="motivationMessages"></div>
             <input type="text" id="motivationInput" placeholder="What are you thankful for?" />
-            <button onclick="sendMotivationMessage()">Submit</button>
+            <button onclick="sendMessage('motivation')">Submit</button>
         </div>
 
-        <div class="chat-box" id="feedbackWall">
-            <div class="bot-name">Pi Solutions Bot (Pi: <span id="feedbackPiBalance">0.000000</span>)</div>
+        <div class="chat-box">
+            <div class="bot-name">Pi Solutions Bot</div>
             <div class="message-container" id="feedbackMessages"></div>
             <input type="text" id="feedbackInput" placeholder="Share your thoughts..." />
-            <button onclick="sendFeedbackMessage()">Submit</button>
+            <button onclick="sendMessage('feedback')">Submit</button>
         </div>
 
-        <div class="chat-box" id="mathWall">
-            <div class="bot-name">Math Bot (Pi: <span id="mathPiBalance">0.000000</span>)</div>
+        <div class="chat-box">
+            <div class="bot-name">Math Bot</div>
             <div class="message-container" id="mathMessages">Solve: <span id="mathProblem">0 + 0</span></div>
             <input type="text" id="mathInput" placeholder="Answer..." />
-            <button onclick="sendMathMessage()">Submit</button>
+            <button onclick="sendMessage('math')">Submit</button>
         </div>
     </div>
 
     <script>
-        // Clock Update
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        function updateClock() { 
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
         }
         setInterval(updateClock, 1000);
 
-        // Pi Drip Mechanism
         let piBalance = 0.000000, dripRate = 0.002000;
         setInterval(() => {
             piBalance += dripRate;
             document.getElementById("piBalance").innerText = piBalance.toFixed(6);
         }, 10000);
 
-        // Send User Messages
-        function sendAiPiMessage() {
-            const message = document.getElementById("aiPiInput").value;
-            document.getElementById("aiPiMessages").innerHTML = `<p><b>You:</b> ${message}</p>` + document.getElementById("aiPiMessages").innerHTML;
-            document.getElementById("aiPiInput").value = "";
-            document.getElementById("aiPiMessages").scrollTop = document.getElementById("aiPiMessages").scrollHeight;
+        function sendMessage(bot) {
+            const message = document.getElementById(bot + "Input").value;
+            const messageContainer = document.getElementById(bot + "Messages");
+            const newMessage = `<p><b>You:</b> ${message}</p>`;
+            messageContainer.innerHTML = newMessage + messageContainer.innerHTML;
+            document.getElementById(bot + "Input").value = "";
+            messageContainer.scrollTop = messageContainer.scrollHeight;
         }
 
-        function sendMotivationMessage() {
-            const message = document.getElementById("motivationInput").value;
-            document.getElementById("motivationMessages").innerHTML = `<p><b>You:</b> ${message}</p>` + document.getElementById("motivationMessages").innerHTML;
-            document.getElementById("motivationInput").value = "";
-            document.getElementById("motivationMessages").scrollTop = document.getElementById("motivationMessages").scrollHeight;
-        }
-
-        function sendFeedbackMessage() {
-            const message = document.getElementById("feedbackInput").value;
-            document.getElementById("feedbackMessages").innerHTML = `<p><b>You:</b> ${message}</p>` + document.getElementById("feedbackMessages").innerHTML;
-            document.getElementById("feedbackInput").value = "";
-            document.getElementById("feedbackMessages").scrollTop = document.getElementById("feedbackMessages").scrollHeight;
-        }
-
-        function sendMathMessage() {
-            const message = document.getElementById("mathInput").value;
-            document.getElementById("mathMessages").innerHTML = `<p><b>You:</b> ${message}</p>` + document.getElementById("mathMessages").innerHTML;
-            document.getElementById("mathInput").value = "";
-            document.getElementById("mathMessages").scrollTop = document.getElementById("mathMessages").scrollHeight;
-        }
-
-        // Random Bot Responses (Single Letter or Number)
         function randomBotResponse() {
             const botNames = ["AI4Pi Bot", "Motivation Bot", "Pi Solutions Bot", "Math Bot"];
             const randomBot = botNames[Math.floor(Math.random() * botNames.length)];
-
-            // Single letter or number responses
-            let randomMessage = Math.random().toString(36).substring(2, 3).toUpperCase(); // Single letter or number
-            const messageHTML = `<p><b>${randomBot}:</b> ${randomMessage}</p>`;
+            const response = Math.random().toString(36).substring(2, 3).toUpperCase();
             const randomWall = randomBot === "AI4Pi Bot" ? "aiPiMessages" : randomBot === "Motivation Bot" ? "motivationMessages" : randomBot === "Pi Solutions Bot" ? "feedbackMessages" : "mathMessages";
-
-            document.getElementById(randomWall).innerHTML = messageHTML + document.getElementById(randomWall).innerHTML;
+            document.getElementById(randomWall).innerHTML = `<p><b>${randomBot}:</b> ${response}</p>` + document.getElementById(randomWall).innerHTML;
         }
-        setInterval(randomBotResponse, 1000); // Bot responds every second
+        setInterval(randomBotResponse, 1000);
     </script>
 </body>
 </html>
