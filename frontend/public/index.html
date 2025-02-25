@@ -6,18 +6,18 @@
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
-  body { display:grid; grid-template-rows:auto 1fr; height:100vh; padding:1em; gap:1em; }
-  .grid { display:grid; grid-template-columns:repeat(2, 1fr); grid-template-rows:repeat(2, 1fr); gap:1em; height:100%; }
-  .container { display:flex; flex-direction:column; padding:1em; border:6px solid; background:#f9f9f9; border-radius:8px; flex-grow:1; justify-content:space-between; }
+  body { display:grid; grid-template-rows:auto 1fr; height:100vh; padding:1em; gap:.5em; }
+  .grid { display:grid; grid-template-columns:repeat(2, 1fr); grid-template-rows:repeat(2, 1fr); gap:.5em; height:100%; }
+  .container { display:flex; flex-direction:column; padding:1em; border:5px solid; background:#f9f9f9; border-radius:8px; flex-grow:1; justify-content:space-between; }
   .box { flex-grow:1; overflow-y:auto; padding:.5em; font-size:small; background:#fff; border-radius:4px; }
   h4 { margin-bottom:.5em; text-align:center; }
   button { margin:.3em 0; padding:.5em; border:none; background:#333; color:#fff; cursor:pointer; border-radius:4px; }
   button:hover { background:#555; }
   input { width:100%; padding:.3em; margin-top:.5em; }
-  .rainbow:nth-child(1) { border-color:#FF4D4D; } /* Red */
-  .rainbow:nth-child(2) { border-color:#FFAA00; } /* Orange */
-  .rainbow:nth-child(3) { border-color:#66CC66; } /* Green */
-  .rainbow:nth-child(4) { border-color:#6699FF; } /* Blue */
+  .rainbow:nth-child(1) { border-image: linear-gradient(45deg, #FF4D4D, #FFAA00, #FFDC00) 1; }
+  .rainbow:nth-child(2) { border-image: linear-gradient(45deg, #FFAA00, #FFD700, #66CC66) 1; }
+  .rainbow:nth-child(3) { border-image: linear-gradient(45deg, #66CC66, #00AEEF, #0033CC) 1; }
+  .rainbow:nth-child(4) { border-image: linear-gradient(45deg, #6699FF, #0033CC, #8A2BE2) 1; }
   #coinDrip { text-align:center; padding:0.5em; font-size:1.2em; font-weight:bold; color:#DAA520; }
 </style>
 </head>
@@ -69,10 +69,10 @@ onload=()=>Pi.init({ version:"2.0", sandbox:SANDBOX });
 setInterval(() => {
   piBalance += lastWinner ? dripRate + mathBonus : dripRate;
   document.getElementById("piBalance").innerText = piBalance.toFixed(2);
-  lastWinner = null; // Reset winner after one cycle
+  lastWinner = null;
 }, 10000);
 
-// Generate a new math problem every 10 seconds
+// Generate new content dynamically
 const generateMathProblem = () => {
   let num1 = Math.floor(Math.random() * 10) + 1;
   let num2 = Math.floor(Math.random() * 10) + 1;
@@ -80,61 +80,62 @@ const generateMathProblem = () => {
   document.getElementById("mathProblem").innerText = `${num1} + ${num2}`;
 };
 setInterval(generateMathProblem, 10000);
-generateMathProblem(); // Start with an initial problem
+
+const chatbotQuestions = [
+  "What's your favorite color?",
+  "What's your dream job?",
+  "If you had a superpower, what would it be?",
+  "What is your favorite food?",
+  "If you could visit anywhere, where would you go?"
+];
+setInterval(() => {
+  const question = chatbotQuestions[Math.floor(Math.random() * chatbotQuestions.length)];
+  document.getElementById("chatBox").innerHTML += `<p><strong>AI:</strong> ${question}</p>`;
+}, 8000);
+
+const motivationalQuotes = [
+  "Believe in yourself and all that you are.",
+  "Your only limit is your mind.",
+  "Stay positive, work hard, make it happen.",
+  "Success is not final, failure is not fatal.",
+  "Dream big and dare to fail."
+];
+setInterval(() => {
+  const quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+  document.getElementById("gratitudeBox").innerHTML += `<p><strong>Quote:</strong> ${quote}</p>`;
+}, 7000);
+
+const piSolutions = [
+  "Pi Network provides decentralized transactions.",
+  "Pi enables secure, peer-to-peer payments.",
+  "Pi aims to build a scalable Web3 ecosystem.",
+  "Pi fosters community-driven decentralized applications.",
+  "Pi is creating a new digital economy for everyone."
+];
+setInterval(() => {
+  const solution = piSolutions[Math.floor(Math.random() * piSolutions.length)];
+  document.getElementById("feedbackBox").innerHTML += `<p><strong>Solution:</strong> ${solution}</p>`;
+}, 12000);
 
 const addMessage = (box, sender, text) => {
   document.getElementById(box).innerHTML += `<p><strong>${sender}:</strong> ${text}</p>`;
 };
 
-// Pi Login
-document.getElementById("loginBtn").onclick = () => {
-  alert("Initiating Pi login...");
-  Pi.authenticate(["username"], a => {
-    user=a.user?a.user.username:null;
-    alert(user?`Welcome, ${user}`:"Login failed.");
-    document.getElementById("status").innerText=user?`Logged in as ${user}`:"Unregistered User";
-  }, e=>alert(`Login error: ${e}`));
-};
-
-// Pi Payment
-document.getElementById("payBtn").onclick = () => {
-  alert("Initiating Pi payment...");
-  Pi.createPayment({ amount:3.14, memo:"AI4Pi Payment", metadata:{ test:"data" } },
-  { onSuccessfulPayment:(p,t)=>alert(`Payment success! TxID: ${t}`),
-    onError:e=>alert(`Payment error: ${e}`),
-    onPaymentCancel:p=>alert(`Payment cancelled: ${p}`) });
-};
-
-// AI Chat with Trivia & Motivation
 document.getElementById("sendChat").onclick = () => {
   const input = document.getElementById("chatInput"), msg = input.value.trim();
-  if (!msg) return;
-  input.value = "";
-  addMessage("chatBox", "You", msg);
-
-  let aiResponses = [
-    "Did you know Pi has been calculated to over 62 trillion digits?",
-    "Here’s a motivational quote: 'The best way to predict the future is to invent it.'",
-    "Pi is an irrational number, meaning it goes on forever without repeating.",
-    `Echo: ${msg}`
-  ];
-  let response = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-  setTimeout(() => addMessage("chatBox", "AI", response), 800);
+  if (msg) { input.value=""; addMessage("chatBox", "You", msg); }
 };
 
-// Gratitude Wall
 document.getElementById("submitGratitude").onclick = () => {
   const input = document.getElementById("gratitudeInput"), msg = input.value.trim();
   if (msg) { input.value=""; addMessage("gratitudeBox", "Grateful User", msg); }
 };
 
-// Feedback Box
 document.getElementById("submitFeedback").onclick = () => {
   const input = document.getElementById("feedbackInput"), msg = input.value.trim();
   if (msg) { input.value=""; addMessage("feedbackBox", "User Feedback", msg); }
 };
 
-// Math Challenge Submission
 document.getElementById("submitMath").onclick = () => {
   const input = document.getElementById("mathInput"), answer = parseInt(input.value.trim());
   if (answer === currentAnswer) {
@@ -145,7 +146,6 @@ document.getElementById("submitMath").onclick = () => {
   }
   input.value = "";
 };
-
 </script>
 
 </body>
