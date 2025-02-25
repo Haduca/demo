@@ -2,105 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI4Pi Test</title>
+  <title>AI4Pi Short Demo</title>
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
-    body {
-      font-family: sans-serif; 
-      text-align: center; 
-      margin-top: 2em;
-    }
-    button {
-      margin: 0.5em; 
-      padding: 0.7em 1em; 
-      border: none; 
-      border-radius: 4px; 
-      background: #333; 
-      color: #fff;
-      cursor: pointer;
-    }
+    body { font-family: sans-serif; text-align: center; margin-top: 2em; }
+    button { margin: 0.5em; padding: 0.7em 1em; border: none; border-radius: 4px; background: #333; color: #fff; cursor: pointer; }
     button:hover { background: #555; }
-
-    /* Modal styling */
-    .modal {
-      display: none; 
-      position: fixed; 
-      z-index: 999; 
-      left: 0; 
-      top: 0; 
-      width: 100%; 
-      height: 100%; 
-      overflow: auto; 
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-    .modal-content {
-      background: #fff;
-      margin: 10% auto;
-      padding: 1em;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 400px;
-      text-align: left;
-    }
-    .close {
-      float: right;
-      font-size: 1.2em;
-      cursor: pointer;
-      color: #999;
-    }
+    .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+    .modal-content { background: #fff; margin: 10% auto; padding: 1em; border-radius: 8px; width: 90%; max-width: 400px; text-align: left; }
+    .close { float: right; font-size: 1.2em; cursor: pointer; color: #999; }
     .close:hover { color: #666; }
-
-    /* Chat box */
-    #chatBox {
-      border: 1px solid #ccc; 
-      height: 200px; 
-      overflow-y: auto; 
-      padding: 0.5em; 
-      margin-bottom: 0.5em;
-    }
-    #chatInput {
-      width: 70%; 
-      padding: 0.4em;
-    }
+    #chatBox { border: 1px solid #ccc; height: 200px; overflow-y: auto; padding: 0.5em; margin-bottom: 0.5em; }
+    #chatInput { width: 70%; padding: 0.4em; }
   </style>
 </head>
 <body>
-  <h1>AI4Pi Test</h1>
+  <h1>AI4Pi Short Demo</h1>
   <button onclick="loginWithPi()">Login with Pi</button>
   <button onclick="payWithPi()">Pay 3.14 Pi</button>
 
-  <!-- Modal for AI Chat -->
+  <!-- Chat Modal -->
   <div id="chatModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-      <h2>AI Chat</h2>
+      <h2 id="userStatus">Unregistered User</h2>
       <div id="chatBox"></div>
-      <input id="chatInput" type="text" placeholder="Type a message...">
-      <button onclick="sendMessage()">Send</button>
+      <input id="chatInput" type="text" placeholder="Type your message...">
+      <button onclick="sendChat()">Send</button>
     </div>
   </div>
 
   <script>
-    // Toggle sandbox: true if your domain is in Testnet/Development, false if Production.
+    // Toggle this: true if your domain is in Testnet, false if Production
     const SANDBOX_MODE = true;
+    let currentUser = null; // Will store "unregistered" or a Pi username
 
-    // Initialize Pi SDK when page loads
-    window.onload = function() {
+    // Initialize Pi SDK on page load
+    window.onload = () => {
       Pi.init({ version: "2.0", sandbox: SANDBOX_MODE });
     };
 
-    // Open the chat modal
+    // Open chat modal
     function openModal() {
       document.getElementById("chatModal").style.display = "block";
     }
-    // Close the chat modal
+    // Close chat modal
     function closeModal() {
       document.getElementById("chatModal").style.display = "none";
     }
 
-    // Show new message in chat box
-    function addChatMessage(sender, text) {
+    // Add a message to the chat box
+    function addMessage(sender, text) {
       const chatBox = document.getElementById("chatBox");
       const p = document.createElement("p");
       p.innerHTML = `<strong>${sender}:</strong> ${text}`;
@@ -108,49 +61,53 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Send a user message, simulate AI reply
-    function sendMessage() {
+    // Send chat
+    function sendChat() {
       const input = document.getElementById("chatInput");
       const msg = input.value.trim();
       if (!msg) return;
-      addChatMessage("You", msg);
+      addMessage("You", msg);
       input.value = "";
-      // Fake AI response after 1 second
-      setTimeout(() => {
-        addChatMessage("AI", "I'm just a placeholder AI. You said: " + msg);
-      }, 1000);
+      // Fake AI response
+      setTimeout(() => addMessage("AI", "Echo: " + msg), 800);
     }
 
-    // Pi Login
+    // Login with Pi
     function loginWithPi() {
       alert("Initiating Pi login...");
-      Pi.authenticate(["username"], function(auth) {
+      Pi.authenticate(["username"], (auth) => {
         if (!auth.user) {
-          alert("Login failed: no user data.");
-          return;
+          alert("Login failed or declined. You are unregistered.");
+          currentUser = null; 
+          document.getElementById("userStatus").innerText = "Unregistered User";
+        } else {
+          alert("Welcome, " + auth.user.username);
+          currentUser = auth.user.username;
+          document.getElementById("userStatus").innerText = "Logged in as " + currentUser;
         }
-        alert("Welcome, " + auth.user.username);
-        // Once logged in, open the chat modal
-        openModal();
-      }, function(err) {
+        openModal(); // Always open the chat modal no matter what
+      }, (err) => {
         alert("Login error: " + err);
+        currentUser = null; 
+        document.getElementById("userStatus").innerText = "Unregistered User";
+        openModal();
       });
     }
 
-    // Pi Payment
+    // Pay with Pi
     function payWithPi() {
       alert("Initiating Pi payment...");
       const payment = {
         amount: 3.14,
         memo: "AI4Pi Payment",
-        metadata: { test: "someData" }
+        metadata: { sample: "data" }
       };
       Pi.createPayment(payment, {
-        onReadyForServerApproval: (paymentId) => { console.log("Payment ID:", paymentId); },
-        onReadyForServerCompletion: (paymentId, txid) => { console.log("Ready for completion:", paymentId, txid); },
-        onSuccessfulPayment: (paymentId, txid) => { alert("Payment successful! TxID: " + txid); },
-        onError: (err) => { alert("Payment error: " + err); },
-        onPaymentCancel: (paymentId) => { alert("Payment cancelled: " + paymentId); }
+        onReadyForServerApproval: (paymentId) => console.log("Payment ID:", paymentId),
+        onReadyForServerCompletion: (paymentId, txid) => console.log("Ready for completion:", paymentId, txid),
+        onSuccessfulPayment: (paymentId, txid) => alert("Payment successful! TxID: " + txid),
+        onError: (error) => alert("Payment error: " + error),
+        onPaymentCancel: (paymentId) => alert("Payment cancelled: " + paymentId)
       });
     }
   </script>
