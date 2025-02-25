@@ -3,33 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Mobile Optimized</title>
+    <title>AI4Pi - Static Screen</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: white; color: black; margin: 0; padding: 0; }
-        
-        /* Ensure the app takes up full screen on mobile */
-        .container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            width: 95%;
-            max-width: 480px; /* Restrict max width to fit a phone screen */
-            margin: auto;
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background: white;
+            color: black;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden; /* Prevent accidental scrolling */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        /* Walls (Chat Areas) */
-        .wall {
-            border-radius: 8px;
+        /* Container for the app layout */
+        .app-container {
+            width: 100%;
+            max-width: 480px; /* Matches standard mobile screen size */
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 5px;
             padding: 10px;
-            height: 180px; /* Adjusted height for mobile */
-            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        /* Walls (Static Quadrants) */
+        .wall {
             display: flex;
             flex-direction: column-reverse;
-            background: white;
+            justify-content: space-between;
             border: 2px solid black;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            height: 100%;
         }
 
-        /* Text Box for Input */
+        /* Text Box */
         .text-box {
             display: flex;
             gap: 5px;
@@ -42,7 +58,7 @@
             border: 1px solid black;
             background: white;
             color: black;
-            font-size: 16px; /* Increased for mobile readability */
+            font-size: 16px;
         }
         button {
             padding: 8px;
@@ -57,24 +73,16 @@
 
         /* Top Buttons */
         .top-buttons {
-            margin-bottom: 10px;
+            width: 100%;
+            max-width: 480px;
             display: flex;
             justify-content: space-between;
-            padding: 0 10px;
+            padding: 10px;
+            box-sizing: border-box;
         }
         .top-buttons button {
             flex: 1;
             margin: 5px;
-        }
-
-        /* Responsive Design for Smaller Screens */
-        @media (max-width: 480px) {
-            .wall {
-                height: 200px;
-            }
-            button, input {
-                font-size: 14px;
-            }
         }
     </style>
 </head>
@@ -89,7 +97,8 @@
         <button onclick="piAction()">🔄 3.14 Action</button>
     </div>
 
-    <div class="container">
+    <!-- Static 2x2 Grid Layout -->
+    <div class="app-container">
         <div class="wall" id="ai">
             <b>AI</b>
             <div class="messages"></div>
