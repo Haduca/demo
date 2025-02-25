@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
     <title>AI4Pi - Fixed Layout</title>
     <style>
-        /* Lock screen size to ensure static layout */
+        /* Lock screen size and prevent resizing */
         html, body {
             font-family: sans-serif;
             text-align: center;
@@ -15,26 +15,58 @@
             padding: 0;
             width: 100vw;
             height: 100vh;
-            overflow: hidden; /* Prevents scrolling */
+            overflow: hidden; /* Ensures no scrolling */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
         }
 
-        /* Fixed container for 2x2 quadrant layout */
+        /* Top header section */
+        .header {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Fixed button section */
+        .top-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .top-buttons button {
+            flex: 1;
+            margin: 2px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 3px;
+            border: 1px solid black;
+            background: black;
+            color: white;
+            cursor: pointer;
+        }
+
+        .top-buttons button:hover {
+            background: gray;
+        }
+
+        /* Fixed 2x2 quadrant layout */
         .app-container {
             display: grid;
             width: 100vw;
-            height: calc(100vh - 80px); /* Adjusted for header & buttons */
+            height: calc(100vh - 100px); /* Adjusted height for header & buttons */
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            gap: 3px;
+            gap: 2px;
             box-sizing: border-box;
             padding: 5px;
         }
 
-        /* Walls remain evenly divided */
+        /* Walls evenly divided */
         .wall {
             display: flex;
             flex-direction: column;
@@ -49,7 +81,7 @@
             box-sizing: border-box;
         }
 
-        /* Text boxes stay inside walls */
+        /* Keep text input inside the wall */
         .text-box {
             display: flex;
             width: 100%;
@@ -79,29 +111,19 @@
             cursor: pointer;
         }
 
-        button:hover { background: gray; }
-
-        /* Top Buttons */
-        .top-buttons {
-            width: 100vw;
-            display: flex;
-            justify-content: space-between;
-            padding: 5px;
-            box-sizing: border-box;
-        }
-
-        .top-buttons button {
-            flex: 1;
-            margin: 2px;
+        button:hover {
+            background: gray;
         }
     </style>
 </head>
 <body>
 
-    <h2 id="t"></h2>
-    <h3>💰 Pi: <span id="p">0.000000</span> (Drip: 0.002000/10s)</h3>
+    <div class="header">
+        <h2 id="t"></h2>
+        <h3>💰 Pi: <span id="p">0.000000</span> (Drip: 0.002000/10s)</h3>
+    </div>
 
-    <!-- Sign-In & 3.14 Button -->
+    <!-- Sign-In & 3.14 Buttons -->
     <div class="top-buttons">
         <button onclick="signIn()">🔑 Sign In</button>
         <button onclick="piAction()">🔄 3.14 Action</button>
