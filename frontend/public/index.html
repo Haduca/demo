@@ -33,7 +33,7 @@
 
 <!-- Pi Coin Drip & Transfer -->
 <div id="coinDrip">
-  💰 Pi Earnings: <span id="piBalance">0</span> Pi
+  💰 Pi Earnings: <span id="piBalance">0.000000</span> Pi (Drip: <span id="dripRate">0.002000</span> Pi/10s)
   <button id="sendPi" style="margin-left:10px;">Send to Wallet</button>
 </div>
 
@@ -41,8 +41,7 @@
 <div class="grid">
   <div class="container rainbow" id="chatBotContainer">
     <h4>AI4Pi Bot</h4>
-    <div class="botName">AI4Pi Bot</div>
-    <div class="botBalance">Pi Balance: <span id="aiPiBalance">0</span></div>
+    <div class="botName">Pi Balance: <span id="aiPiBalance">0.000000</span></div>
     <div id="chatBox"></div>
     <input id="chatInput" placeholder="Type message...">
     <button id="sendChat">Send</button>
@@ -50,8 +49,7 @@
 
   <div class="container rainbow" id="gratitudeBotContainer">
     <h4>Motivation Bot</h4>
-    <div class="botName">Motivation Bot</div>
-    <div class="botBalance">Pi Balance: <span id="motivationPiBalance">0</span></div>
+    <div class="botName">Pi Balance: <span id="motivationPiBalance">0.000000</span></div>
     <div id="gratitudeBox"></div>
     <input id="gratitudeInput" placeholder="What are you thankful for?">
     <button id="submitGratitude">Submit</button>
@@ -59,8 +57,7 @@
 
   <div class="container rainbow" id="feedbackBotContainer">
     <h4>Pi Solutions Bot</h4>
-    <div class="botName">Pi Solutions Bot</div>
-    <div class="botBalance">Pi Balance: <span id="feedbackPiBalance">0</span></div>
+    <div class="botName">Pi Balance: <span id="feedbackPiBalance">0.000000</span></div>
     <div id="feedbackBox"></div>
     <input id="feedbackInput" placeholder="Share your thoughts...">
     <button id="submitFeedback">Submit</button>
@@ -68,8 +65,7 @@
 
   <div class="container rainbow" id="mathBotContainer">
     <h4>Math Bot</h4>
-    <div class="botName">Math Bot</div>
-    <div class="botBalance">Pi Balance: <span id="mathPiBalance">0</span></div>
+    <div class="botName">Pi Balance: <span id="mathPiBalance">0.000000</span></div>
     <div id="mathBox">Solve: <span id="mathProblem">0 + 0</span></div>
     <input id="mathInput" placeholder="Answer...">
     <button id="submitMath">Submit</button>
@@ -77,73 +73,44 @@
 </div>
 
 <script>
+let piBalance = 0.000000, dripRate = 0.002000;
 let bots = [
-  { name: "AI4Pi Bot", balance: 0, lastPost: 0, wallId: "chatBox", elementId: "aiPiBalance" },
-  { name: "Motivation Bot", balance: 0, lastPost: 0, wallId: "gratitudeBox", elementId: "motivationPiBalance" },
-  { name: "Pi Solutions Bot", balance: 0, lastPost: 0, wallId: "feedbackBox", elementId: "feedbackPiBalance" },
-  { name: "Math Bot", balance: 0, lastPost: 0, wallId: "mathBox", elementId: "mathPiBalance" }
+  { name: "AI4Pi Bot", balance: 0.000000, wallId: "chatBox", elementId: "aiPiBalance" },
+  { name: "Motivation Bot", balance: 0.000000, wallId: "gratitudeBox", elementId: "motivationPiBalance" },
+  { name: "Pi Solutions Bot", balance: 0.000000, wallId: "feedbackBox", elementId: "feedbackPiBalance" },
+  { name: "Math Bot", balance: 0.000000, wallId: "mathBox", elementId: "mathPiBalance" }
 ];
 
-let users = [];
-let clockInterval = setInterval(updateClock, 1000);
-
-// Timer for Pi Coin Drip
+// Update Clock
 setInterval(() => {
-  let dripper = bots[Math.floor(Math.random() * bots.length)];
-  let targetUser = users[Math.floor(Math.random() * users.length)];
-  
-  if(targetUser) {
-    let dripAmount = dripper.balance * 0.1;
-    targetUser.balance += dripAmount;
-    document.getElementById("coinDrip").innerHTML = `💰 Pi Earnings: ${targetUser.balance.toFixed(2)} Pi`;
-  }
+  document.getElementById("clock").innerText = new Date().toLocaleTimeString();
+}, 1000);
+
+// Pi Drip Mechanism
+setInterval(() => {
+  piBalance += dripRate;
+  document.getElementById("piBalance").innerText = piBalance.toFixed(6);
+  let activeBot = bots[Math.floor(Math.random() * bots.length)];
+  activeBot.balance += dripRate / bots.length;
+  document.getElementById(activeBot.elementId).innerText = activeBot.balance.toFixed(6);
 }, 10000);
 
-// Update clock
-function updateClock() {
-  let clock = document.getElementById("clock");
-  clock.innerText = new Date().toLocaleTimeString();
-  if (Math.random() < 0.1) clock.classList.add("sparkle");
-  else clock.classList.remove("sparkle");
-}
-
-// Random messages from bots
+// Bots Respond to Each Other & Rotate
 setInterval(() => {
   let activeBot = bots[Math.floor(Math.random() * bots.length)];
-  let message = `${activeBot.name}: ${getRandomMessage()}`;
-  
-  document.getElementById(activeBot.wallId).innerHTML += `<p>${message}</p>`;
-  activeBot.lastPost = Date.now();
+  let targetBot = bots.filter(b => b.name !== activeBot.name)[Math.floor(Math.random() * (bots.length - 1))];
+
+  document.getElementById(activeBot.wallId).innerHTML += `<p>${activeBot.name}: "What do you think, ${targetBot.name}?"</p>`;
+  setTimeout(() => {
+    document.getElementById(targetBot.wallId).innerHTML += `<p>${targetBot.name}: "I think that's a great point, ${activeBot.name}!"</p>`;
+  }, 2000);
 }, Math.floor(Math.random() * (15000 - 8000) + 8000));
 
-// Math Problem
-let mathProblem = generateMathProblem();
-document.getElementById("mathProblem").innerText = mathProblem;
-document.getElementById("submitMath").onclick = function() {
-  if (parseInt(document.getElementById("mathInput").value) === mathProblem) {
-    bots.find(b => b.name === "Math Bot").balance += 0.05;
-    document.getElementById("mathBox").innerHTML += `<p>Math Bot: Correct! You earned Pi.</p>`;
-  } else {
-    document.getElementById("mathBox").innerHTML += `<p>Math Bot: Incorrect, try again!</p>`;
-  }
-};
-
-// Bot Random Question Generation
-function getRandomMessage() {
-  let messages = [
-    "What's your favorite color?", 
-    "What makes you happy?", 
-    "What is your dream job?"
-  ];
-  return messages[Math.floor(Math.random() * messages.length)];
-}
-
-// Generate math problem
-function generateMathProblem() {
-  let num1 = Math.floor(Math.random() * 10) + 1;
-  let num2 = Math.floor(Math.random() * 10) + 1;
-  return num1 + num2;
-}
+// Math Bot Problem Generator
+setInterval(() => {
+  let num1 = Math.floor(Math.random() * 10) + 1, num2 = Math.floor(Math.random() * 10) + 1;
+  document.getElementById("mathProblem").innerText = `${num1} + ${num2}`;
+}, 10000);
 </script>
 
 </body>
