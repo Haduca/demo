@@ -40,8 +40,38 @@
 <body>
   <h1>AI4Pi Login Test</h1>
   <button onclick="loginWithPi()">Login with Pi</button>
+  <button onclick="payWithPi()">Pay 3.14 Pi</button>
   <div id="statusIndicator"></div>
+<script>
+  function payWithPi() {
+    // The payment object tells Pi how much Pi to charge and optional info
+    const payment = {
+      amount: 3.14,                 // Pi amount
+      memo: "AI4Pi Payment",        // A short note for the payment
+      metadata: { test: "someData" } // Any extra data (optional)
+    };
 
+    Pi.createPayment(payment, {
+      onReadyForServerApproval: function(paymentId) {
+        console.log("Payment ID:", paymentId);
+        // If you had a backend, you'd approve here. For now, do nothing.
+      },
+      onReadyForServerCompletion: function(paymentId, txid) {
+        console.log("Ready for completion:", paymentId, txid);
+        // If you had a backend, you'd finalize here. For now, do nothing.
+      },
+      onSuccessfulPayment: function(paymentId, txid) {
+        alert("Payment successful! TxID: " + txid);
+      },
+      onError: function(error) {
+        alert("Payment error: " + error);
+      },
+      onPaymentCancel: function(paymentId) {
+        alert("Payment cancelled!");
+      }
+    });
+  }
+</script>
   <script>
     // Set to true for Testnet; set to false for Production/Mainnet.
     const SANDBOX_MODE = true;
