@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Static Screen</title>
+    <title>AI4Pi - No Bot Responses</title>
     <style>
         body {
             font-family: sans-serif;
@@ -13,27 +13,40 @@
             margin: 0;
             padding: 0;
             height: 100vh;
-            overflow: hidden; /* Prevent accidental scrolling */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
         }
 
-        /* Container for the app layout */
         .app-container {
             width: 100%;
-            max-width: 480px; /* Matches standard mobile screen size */
             height: 100vh;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 5px;
-            padding: 10px;
             box-sizing: border-box;
+            padding: 10px;
         }
 
-        /* Walls (Static Quadrants) */
+        /* Default Layout for Desktop (2x2 Quadrants) */
+        @media (min-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr 1fr;
+                gap: 10px;
+                max-width: 800px;
+            }
+        }
+
+        /* Mobile Layout (Single Column) */
+        @media (max-width: 767px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, 1fr);
+                height: auto;
+            }
+        }
+
+        /* Walls */
         .wall {
             display: flex;
             flex-direction: column-reverse;
@@ -42,7 +55,7 @@
             background: white;
             padding: 10px;
             border-radius: 5px;
-            height: 100%;
+            overflow-y: auto;
         }
 
         /* Text Box */
@@ -74,7 +87,7 @@
         /* Top Buttons */
         .top-buttons {
             width: 100%;
-            max-width: 480px;
+            max-width: 800px;
             display: flex;
             justify-content: space-between;
             padding: 10px;
@@ -97,7 +110,6 @@
         <button onclick="piAction()">🔄 3.14 Action</button>
     </div>
 
-    <!-- Static 2x2 Grid Layout -->
     <div class="app-container">
         <div class="wall" id="ai">
             <b>AI</b>
@@ -131,7 +143,6 @@
 
     <script>
         const $ = id => document.getElementById(id);
-        const walls = ["ai", "mo", "so", "ma"];
         let p = 0;
 
         // Display real-time clock
@@ -156,33 +167,6 @@
             }
 
             input.value = "";
-        }
-
-        // Bot AI Responses (Each wall gets periodic bot interactions)
-        setInterval(() => {
-            let wallId = walls[Math.random() * walls.length | 0];
-            let messages = $("#" + wallId).querySelector(".messages");
-            let botResponse = `<p><b>${wallId.toUpperCase()} Bot:</b> ${generateBotResponse()}</p>`;
-
-            messages.insertAdjacentHTML("afterbegin", botResponse);
-
-            while (messages.children.length > 10) {
-                messages.removeChild(messages.lastChild);
-            }
-        }, 3000);
-
-        function generateBotResponse() {
-            let responses = [
-                "Interesting thought!",
-                "Let's explore this idea.",
-                "I like where this is going!",
-                "Can you elaborate?",
-                "This has potential.",
-                "How does this relate to AI?",
-                "Pi Network integration idea?",
-                "Have you considered another approach?"
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
         }
 
         // Sign-In Simulation
