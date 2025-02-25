@@ -2,23 +2,80 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Bot Network</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AI4Pi - Mobile Optimized</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: white; color: black; }
-        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
+        body { font-family: sans-serif; text-align: center; background: white; color: black; margin: 0; padding: 0; }
         
-        /* Walls */
-        .wall { border-radius: 8px; padding: 10px; height: 200px; overflow-y: auto; display: flex; flex-direction: column-reverse; background: white; border: 2px solid black; }
+        /* Ensure the app takes up full screen on mobile */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            width: 95%;
+            max-width: 480px; /* Restrict max width to fit a phone screen */
+            margin: auto;
+        }
 
-        /* Text Box */
-        .text-box { display: flex; margin-top: 5px; }
-        input { flex-grow: 1; padding: 5px; border-radius: 5px; border: 1px solid black; background: white; color: black; }
-        button { padding: 5px; border-radius: 5px; border: 1px solid black; background: black; color: white; cursor: pointer; }
+        /* Walls (Chat Areas) */
+        .wall {
+            border-radius: 8px;
+            padding: 10px;
+            height: 180px; /* Adjusted height for mobile */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            background: white;
+            border: 2px solid black;
+        }
+
+        /* Text Box for Input */
+        .text-box {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        input {
+            flex-grow: 1;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid black;
+            background: white;
+            color: black;
+            font-size: 16px; /* Increased for mobile readability */
+        }
+        button {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid black;
+            background: black;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
         button:hover { background: gray; }
 
         /* Top Buttons */
-        .top-buttons { margin-bottom: 10px; }
+        .top-buttons {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+        .top-buttons button {
+            flex: 1;
+            margin: 5px;
+        }
+
+        /* Responsive Design for Smaller Screens */
+        @media (max-width: 480px) {
+            .wall {
+                height: 200px;
+            }
+            button, input {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
