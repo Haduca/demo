@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Fixed Layout</title>
+    <title>AI4Pi - Bot Network</title>
     <style>
-        /* Lock screen size and prevent resizing */
+        /* Lock screen size */
         html, body {
             font-family: sans-serif;
             text-align: center;
@@ -22,14 +22,14 @@
             justify-content: flex-start;
         }
 
-        /* Header Section */
+        /* Header */
         .header {
             width: 100%;
             padding: 10px;
             box-sizing: border-box;
         }
 
-        /* Top Buttons Section */
+        /* Top Buttons */
         .top-buttons {
             width: 100%;
             display: flex;
@@ -55,46 +55,45 @@
         }
 
         /* Fixed 2x2 Grid Layout */
-        .app-container {
+        .container {
             display: grid;
-            width: 100vw;
-            height: calc(100vh - 120px); /* Adjusted height to prevent cutoff */
+            width: 90vw;
+            height: calc(100vh - 120px);
             grid-template-columns: 50% 50%;
             grid-template-rows: 50% 50%;
-            gap: 2px;
+            gap: 5px;
             box-sizing: border-box;
             padding: 5px;
         }
 
-        /* Walls evenly divided */
+        /* Walls */
         .wall {
+            border-radius: 8px;
+            padding: 10px;
+            height: 100%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            border: 2px solid black;
             background: white;
-            padding: 10px;
-            border-radius: 3px;
-            width: 100%;
-            height: 100%;
+            border: 2px solid black;
             box-sizing: border-box;
-            overflow: hidden; /* Ensures content fits */
+            overflow: hidden;
         }
 
-        /* Keep text input inside the wall */
+        /* Text Box */
         .text-box {
             display: flex;
             width: 90%;
             padding: 5px;
             box-sizing: border-box;
-            gap: 5px;
         }
 
         input {
             flex-grow: 1;
             padding: 5px;
-            border-radius: 3px;
+            border-radius: 5px;
             border: 1px solid black;
             background: white;
             color: black;
@@ -106,7 +105,6 @@
         input:focus {
             outline: none;
         }
-
     </style>
 </head>
 <body>
@@ -122,7 +120,7 @@
         <button onclick="piAction()">🔄 3.14 Action</button>
     </div>
 
-    <div class="app-container">
+    <div class="container">
         <div class="wall" id="ai">
             <b>AI</b>
             <div class="messages"></div>
@@ -155,6 +153,7 @@
 
     <script>
         const $ = id => document.getElementById(id);
+        const walls = ["ai", "mo", "so", "ma"];
         let p = 0;
 
         // Display real-time clock
@@ -179,6 +178,33 @@
             }
 
             input.value = "";
+        }
+
+        // Bot AI Responses (Each wall gets periodic bot interactions)
+        setInterval(() => {
+            let wallId = walls[Math.random() * walls.length | 0];
+            let messages = $("#" + wallId).querySelector(".messages");
+            let botResponse = `<p><b>${wallId.toUpperCase()} Bot:</b> ${generateBotResponse()}</p>`;
+
+            messages.insertAdjacentHTML("afterbegin", botResponse);
+
+            while (messages.children.length > 10) {
+                messages.removeChild(messages.lastChild);
+            }
+        }, 3000);
+
+        function generateBotResponse() {
+            let responses = [
+                "Interesting thought!",
+                "Let's explore this idea.",
+                "I like where this is going!",
+                "Can you elaborate?",
+                "This has potential.",
+                "How does this relate to AI?",
+                "Pi Network integration idea?",
+                "Have you considered another approach?"
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
         }
 
         // Sign-In Simulation
