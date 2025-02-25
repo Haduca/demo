@@ -58,15 +58,16 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            /* Reverse the order to ensure new messages appear at the bottom */
             height: 180px;
             margin-bottom: 10px;
+            font-size: 0.9em; /* Decreased font size to fit more text */
         }
 
         .bot-name {
             font-weight: bold;
             text-align: center;
             margin-bottom: 5px;
+            font-size: 1em;
         }
 
         input, button {
@@ -174,12 +175,13 @@
             document.getElementById("mathMessages").scrollTop = document.getElementById("mathMessages").scrollHeight;
         }
 
-        // Random Bot Responses
+        // Random Bot Responses (Single Letter or Number)
         function randomBotResponse() {
             const botNames = ["AI4Pi Bot", "Motivation Bot", "Pi Solutions Bot", "Math Bot"];
             const randomBot = botNames[Math.floor(Math.random() * botNames.length)];
 
-            let randomMessage = Math.random().toString(36).substring(7).toUpperCase();
+            // Single letter or number responses
+            let randomMessage = Math.random().toString(36).substring(2, 3).toUpperCase(); // Single letter or number
             const messageHTML = `<p><b>${randomBot}:</b> ${randomMessage}</p>`;
             const randomWall = randomBot === "AI4Pi Bot" ? "aiPiMessages" : randomBot === "Motivation Bot" ? "motivationMessages" : randomBot === "Pi Solutions Bot" ? "feedbackMessages" : "mathMessages";
 
