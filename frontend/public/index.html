@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI4Pi Chat</title>
     <style>
-        /* Basic CSS for layout and appearance */
+        /* Layout and appearance updates */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
         .bot-wall {
             width: 48%;
             display: inline-block;
@@ -14,9 +21,10 @@
             border-radius: 10px;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow-y: scroll;
-            max-height: 200px;
-            border: 2px solid transparent;
+            overflow-y: auto;
+            max-height: 300px;
+            border: 3px solid transparent;
+            margin-top: 10px;
         }
 
         .bot-wall input {
@@ -40,6 +48,7 @@
             text-align: center;
             margin-top: 20px;
             font-weight: bold;
+            color: #555;
         }
 
         .highlight-border {
@@ -54,33 +63,39 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        .bot-wall input {
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
+
     <div id="clock"></div>
-    <div class="bot-wall" id="chatWall">
-        <div class="bot-name" id="aiPiName">AI4Pi Bot (Pi Balance: 0 Pi)</div>
+
+    <div class="bot-wall" id="aiPiBot">
+        <div class="bot-name">AI4Pi Bot (Pi Balance: 0 Pi)</div>
         <div id="aiPiMessages" class="message"></div>
         <input type="text" id="aiPiInput" placeholder="Say something..." />
         <button class="button" onclick="sendAiPiMessage()">Send</button>
     </div>
 
-    <div class="bot-wall" id="motivationWall">
-        <div class="bot-name" id="motivationBotName">Motivation Bot (Pi Balance: 0 Pi)</div>
+    <div class="bot-wall" id="motivationBot">
+        <div class="bot-name">Motivation Bot (Pi Balance: 0 Pi)</div>
         <div id="motivationMessages" class="message"></div>
         <input type="text" id="motivationInput" placeholder="What are you thankful for?" />
         <button class="button" onclick="sendMotivationMessage()">Submit</button>
     </div>
 
-    <div class="bot-wall" id="feedbackWall">
-        <div class="bot-name" id="feedbackBotName">Pi Solutions Bot (Pi Balance: 0 Pi)</div>
+    <div class="bot-wall" id="feedbackBot">
+        <div class="bot-name">Pi Solutions Bot (Pi Balance: 0 Pi)</div>
         <div id="feedbackMessages" class="message"></div>
         <input type="text" id="feedbackInput" placeholder="Share your thoughts..." />
         <button class="button" onclick="sendFeedbackMessage()">Submit</button>
     </div>
 
-    <div class="bot-wall" id="mathWall">
-        <div class="bot-name" id="mathBotName">Math Bot (Pi Balance: 0 Pi)</div>
+    <div class="bot-wall" id="mathBot">
+        <div class="bot-name">Math Bot (Pi Balance: 0 Pi)</div>
         <div id="mathMessages" class="message"></div>
         <input type="text" id="mathInput" placeholder="Answer the question..." />
         <button class="button" onclick="sendMathMessage()">Submit</button>
@@ -106,9 +121,9 @@
         let botInterval = null;
 
         const bots = [
-            { name: 'AI4Pi Bot', balance: 0, messages: ['What is your dream job?', 'What is your favorite color?'], wall: 'aiPiMessages' },
+            { name: 'AI4Pi Bot', balance: 0, messages: ['What do you think, Motivation Bot?', 'What do you think, Pi Solutions Bot?'], wall: 'aiPiMessages' },
             { name: 'Motivation Bot', balance: 0, messages: ['What is your favorite color?', 'How are you feeling today?'], wall: 'motivationMessages' },
-            { name: 'Pi Solutions Bot', balance: 0, messages: ['What is your favorite thing about Pi?', 'How do you use Pi in your daily life?'], wall: 'feedbackMessages' },
+            { name: 'Pi Solutions Bot', balance: 0, messages: ['What do you think about Pi?', 'How do you use Pi in your daily life?'], wall: 'feedbackMessages' },
             { name: 'Math Bot', balance: 0, messages: ['Solve 8 + 3', 'Solve 12 - 4'], wall: 'mathMessages' }
         ];
 
