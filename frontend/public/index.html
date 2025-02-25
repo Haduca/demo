@@ -10,7 +10,7 @@
         #coinDrip { color: #DAA520; font-weight: bold; }
         .chat-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 90%; max-width: 1200px; margin-top: 10px; }
         .chat-box { display: flex; flex-direction: column; border: 2px solid #ccc; padding: 5px; height: 250px; overflow-y: auto; }
-        .message-container { flex-grow: 1; overflow-y: auto; height: 180px; font-size: 0.9em; }
+        .message-container { flex-grow: 1; overflow-y: auto; font-size: 0.9em; }
         .bot-name { font-weight: bold; text-align: center; font-size: 1em; }
         input, button { padding: 5px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
         button { background: #333; color: white; cursor: pointer; }
@@ -22,28 +22,28 @@
     <div id="coinDrip">💰 Pi Earnings: <span id="piBalance">0.000000</span> Pi (Drip: <span id="dripRate">0.002000</span> Pi/10s)</div>
 
     <div class="chat-container">
-        <div class="chat-box">
+        <div class="chat-box" id="aiPiBox">
             <div class="bot-name">AI4Pi Bot</div>
             <div class="message-container" id="aiPiMessages"></div>
             <input type="text" id="aiPiInput" placeholder="Say something..." />
             <button onclick="sendMessage('aiPi')">Send</button>
         </div>
 
-        <div class="chat-box">
+        <div class="chat-box" id="motivationBox">
             <div class="bot-name">Motivation Bot</div>
             <div class="message-container" id="motivationMessages"></div>
             <input type="text" id="motivationInput" placeholder="What are you thankful for?" />
             <button onclick="sendMessage('motivation')">Submit</button>
         </div>
 
-        <div class="chat-box">
+        <div class="chat-box" id="feedbackBox">
             <div class="bot-name">Pi Solutions Bot</div>
             <div class="message-container" id="feedbackMessages"></div>
             <input type="text" id="feedbackInput" placeholder="Share your thoughts..." />
             <button onclick="sendMessage('feedback')">Submit</button>
         </div>
 
-        <div class="chat-box">
+        <div class="chat-box" id="mathBox">
             <div class="bot-name">Math Bot</div>
             <div class="message-container" id="mathMessages">Solve: <span id="mathProblem">0 + 0</span></div>
             <input type="text" id="mathInput" placeholder="Answer..." />
@@ -73,12 +73,18 @@
         }
 
         function randomBotResponse() {
-            const botNames = ["AI4Pi Bot", "Motivation Bot", "Pi Solutions Bot", "Math Bot"];
-            const randomBot = botNames[Math.floor(Math.random() * botNames.length)];
+            const bots = ["AI4Pi Bot", "Motivation Bot", "Pi Solutions Bot", "Math Bot"];
+            const randomBot = bots[Math.floor(Math.random() * bots.length)];
             const response = Math.random().toString(36).substring(2, 3).toUpperCase();
-            const randomWall = randomBot === "AI4Pi Bot" ? "aiPiMessages" : randomBot === "Motivation Bot" ? "motivationMessages" : randomBot === "Pi Solutions Bot" ? "feedbackMessages" : "mathMessages";
+            const randomWall = {
+                "AI4Pi Bot": "aiPiMessages",
+                "Motivation Bot": "motivationMessages",
+                "Pi Solutions Bot": "feedbackMessages",
+                "Math Bot": "mathMessages"
+            }[randomBot];
             document.getElementById(randomWall).innerHTML = `<p><b>${randomBot}:</b> ${response}</p>` + document.getElementById(randomWall).innerHTML;
         }
+
         setInterval(randomBotResponse, 1000);
     </script>
 </body>
