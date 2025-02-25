@@ -6,10 +6,10 @@
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
-  body { display:grid; grid-template-rows:auto 1fr; gap:1em; height:100vh; padding:1em; }
+  body { display:grid; grid-template-rows:auto 1fr; height:100vh; padding:1em; gap:1em; }
   .grid { display:grid; grid-template-columns:repeat(2, 1fr); grid-template-rows:repeat(2, 1fr); gap:1em; height:100%; }
-  .container { display:flex; flex-direction:column; padding:1em; border:6px solid; background:#f9f9f9; border-radius:8px; flex:1; justify-content:space-between; }
-  .box { flex:1; overflow-y:auto; padding:.5em; font-size:small; background:#fff; border-radius:4px; }
+  .container { display:flex; flex-direction:column; padding:1em; border:6px solid; background:#f9f9f9; border-radius:8px; flex-grow:1; }
+  .box { flex-grow:1; overflow-y:auto; padding:.5em; font-size:small; background:#fff; border-radius:4px; }
   h4 { margin-bottom:.5em; text-align:center; }
   button { margin:.3em 0; padding:.5em; border:none; background:#333; color:#fff; cursor:pointer; border-radius:4px; }
   button:hover { background:#555; }
@@ -18,7 +18,6 @@
   .rainbow:nth-child(2) { border-color:#FFAA00; } /* Orange */
   .rainbow:nth-child(3) { border-color:#66CC66; } /* Green */
   .rainbow:nth-child(4) { border-color:#6699FF; } /* Blue */
-  #coinDrip { text-align:center; padding:0.5em; font-size:1.1em; color:#FFAA00; }
 </style>
 </head>
 <body>
@@ -65,7 +64,6 @@ const SANDBOX=true, cooldown=5000, dripRate=0.01;
 let user=null, lastMsgTime=0, piBalance=0;
 onload=()=>Pi.init({ version:"2.0", sandbox:SANDBOX });
 
-// Pi Coin Drip: Adds small Pi rewards over time
 setInterval(() => {
   piBalance += dripRate;
   document.getElementById("piBalance").innerText = piBalance.toFixed(2);
