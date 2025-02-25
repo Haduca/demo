@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Full Screen Scaling</title>
+    <title>AI4Pi - Fixed Quadrant Layout</title>
     <style>
-        /* Ensure the entire screen is fully used */
+        /* Ensure the entire screen is used */
         html, body {
             font-family: sans-serif;
             text-align: center;
@@ -21,37 +21,23 @@
             justify-content: space-between;
         }
 
-        /* Grid container adjusts to fill both width & height */
+        /* Container for structured 2x2 quadrant layout */
         .app-container {
             display: grid;
             width: 100vw;
             height: 100vh;
-            gap: 2px;
             padding: 5px;
             box-sizing: border-box;
         }
 
-        /* Default 2x2 Quadrant Layout for PC */
-        @media (min-width: 768px) {
-            .app-container {
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: 1fr 1fr;
-                max-width: 900px;
-                max-height: 90vh;
-            }
+        /* Enforce 2x2 Grid on All Devices */
+        .app-container {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 5px;
         }
 
-        /* 1x4 Column Layout for Mobile (ensures all walls are fully visible) */
-        @media (max-width: 767px) {
-            .app-container {
-                grid-template-columns: 1fr;
-                grid-template-rows: repeat(4, 1fr);
-                height: 100vh;
-                width: 100vw;
-            }
-        }
-
-        /* Walls scale dynamically with screen */
+        /* Walls remain evenly divided */
         .wall {
             display: flex;
             flex-direction: column;
@@ -65,7 +51,7 @@
             height: 100%;
         }
 
-        /* Text Box Stays at the Bottom Inside Walls */
+        /* Ensure Text Box Stays Inside Walls */
         .text-box {
             display: flex;
             gap: 5px;
