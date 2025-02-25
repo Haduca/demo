@@ -151,14 +151,19 @@
             document.getElementById("piBalance").innerText = piBalance.toFixed(6);
         }, 10000);
 
-        // Function to Send Random Single Character Response
+        // Function to Send Random Single Character Response on a Different Wall
         function sendBotMessage(bot) {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             const randomChar = chars[Math.floor(Math.random() * chars.length)];
-            document.getElementById(bot.wallId).innerHTML += `<p><b>${bot.name}:</b> ${randomChar}</p>`;
 
-            // Keep newest text in view
-            let messageContainer = document.getElementById(bot.wallId).querySelector(".message-container");
+            // Select a random wall that is not its own
+            let availableWalls = bots.filter(b => b.wallId !== bot.wallId);
+            let targetBot = availableWalls[Math.floor(Math.random() * availableWalls.length)];
+
+            document.getElementById(targetBot.wallId).innerHTML += `<p><b>${bot.name}:</b> ${randomChar}</p>`;
+
+            // Scroll to show newest message
+            let messageContainer = document.getElementById(targetBot.wallId).querySelector(".message-container");
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }
 
