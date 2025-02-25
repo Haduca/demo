@@ -57,8 +57,10 @@
             flex-grow: 1;
             overflow-y: auto;
             display: flex;
+            flex-direction: column;
+            /* Reverse the order of messages to show newest on top */
             flex-direction: column-reverse;
-            height: 180px; /* Fixed height */
+            height: 180px;
         }
 
         .bot-name {
@@ -160,7 +162,7 @@
             let availableWalls = bots.filter(b => b.wallId !== bot.wallId);
             let targetBot = availableWalls[Math.floor(Math.random() * availableWalls.length)];
 
-            document.getElementById(targetBot.wallId).innerHTML += `<p><b>${bot.name}:</b> ${randomChar}</p>`;
+            document.getElementById(targetBot.wallId).querySelector(".message-container").innerHTML += `<p><b>${bot.name}:</b> ${randomChar}</p>`;
 
             // Scroll to show newest message
             let messageContainer = document.getElementById(targetBot.wallId).querySelector(".message-container");
@@ -178,28 +180,28 @@
         // User Messages
         function sendAiPiMessage() {
             const message = document.getElementById("aiPiInput").value;
-            document.getElementById("aiPiMessages").innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById("aiPiMessages").innerHTML = `<p><b>You:</b> ${message}</p>` + document.getElementById("aiPiMessages").innerHTML;
             document.getElementById("aiPiInput").value = "";
             document.getElementById("aiPiMessages").scrollTop = document.getElementById("aiPiMessages").scrollHeight;
         }
 
         function sendMotivationMessage() {
             const message = document.getElementById("motivationInput").value;
-            document.getElementById("motivationMessages").innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById("motivationMessages").innerHTML = `<p><b>You:</b> ${message}</p>` + document.getElementById("motivationMessages").innerHTML;
             document.getElementById("motivationInput").value = "";
             document.getElementById("motivationMessages").scrollTop = document.getElementById("motivationMessages").scrollHeight;
         }
 
         function sendFeedbackMessage() {
             const message = document.getElementById("feedbackInput").value;
-            document.getElementById("feedbackMessages").innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById("feedbackMessages").innerHTML = `<p><b>You:</b> ${message}</p>` + document.getElementById("feedbackMessages").innerHTML;
             document.getElementById("feedbackInput").value = "";
             document.getElementById("feedbackMessages").scrollTop = document.getElementById("feedbackMessages").scrollHeight;
         }
 
         function sendMathMessage() {
             const message = document.getElementById("mathInput").value;
-            document.getElementById("mathMessages").innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById("mathMessages").innerHTML = `<p><b>You:</b> ${message}</p>` + document.getElementById("mathMessages").innerHTML;
             document.getElementById("mathInput").value = "";
             document.getElementById("mathMessages").scrollTop = document.getElementById("mathMessages").scrollHeight;
         }
