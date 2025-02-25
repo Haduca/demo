@@ -1,125 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AI4Pi Bot Network</title>
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
-    body { display:grid; grid-template-rows:auto auto 1fr; height:100vh; padding:1em; gap:.5em; background:#f4f4f4; }
-    .clock { text-align:center; font-size:1.4em; font-weight:bold; padding:.5em; color:#333; transition: 0.3s ease-in-out; }
-    .grid { display:grid; grid-template-columns:repeat(2, 1fr); grid-template-rows:repeat(2, 1fr); gap:.5em; height:100%; }
-    .container { display:flex; flex-direction:column; padding:1em; border:5px solid; background:#fff; border-radius:8px; flex-grow:1; justify-content:space-between; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);}
-    .activeBot { border: 5px solid #ff6347; }
-    .box { flex-grow:1; overflow-y:auto; padding:.5em; font-size:small; background:#fff; border-radius:4px; line-height:1.3;}
-    h4 { margin-bottom:.5em; text-align:center; font-size:1.2em; font-weight:bold; }
-    button { margin:.3em 0; padding:.5em; border:none; background:#333; color:#fff; cursor:pointer; border-radius:4px; }
-    button:hover { background:#555; }
-    input { width:100%; padding:.3em; margin-top:.5em; }
-    .rainbow:nth-child(1) { border-image: linear-gradient(45deg, #FF4D4D, #FFAA00, #FFDC00) 1; }
-    .rainbow:nth-child(2) { border-image: linear-gradient(45deg, #FFAA00, #FFD700, #66CC66) 1; }
-    .rainbow:nth-child(3) { border-image: linear-gradient(45deg, #66CC66, #00AEEF, #0033CC) 1; }
-    .rainbow:nth-child(4) { border-image: linear-gradient(45deg, #6699FF, #0033CC, #8A2BE2) 1; }
-    #coinDrip { text-align:center; padding:0.5em; font-size:1.2em; font-weight:bold; color:#DAA520; }
-    .sparkle { color:#ff0000; font-size:1.5em; text-shadow:0 0 10px #ffcc00, 0 0 20px #ffcc00; }
-    .botName { font-size:1.1em; font-weight:bold; text-align:center; margin-top:.5em; }
-    .botBalance { font-size:.9em; text-align:center; color:#000; margin-top:10px; }
-    .controlBtns { position:absolute; top:10px; left:10px; display:flex; flex-direction:column; }
-    .controlBtns button { padding:0.5em; margin:.2em; font-size:.8em; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI4Pi Chat</title>
+    <style>
+        /* Basic CSS for layout and appearance */
+        .bot-wall {
+            width: 48%;
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-y: scroll;
+            max-height: 200px;
+        }
+
+        .bot-wall input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .bot-wall .bot-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .bot-wall .message {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        #clock {
+            font-size: 1.5em;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Border Color Animation for Drip Highlight */
+        .highlight-border {
+            border: 5px solid gold;
+            box-shadow: 0 0 10px rgba(255, 223, 0, 0.8);
+        }
+    </style>
 </head>
 <body>
+    <div id="clock"></div>
+    <div class="bot-wall" id="chatWall">
+        <div class="bot-name" id="aiPiName">AI4Pi Bot (Pi Balance: 0 Pi)</div>
+        <div id="aiPiMessages" class="message"></div>
+        <input type="text" id="aiPiInput" placeholder="Say something..." />
+        <button class="button" onclick="sendAiPiMessage()">Send</button>
+    </div>
 
-<!-- Control Buttons -->
-<div class="controlBtns">
-  <button id="loginBtn">Login with Pi</button>
-  <button id="payBtn">Pay 3.14 Pi</button>
-</div>
+    <div class="bot-wall" id="motivationWall">
+        <div class="bot-name" id="motivationBotName">Motivation Bot (Pi Balance: 0 Pi)</div>
+        <div id="motivationMessages" class="message"></div>
+        <input type="text" id="motivationInput" placeholder="What are you thankful for?" />
+        <button class="button" onclick="sendMotivationMessage()">Submit</button>
+    </div>
 
-<!-- Clock Display -->
-<div class="clock" id="clock">Loading time...</div>
+    <div class="bot-wall" id="feedbackWall">
+        <div class="bot-name" id="feedbackBotName">Pi Solutions Bot (Pi Balance: 0 Pi)</div>
+        <div id="feedbackMessages" class="message"></div>
+        <input type="text" id="feedbackInput" placeholder="Share your thoughts..." />
+        <button class="button" onclick="sendFeedbackMessage()">Submit</button>
+    </div>
 
-<!-- Pi Coin Drip & Transfer -->
-<div id="coinDrip">
-  💰 Pi Earnings: <span id="piBalance">0.000000</span> Pi (Drip: <span id="dripRate">0.002000</span> Pi/10s)
-  <button id="sendPi" style="margin-left:10px;">Send to Wallet</button>
-</div>
+    <div class="bot-wall" id="mathWall">
+        <div class="bot-name" id="mathBotName">Math Bot (Pi Balance: 0 Pi)</div>
+        <div id="mathMessages" class="message"></div>
+        <input type="text" id="mathInput" placeholder="Answer the question..." />
+        <button class="button" onclick="sendMathMessage()">Submit</button>
+    </div>
 
-<!-- Main Grid Layout -->
-<div class="grid">
-  <div class="container rainbow" id="chatBotContainer">
-    <h4>AI4Pi Bot</h4>
-    <div class="botName">Pi Balance: <span id="aiPiBalance">0.000000</span></div>
-    <div id="chatBox"></div>
-    <input id="chatInput" placeholder="Type message...">
-    <button id="sendChat">Send</button>
-  </div>
+    <script>
+        // Clock Update
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('clock').innerText = timeString;
 
-  <div class="container rainbow" id="gratitudeBotContainer">
-    <h4>Motivation Bot</h4>
-    <div class="botName">Pi Balance: <span id="motivationPiBalance">0.000000</span></div>
-    <div id="gratitudeBox"></div>
-    <input id="gratitudeInput" placeholder="What are you thankful for?">
-    <button id="submitGratitude">Submit</button>
-  </div>
+            // If drip is active, highlight clock
+            if (Math.random() < 0.2) {
+                document.getElementById('clock').style.color = 'red';
+            } else {
+                document.getElementById('clock').style.color = 'black';
+            }
+        }
+        setInterval(updateClock, 1000);
 
-  <div class="container rainbow" id="feedbackBotContainer">
-    <h4>Pi Solutions Bot</h4>
-    <div class="botName">Pi Balance: <span id="feedbackPiBalance">0.000000</span></div>
-    <div id="feedbackBox"></div>
-    <input id="feedbackInput" placeholder="Share your thoughts...">
-    <button id="submitFeedback">Submit</button>
-  </div>
+        // Bot Interaction System
+        let botInterval = null;
 
-  <div class="container rainbow" id="mathBotContainer">
-    <h4>Math Bot</h4>
-    <div class="botName">Pi Balance: <span id="mathPiBalance">0.000000</span></div>
-    <div id="mathBox">Solve: <span id="mathProblem">0 + 0</span></div>
-    <input id="mathInput" placeholder="Answer...">
-    <button id="submitMath">Submit</button>
-  </div>
-</div>
+        const bots = [
+            { name: 'AI4Pi Bot', balance: 0, messages: ['What is your dream job?'], wall: 'aiPiMessages' },
+            { name: 'Motivation Bot', balance: 0, messages: ['What is your favorite color?'], wall: 'motivationMessages' },
+            { name: 'Pi Solutions Bot', balance: 0, messages: ['What is your favorite thing about Pi?'], wall: 'feedbackMessages' },
+            { name: 'Math Bot', balance: 0, messages: ['Solve 8 + 3'], wall: 'mathMessages' }
+        ];
 
-<script>
-  let piBalance = 0.000000, dripRate = 0.002000;
-  let bots = [
-    { name: "AI4Pi Bot", balance: 0.000000, wallId: "chatBox", elementId: "aiPiBalance" },
-    { name: "Motivation Bot", balance: 0.000000, wallId: "gratitudeBox", elementId: "motivationPiBalance" },
-    { name: "Pi Solutions Bot", balance: 0.000000, wallId: "feedbackBox", elementId: "feedbackPiBalance" },
-    { name: "Math Bot", balance: 0.000000, wallId: "mathBox", elementId: "mathPiBalance" }
-  ];
+        // Randomly send bot messages at intervals
+        function sendBotMessage(botIndex) {
+            const bot = bots[botIndex];
+            const messageBox = document.getElementById(bot.wall);
+            const randomMessage = bot.messages[Math.floor(Math.random() * bot.messages.length)];
+            messageBox.innerHTML += `<p><b>${bot.name}:</b> ${randomMessage}</p>`;
 
-  // Update Clock
-  setInterval(() => {
-    document.getElementById("clock").innerText = new Date().toLocaleTimeString();
-  }, 1000);
+            bot.balance += Math.random() * 0.01;  // Increase balance by a small random amount
+            updateBotBalance();
+        }
 
-  // Pi Drip Mechanism
-  setInterval(() => {
-    piBalance += dripRate;
-    document.getElementById("piBalance").innerText = piBalance.toFixed(6);
-    let activeBot = bots[Math.floor(Math.random() * bots.length)];
-    activeBot.balance += dripRate / bots.length;
-    document.getElementById(activeBot.elementId).innerText = activeBot.balance.toFixed(6);
-  }, 10000);
+        // Start bot interaction
+        function startBotInteraction() {
+            botInterval = setInterval(() => {
+                const botIndex = Math.floor(Math.random() * bots.length);
+                sendBotMessage(botIndex);
+            }, 8000 + Math.random() * 7000);  // Random interval between 8-15 seconds
+        }
 
-  // Bots Interact with Each Other & Users
-  setInterval(() => {
-    let activeBot = bots[Math.floor(Math.random() * bots.length)];
-    let targetBot = bots.filter(b => b.name !== activeBot.name)[Math.floor(Math.random() * (bots.length - 1))];
-    
-    document.getElementById(activeBot.wallId).innerHTML += `<p>${activeBot.name}: "What do you think, ${targetBot.name}?"</p>`;
-    setTimeout(() => {
-      document.getElementById(targetBot.wallId).innerHTML += `<p>${targetBot.name}: "I think that's a great point, ${activeBot.name}!"</p>`;
-    }, 2000);
-  }, Math.floor(Math.random() * (15000 - 8000) + 8000));
+        // Send messages from the AI4Pi bot
+        function sendAiPiMessage() {
+            const message = document.getElementById('aiPiInput').value;
+            document.getElementById('aiPiMessages').innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById('aiPiInput').value = '';  // Clear input
+        }
 
-  // Math Bot Problem Generator
-  setInterval(() => {
-    let num1 = Math.floor(Math.random() * 10) + 1, num2 = Math.floor(Math.random() * 10) + 1;
-    document.getElementById("mathProblem").innerText = `${num1} + ${num2}`;
-  }, 10000);
-</script>
+        // Send messages from the Motivation bot
+        function sendMotivationMessage() {
+            const message = document.getElementById('motivationInput').value;
+            document.getElementById('motivationMessages').innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById('motivationInput').value = '';  // Clear input
+        }
 
+        // Send messages from the Pi Solutions bot
+        function sendFeedbackMessage() {
+            const message = document.getElementById('feedbackInput').value;
+            document.getElementById('feedbackMessages').innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById('feedbackInput').value = '';  // Clear input
+        }
+
+        // Send messages from the Math bot
+        function sendMathMessage() {
+            const message = document.getElementById('mathInput').value;
+            document.getElementById('mathMessages').innerHTML += `<p><b>You:</b> ${message}</p>`;
+            document.getElementById('mathInput').value = '';  // Clear input
+        }
+
+        // Update the bot balances periodically
+        function updateBotBalance() {
+            bots.forEach(bot => {
+                document.getElementById(`${bot.name.replace(/ /g, '')}Balance`).innerText = `Pi Balance: ${bot.balance.toFixed(4)} Pi`;
+            });
+        }
+
+        // Start bot interaction when the page loads
+        window.onload = startBotInteraction;
+    </script>
 </body>
 </html>
