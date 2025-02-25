@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Fully Fixed Screen</title>
+    <title>AI4Pi - Fixed & Fully Visible</title>
     <style>
         /* Lock screen size */
         html, body {
@@ -15,7 +15,7 @@
             padding: 0;
             width: 100vw;
             height: 100vh;
-            overflow: hidden; /* Prevents unwanted scrolling */
+            overflow: hidden; /* Prevent scrolling */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -27,13 +27,13 @@
             display: grid;
             width: 100vw;
             height: 100vh;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 5px;
+            grid-template-columns: 50% 50%;
+            grid-template-rows: 50% 50%;
+            gap: 0;
             box-sizing: border-box;
         }
 
-        /* Each wall remains fixed in its quadrant */
+        /* Walls remain evenly divided */
         .wall {
             display: flex;
             flex-direction: column;
