@@ -1,26 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AI4Pi - Login Test</title>
+  <meta charset="UTF-8" />
+  <title>AI4Pi All-in-One</title>
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     body {
-      margin: 0; padding: 1em;
       font-family: sans-serif;
-      background: #fafafa;
       text-align: center;
+      margin: 2em;
     }
-    h1 { margin-bottom: 1em; }
     button {
-      margin: 0.5em; padding: 0.6em 1.2em;
-      border: none; border-radius: 4px;
-      background: #333; color: #fff;
+      margin: 0.5em;
+      padding: 0.7em 1.2em;
+      border: none;
+      border-radius: 4px;
+      background: #333;
+      color: #fff;
       cursor: pointer;
     }
-    button:hover { background: #555; }
-    /* Status indicator circle */
+    button:hover {
+      background: #555;
+    }
     #statusIndicator {
       width: 20px;
       height: 20px;
@@ -29,7 +31,6 @@
       margin-left: 10px;
       background-color: #ccc; /* default gray */
     }
-    /* Blinking animation for "connecting" */
     @keyframes blink {
       0% { background-color: #0f0; }
       50% { background-color: #ccc; }
@@ -38,81 +39,97 @@
   </style>
 </head>
 <body>
-  <h1>AI4Pi Login Test</h1>
-  <button onclick="loginWithPi()">Login with Pi</button>
-  <button onclick="payWithPi()">Pay 3.14 Pi</button>
-  <div id="statusIndicator"></div>
-<script>
-  function payWithPi() {
-    // The payment object tells Pi how much Pi to charge and optional info
-    const payment = {
-      amount: 3.14,                 // Pi amount
-      memo: "AI4Pi Payment",        // A short note for the payment
-      metadata: { test: "someData" } // Any extra data (optional)
-    };
+  <h1>AI4Pi All-in-One Test</h1>
 
-    Pi.createPayment(payment, {
-      onReadyForServerApproval: function(paymentId) {
-        console.log("Payment ID:", paymentId);
-        // If you had a backend, you'd approve here. For now, do nothing.
-      },
-      onReadyForServerCompletion: function(paymentId, txid) {
-        console.log("Ready for completion:", paymentId, txid);
-        // If you had a backend, you'd finalize here. For now, do nothing.
-      },
-      onSuccessfulPayment: function(paymentId, txid) {
-        alert("Payment successful! TxID: " + txid);
-      },
-      onError: function(error) {
-        alert("Payment error: " + error);
-      },
-      onPaymentCancel: function(paymentId) {
-        alert("Payment cancelled!");
-      }
-    });
-  }
-</script>
+  <!-- LOGIN SECTION -->
+  <button id="loginBtn">Login with Pi</button>
+  <div id="statusIndicator"></div>
+
+  <!-- PAYMENT SECTION -->
+  <button id="payBtn">Pay 3.14 Pi</button>
+
   <script>
-    // Set to true for Testnet; set to false for Production/Mainnet.
+    // If your domain is Testnet/Development in Pi Portal, use sandbox: true.
+    // If Production, set sandbox: false.
     const SANDBOX_MODE = true;
 
-    // Initialize Pi SDK on window load.
-    window.onload = () => {
+    // We'll track login status for the blinking indicator
+    let loginStatus = 'idle'; // 'connecting', 'success', 'fail'
+
+    // On page load, initialize Pi SDK
+    window.onload = function() {
       Pi.init({ version: "2.0", sandbox: SANDBOX_MODE });
     };
 
-    // Function to update the status indicator.
-    // status: "connecting", "success", or "fail"
-    function updateStatus(status) {
+    // Update status indicator circle
+    function updateIndicator(status) {
       const indicator = document.getElementById("statusIndicator");
-      if (status === "connecting") {
+      if (status === 'connecting') {
         indicator.style.animation = "blink 1s infinite";
       } else {
         indicator.style.animation = "none";
       }
-      if (status === "success") {
+      if (status === 'success') {
         indicator.style.backgroundColor = "#0f0"; // solid green
-      } else if (status === "fail") {
+      } else if (status === 'fail') {
         indicator.style.backgroundColor = "#f00"; // solid red
+      } else if (status === 'idle') {
+        indicator.style.backgroundColor = "#ccc"; // gray
       }
     }
 
+    // LOGIN WITH PI
     function loginWithPi() {
-      updateStatus("connecting"); // show blinking green
-      Pi.authenticate(["username"], (auth) => {
+      loginStatus = 'connecting';
+      updateIndicator(loginStatus);
+
+      Pi.authenticate(["username"], function(auth) {
         if (!auth.user) {
-          updateStatus("fail");
-          alert("Login failed.");
+          loginStatus = 'fail';
+          updateIndicator(loginStatus);
+          alert("Login failed: no user data.");
           return;
         }
-        updateStatus("success");
-        alert("Welcome, " + auth.user.username);
-      }, (err) => {
-        updateStatus("fail");
-        alert("Login error: " + err);
+        loginStatus = 'success';
+        updateIndicator(loginStatus);
+        alert("Welcome, " + auth.user.username + "!");
+      }, function(error) {
+        loginStatus = 'fail';
+        updateIndicator(loginStatus);
+        alert("Login error: " + error);
       });
     }
+
+    // PAY 3.14 PI
+    function payWithPi() {
+      const payment = {
+        amount: 3.14,
+        memo: "AI4Pi Payment",
+        metadata: { exampleKey: "exampleValue" }
+      };
+
+      Pi.createPayment(payment, {
+        onReadyForServerApproval: function(paymentId) {
+          console.log("Payment ID:", paymentId);
+        },
+        onReadyForServerCompletion: function(paymentId, txid) {
+          console.log("Ready for completion:", paymentId, txid);
+        },
+        onSuccessfulPayment: function(paymentId, txid) {
+          alert("Payment successful! TxID: " + txid);
+        },
+        onError: function(error) {
+          alert("Payment error: " + error);
+        },
+        onPaymentCancel: function(paymentId) {
+          alert("Payment cancelled: " + paymentId);
+        }
+      });
+    }
+
+    // Attach button handlers
+    document.getElementById("loginBtn").onclick = loginWithPi;
+    document.getElementById("payBtn").onclick = payWithPi;
   </script>
 </body>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </html>
