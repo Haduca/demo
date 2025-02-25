@@ -15,6 +15,34 @@
         button:hover { background: #555; }
         .top-buttons { margin-bottom: 10px; }
     </style>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Check if a backup version exists in localStorage
+    if (!localStorage.getItem("backupIndex")) {
+        localStorage.setItem("backupIndex", document.documentElement.innerHTML);
+    }
+});
+
+// Function to trigger a rollback manually
+function rollbackVersion() {
+    let backup = localStorage.getItem("backupIndex");
+    if (backup) {
+        document.open();
+        document.write(backup);
+        document.close();
+        alert("🔄 Rollback Successful: The last working version has been restored.");
+    } else {
+        alert("⚠️ No backup found. Cannot rollback.");
+    }
+}
+
+// Auto-Rollback if a failure is detected
+window.onerror = function () {
+    alert("⚠️ Error Detected! Rolling back to the last working version...");
+    rollbackVersion();
+};
+</script>
+
 </head>
 <body>
 
@@ -123,15 +151,7 @@
         function piAction() {
             alert("🔄 Testnet Pi Interaction simulated!");
         }
-    </script>
-<button onclick="switchVersion()">🔄 Load Latest Update</button>
+<button onclick="rollbackVersion()">🔄 Rollback to Last Working Version</button>
 
-<script>
-function switchVersion() {
-    window.location.href = "/frontend/public/index-update.html";
-}
-</script>
-
-
-</body>
+    </body>
 </html>
