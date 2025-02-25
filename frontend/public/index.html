@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Mobile First UI</title>
+    <title>AI4Pi - Full Screen Scaling</title>
     <style>
-        body {
+        /* Ensure the entire screen is fully used */
+        html, body {
             font-family: sans-serif;
             text-align: center;
             background: white;
             color: black;
             margin: 0;
             padding: 0;
-            height: 100vh;
+            height: 100%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
         }
 
-        /* Mobile-First Layout */
+        /* Grid container adjusts to fill both width & height */
         .app-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
             width: 100vw;
             height: 100vh;
             gap: 2px;
@@ -31,7 +31,27 @@
             box-sizing: border-box;
         }
 
-        /* Ensure all walls fit perfectly inside mobile screen */
+        /* Default 2x2 Quadrant Layout for PC */
+        @media (min-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr 1fr;
+                max-width: 900px;
+                max-height: 90vh;
+            }
+        }
+
+        /* 1x4 Column Layout for Mobile (ensures all walls are fully visible) */
+        @media (max-width: 767px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, 1fr);
+                height: 100vh;
+                width: 100vw;
+            }
+        }
+
+        /* Walls scale dynamically with screen */
         .wall {
             display: flex;
             flex-direction: column;
@@ -41,14 +61,15 @@
             padding: 5px;
             border-radius: 3px;
             overflow-y: auto;
-            min-height: 45vh;
+            width: 100%;
+            height: 100%;
         }
 
-        /* Text Box Stays Inside Walls */
+        /* Text Box Stays at the Bottom Inside Walls */
         .text-box {
             display: flex;
             gap: 5px;
-            margin-top: auto; /* Locks input at the bottom */
+            margin-top: auto;
         }
 
         input {
