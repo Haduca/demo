@@ -2,40 +2,72 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI4Pi</title>
+<title>AI4Pi Test</title>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <style>
-  body { font-family:sans-serif; margin:0; padding:0; display:flex; justify-content:flex-start; align-items:flex-start; height:100vh; }
-  .container { width:25vw; height:25vh; padding:1em; border:1px solid #ccc; }
-  button { margin:.2em; padding:.3em .6em; border:none; background:#333; color:#fff; cursor:pointer; }
+  body { font-family:sans-serif; margin:0; padding:2em; display:flex; justify-content:space-between; align-items:flex-start; height:100vh; }
+  .container { width:25vw; padding:1em; border:1px solid #ccc; background:#f9f9f9; border-radius:8px; }
+  h4 { margin:0 0 .5em; }
+  button { margin:.2em; padding:.5em .8em; border:none; background:#333; color:#fff; cursor:pointer; border-radius:4px; }
   button:hover { background:#555; }
-  #chatBox { border:1px solid #ccc; height:8em; overflow-y:auto; padding:.3em; font-size:small; }
-  #chatInput { width:60%; padding:.2em; }
+  #chatBox, #gratitudeBox { border:1px solid #ccc; height:10em; overflow-y:auto; padding:.5em; font-size:small; background:#fff; border-radius:4px; }
+  input { width:70%; padding:.3em; margin-top:.5em; }
 </style>
 </head>
 <body>
+
+<!-- Left Side: AI Chat -->
 <div class="container">
-  <h4>AI4Pi Test</h4>
+  <h4>AI4Pi Chat</h4>
   <div id="status">Unregistered User</div>
-  <button onclick="login()">Login</button>
+  <button onclick="login()">Login with Pi</button>
   <button onclick="pay()">Pay 3.14 Pi</button>
   <div id="chatBox"></div>
-  <input id="chatInput" placeholder="Type...">
+  <input id="chatInput" placeholder="Type message...">
   <button onclick="send()">Send</button>
 </div>
+
+<!-- Right Side: Gratitude Stream -->
+<div class="container">
+  <h4>Gratitude Stream</h4>
+  <div id="gratitudeBox"></div>
+  <input id="gratitudeInput" placeholder="What are you thankful for?">
+  <button onclick="submitGratitude()">Submit</button>
+</div>
+
 <script>
 const SANDBOX=true;let user=null;
 onload=()=>Pi.init({version:"2.0",sandbox:SANDBOX});
-function login(){Pi.authenticate(["username"],a=>{
-  user=a.user?a.user.username:null;alert(user?"Welcome, "+user:"Login failed.");
-  status.innerText=user?"Logged in as "+user:"Unregistered User";
-},e=>{alert("Login error: "+e);status.innerText="Unregistered User";});}
-function pay(){Pi.createPayment({amount:3.14,memo:"AI4Pi Payment",metadata:{test:"data"}},
+
+function login(){
+  alert("Initiating Pi login...");
+  Pi.authenticate(["username"],a=>{
+    if(!a.user){alert("Login failed."); user=null; setStatus("Unregistered User");}
+    else{alert("Welcome, "+a.user.username); user=a.user.username; setStatus("Logged in as "+user);}
+  },e=>{alert("Login error: "+e); setStatus("Unregistered User");});
+}
+
+function pay(){
+  alert("Initiating Pi payment...");
+  Pi.createPayment({amount:3.14,memo:"AI4Pi Payment",metadata:{test:"data"}},
   {onSuccessfulPayment:(p,t)=>alert("Payment success! TxID: "+t),
   onError:e=>alert("Payment error: "+e),
-  onPaymentCancel:p=>alert("Payment cancelled: "+p)});}
-function send(){let v=chatInput.value.trim();if(!v)return;chatInput.value="";
-  chatBox.innerHTML+=`<p><strong>You:</strong> ${v}</p>`;setTimeout(()=>chatBox.innerHTML+=`<p><strong>AI:</strong> Echo: ${v}</p>`,800);}
+  onPaymentCancel:p=>alert("Payment cancelled: "+p)});
+}
+
+function setStatus(txt){document.getElementById("status").innerText=txt;}
+
+function send(){
+  let v=chatInput.value.trim(); if(!v)return; chatInput.value="";
+  chatBox.innerHTML+=`<p><strong>You:</strong> ${v}</p>`;
+  setTimeout(()=>chatBox.innerHTML+=`<p><strong>AI:</strong> Echo: ${v}</p>`,800);
+}
+
+function submitGratitude(){
+  let v=gratitudeInput.value.trim(); if(!v)return; gratitudeInput.value="";
+  gratitudeBox.innerHTML+=`<p>${v}</p>`;
+}
 </script>
+
 </body>
 </html>
