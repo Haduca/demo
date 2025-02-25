@@ -1,21 +1,16 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "AI4Pi",
+  "name": "AI4Pi - Fluffy and Cuddly",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAADtd2ifAAAACXBIWXMAAAsTAAALEwEAmpwYAAAHA0lEQVR4nO2d0W4UQRiF82zEGwSXwBMUwGQc8QTgNhXgGCHEJuJOAr3Aej5uT3+/b92Z2dOZ6q6v9sl3fPMf/tz3nj9/7nzN9wOHzfvf3f0nQjQ5mN/rQcw2rT1AlPclcBYWqek+K5QK4RGuEYuuGGKfhFKmF5BGPhBCrx1CdfOEI3CT7pOWH29N0d1VXf0x6AtjIXNEx3TMb6Kh9D82Cx1S85jCagKNYHsNE8QE1t/wt/TXd5A+fOJB0dGlzrtxb2Xbf/AhTxNGNBhwf82p3g+7hWgKMo4hHCoWeSGS6BR2t/4yALWmR7bdWC9n2AU8O0LtqKvUBcD0I05lDgkp8xmCL2QdfKuJCNb2cJED/FKs1+9izTx4ODU/PjoP0UbFAz/rMTtG6fdAc6R7Z81rOd5gl8rOhvMVu2ycxBvqCfCN1guWBv3p94KStc9lM+Z7zF/bfFZK9TnKcFHVKXHLF7+K4I5qInIAH5lxPB/hnO7u0B0Bf6+LGKEn/lEg2HLuPzC3BGIhxY6FeD2o7+KJz9R/wiyhFz2gzy/0ugKckw8JqvUm8QvS77ylLuDAFAAAAABJRU5ErkJggg==",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIAAgMAAACJFjxpAAAADFBMVEUAAP+f7/v+/v6f///+f7+8lrimAAABN0lEQVR4nO3c0U3DMBRG4cugCFOi4M8d2HbF6XOp/BzvAS59Zsyk7hYz4sBmo2PS6QhS4CQFIEGhB6WQAAzKDo5Xk8bOG6D+WZmcAJ1Os9GU9p10AAAAASUVORK5CYII=",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ],
   "start_url": ".",
