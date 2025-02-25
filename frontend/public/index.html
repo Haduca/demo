@@ -1,33 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi Chat</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #f0f0f0; }
-        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 1200px; margin: auto; }
-        .box { border: 2px solid #ccc; padding: 10px; overflow-y: auto; height: 200px; }
-        input, button { margin-top: 5px; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background: #333; color: white; cursor: pointer; } button:hover { background: #555; }
+        body{font-family:sans-serif;text-align:center;background:#f0f0f0;}
+        .c{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:auto;}
+        .b{border:2px solid #ccc;padding:10px;height:200px;overflow-y:auto;}
+        input,button{margin-top:5px;padding:5px;border-radius:5px;border:1px solid #ccc;}
+        button{background:#333;color:white;cursor:pointer;}button:hover{background:#555;}
     </style>
 </head>
 <body>
-    <h2 id="clock"></h2>
-    <h3>💰 Pi Earnings: <span id="piBalance">0.000000</span> Pi (Drip: 0.002000 Pi/10s)</h3>
-    <div class="container">
-        <div class="box"><b>AI4Pi Bot</b><div id="aiPi"></div><input id="aiPiInput"><button onclick="send('aiPi')">Send</button></div>
-        <div class="box"><b>Motivation Bot</b><div id="motivation"></div><input id="motivationInput"><button onclick="send('motivation')">Submit</button></div>
-        <div class="box"><b>Pi Solutions Bot</b><div id="feedback"></div><input id="feedbackInput"><button onclick="send('feedback')">Submit</button></div>
-        <div class="box"><b>Math Bot</b><div id="math">Solve: <span id="mathProblem">0 + 0</span></div><input id="mathInput"><button onclick="send('math')">Submit</button></div>
+    <h2 id="t"></h2><h3>💰 Pi: <span id="p">0.000000</span> (Drip: 0.002000/10s)</h3>
+    <div class="c">
+        <div class="b"><b>AI4Pi</b><div id="ai"></div><input id="aiI"><button onclick="s('ai')">Send</button></div>
+        <div class="b"><b>Motivation</b><div id="mo"></div><input id="moI"><button onclick="s('mo')">Submit</button></div>
+        <div class="b"><b>Solutions</b><div id="so"></div><input id="soI"><button onclick="s('so')">Submit</button></div>
+        <div class="b"><b>Math</b><div id="ma">Solve: <span id="mQ">0+0</span></div><input id="maI"><button onclick="s('ma')">Submit</button></div>
     </div>
-
     <script>
-        const $ = (id) => document.getElementById(id), bots = { "aiPi": "AI4Pi", "motivation": "Motivation", "feedback": "Pi Solutions", "math": "Math" };
-        setInterval(() => $("clock").innerText = new Date().toLocaleTimeString(), 1000);
-        let piBalance = 0.000000; setInterval(() => $("piBalance").innerText = (piBalance += 0.002).toFixed(6), 10000);
-        function send(bot) { $(bot).innerHTML = `<p><b>You:</b> ${$(bot + "Input").value}</p>` + $(bot).innerHTML; $(bot + "Input").value = ""; }
-        setInterval(() => { let b = Object.keys(bots)[Math.floor(Math.random() * 4)]; $(b).innerHTML = `<p><b>${bots[b]} Bot:</b> ${Math.random().toString(36).substring(2, 3).toUpperCase()}</p>` + $(b).innerHTML; }, 1000);
+        const $=id=>document.getElementById(id),b=["ai","mo","so","ma"];
+        setInterval(()=>$("t").innerText=new Date().toLocaleTimeString(),1000);
+        let p=0;setInterval(()=>$("p").innerText=(p+=.002).toFixed(6),10000);
+        function s(i){$(i).innerHTML=`<p><b>You:</b> ${$(i+"I").value}</p>`+$(i).innerHTML;$(i+"I").value="";}
+        setInterval(()=>{let i=b[Math.random()*4|0];$(i).innerHTML=`<p><b>${i.toUpperCase()}:</b> ${Math.random().toString(36).slice(2,3).toUpperCase()}</p>`+$(i).innerHTML},1000);
     </script>
 </body>
 </html>
