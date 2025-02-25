@@ -52,9 +52,7 @@
     </div>
 
     <script>
-        function updateClock() { 
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-        }
+        const updateClock = () => document.getElementById('clock').innerText = new Date().toLocaleTimeString();
         setInterval(updateClock, 1000);
 
         let piBalance = 0.000000, dripRate = 0.002000;
@@ -63,16 +61,16 @@
             document.getElementById("piBalance").innerText = piBalance.toFixed(6);
         }, 10000);
 
-        function sendMessage(bot) {
+        const sendMessage = (bot) => {
             const message = document.getElementById(bot + "Input").value;
             const messageContainer = document.getElementById(bot + "Messages");
             const newMessage = `<p><b>You:</b> ${message}</p>`;
             messageContainer.innerHTML = newMessage + messageContainer.innerHTML;
             document.getElementById(bot + "Input").value = "";
             messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
+        };
 
-        function randomBotResponse() {
+        const randomBotResponse = () => {
             const bots = ["AI4Pi Bot", "Motivation Bot", "Pi Solutions Bot", "Math Bot"];
             const randomBot = bots[Math.floor(Math.random() * bots.length)];
             const response = Math.random().toString(36).substring(2, 3).toUpperCase();
@@ -83,7 +81,7 @@
                 "Math Bot": "mathMessages"
             }[randomBot];
             document.getElementById(randomWall).innerHTML = `<p><b>${randomBot}:</b> ${response}</p>` + document.getElementById(randomWall).innerHTML;
-        }
+        };
 
         setInterval(randomBotResponse, 1000);
     </script>
