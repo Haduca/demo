@@ -124,7 +124,14 @@
             alert("🔄 Testnet Pi Interaction simulated!");
         }
     </script>
-<script src="/frontend/public/test.js"></script>
+<button onclick="switchVersion()">🔄 Load Latest Update</button>
+
+<script>
+function switchVersion() {
+    window.location.href = "/frontend/public/index-update.html";
+}
+</script>
+
 
 </body>
 </html>
