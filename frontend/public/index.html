@@ -53,28 +53,40 @@
   </div>
 
   <div class="container rainbow">
-    <h4>Community Chat (1 message/5s)</h4>
-    <div class="box" id="communityBox"></div>
-    <input id="communityInput" placeholder="Say something...">
-    <button id="sendCommunity" disabled>Send</button>
+    <h4>Math Challenge</h4>
+    <div class="box" id="mathBox">Solve: <span id="mathProblem">0 + 0</span></div>
+    <input id="mathInput" placeholder="Answer...">
+    <button id="submitMath">Submit</button>
   </div>
 </div>
 
 <script>
-const SANDBOX=true, cooldown=5000, dripRate=0.01;
-let user=null, lastMsgTime=0, piBalance=0;
+const SANDBOX=true, cooldown=5000, dripRate=0.01, mathBonus=0.05;
+let user=null, lastMsgTime=0, piBalance=0, currentAnswer=0, lastWinner=null;
 onload=()=>Pi.init({ version:"2.0", sandbox:SANDBOX });
 
-// Pi Coin Drip: Adds Pi every 10 seconds
+// Pi Coin Drip: Adds Pi every 10 seconds, bigger bonus for math winners
 setInterval(() => {
-  piBalance += dripRate;
+  piBalance += lastWinner ? dripRate + mathBonus : dripRate;
   document.getElementById("piBalance").innerText = piBalance.toFixed(2);
+  lastWinner = null; // Reset winner after one cycle
 }, 10000);
+
+// Generate a new math problem every 10 seconds
+const generateMathProblem = () => {
+  let num1 = Math.floor(Math.random() * 10) + 1;
+  let num2 = Math.floor(Math.random() * 10) + 1;
+  currentAnswer = num1 + num2;
+  document.getElementById("mathProblem").innerText = `${num1} + ${num2}`;
+};
+setInterval(generateMathProblem, 10000);
+generateMathProblem(); // Start with an initial problem
 
 const addMessage = (box, sender, text) => {
   document.getElementById(box).innerHTML += `<p><strong>${sender}:</strong> ${text}</p>`;
 };
 
+// Pi Login
 document.getElementById("loginBtn").onclick = () => {
   alert("Initiating Pi login...");
   Pi.authenticate(["username"], a => {
@@ -84,6 +96,7 @@ document.getElementById("loginBtn").onclick = () => {
   }, e=>alert(`Login error: ${e}`));
 };
 
+// Pi Payment
 document.getElementById("payBtn").onclick = () => {
   alert("Initiating Pi payment...");
   Pi.createPayment({ amount:3.14, memo:"AI4Pi Payment", metadata:{ test:"data" } },
@@ -92,30 +105,47 @@ document.getElementById("payBtn").onclick = () => {
     onPaymentCancel:p=>alert(`Payment cancelled: ${p}`) });
 };
 
+// AI Chat with Trivia & Motivation
 document.getElementById("sendChat").onclick = () => {
-  const i=document.getElementById("chatInput"), msg=i.value.trim();
-  if (msg) { i.value=""; addMessage("chatBox", "You", msg);
-    setTimeout(() => addMessage("chatBox", "AI", `Echo: ${msg}`), 800); }
+  const input = document.getElementById("chatInput"), msg = input.value.trim();
+  if (!msg) return;
+  input.value = "";
+  addMessage("chatBox", "You", msg);
+
+  let aiResponses = [
+    "Did you know Pi has been calculated to over 62 trillion digits?",
+    "Here’s a motivational quote: 'The best way to predict the future is to invent it.'",
+    "Pi is an irrational number, meaning it goes on forever without repeating.",
+    `Echo: ${msg}`
+  ];
+  let response = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+  setTimeout(() => addMessage("chatBox", "AI", response), 800);
 };
 
+// Gratitude Wall
 document.getElementById("submitGratitude").onclick = () => {
-  const i=document.getElementById("gratitudeInput"), msg=i.value.trim();
-  if (msg) { i.value=""; addMessage("gratitudeBox", "Grateful User", msg); }
+  const input = document.getElementById("gratitudeInput"), msg = input.value.trim();
+  if (msg) { input.value=""; addMessage("gratitudeBox", "Grateful User", msg); }
 };
 
+// Feedback Box
 document.getElementById("submitFeedback").onclick = () => {
-  const i=document.getElementById("feedbackInput"), msg=i.value.trim();
-  if (msg) { i.value=""; addMessage("feedbackBox", "User Feedback", msg); }
+  const input = document.getElementById("feedbackInput"), msg = input.value.trim();
+  if (msg) { input.value=""; addMessage("feedbackBox", "User Feedback", msg); }
 };
 
-document.getElementById("sendCommunity").onclick = () => {
-  const now=Date.now(), i=document.getElementById("communityInput"), msg=i.value.trim();
-  if (msg && now-lastMsgTime>=cooldown) { 
-    i.value=""; lastMsgTime=now; addMessage("communityBox", "User", msg);
-    document.getElementById("sendCommunity").disabled=true;
-    setTimeout(() => document.getElementById("sendCommunity").disabled=false, cooldown);
+// Math Challenge Submission
+document.getElementById("submitMath").onclick = () => {
+  const input = document.getElementById("mathInput"), answer = parseInt(input.value.trim());
+  if (answer === currentAnswer) {
+    addMessage("mathBox", "Winner", `Correct! ${user ? user : "Anonymous"} gets a Pi boost!`);
+    lastWinner = user ? user : "Anonymous";
+  } else {
+    addMessage("mathBox", "AI", "Incorrect, try again!");
   }
+  input.value = "";
 };
+
 </script>
 
 </body>
