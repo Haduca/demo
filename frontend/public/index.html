@@ -18,7 +18,7 @@
             overflow: hidden;
         }
 
-        /* Centered Container taking up 90% of the screen */
+        /* Centered Container */
         .container {
             width: 90vw;
             height: 90vh;
@@ -50,22 +50,22 @@
             width: 100%;
         }
 
-        /* Wall Colors */
+        /* Wall Borders */
         .wall1 { border-color: #e6b800; }  /* Darker yellow */
         .wall2 { border-color: #2e8b57; }  /* Darker green */
         .wall3 { border-color: #1e90ff; }  /* Darker blue */
         .wall4 { border-color: #6a0dad; }  /* Darker purple */
 
-        /* Wall Names */
+        /* Wall Name Placement */
         .wall-name {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 1.2em;
             font-weight: bold;
             text-align: center;
-            height: 5%;
-            line-height: 2em;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 5px;
-            margin-bottom: 5px;
+            width: 100%;
         }
 
         /* Wall Content */
@@ -73,8 +73,9 @@
             flex-grow: 1;
             overflow-y: auto;
             padding-right: 5px;
+            margin-bottom: 10px;
             display: flex;
-            flex-direction: column-reverse; /* Ensures new text goes above the textbox */
+            flex-direction: column-reverse;
         }
 
         /* Centered Textbox */
