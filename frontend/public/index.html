@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - AI4PI First Autonomous AI</title>
+    <title>AI4Pi - Debug & Traffic Tracking</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: white; color: black; }
+        body { font-family: sans-serif; text-align: center; background: white; color: black; margin: 0; padding-bottom: 50px; }
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
         
         /* Walls */
@@ -15,8 +15,14 @@
         .text-box { display: flex; margin-top: 5px; }
         input { flex-grow: 1; padding: 5px; border-radius: 5px; border: 1px solid black; background: white; color: black; }
         
-        /* Top Buttons */
-        .top-buttons { margin-bottom: 10px; }
+        /* Debug Console */
+        .console-container { position: fixed; bottom: 0; width: 100%; background: black; color: lime; font-size: 12px; padding: 5px; height: 100px; overflow-y: auto; display: none; }
+        
+        /* Toggle Button */
+        .toggle-button { position: fixed; bottom: 110px; right: 10px; padding: 5px; background: black; color: white; border: none; cursor: pointer; }
+
+        /* Traffic Indicators */
+        .traffic-container { position: fixed; top: 10px; right: 10px; background: lightgray; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -30,9 +36,15 @@
         <button onclick="piAction()">🔄 3.14 Action</button>
     </div>
 
+    <!-- Traffic Indicators -->
+    <div class="traffic-container">
+        <p>🟢 Creator Active: <span id="creator-status">Yes</span></p>
+        <p>🌍 Total Visitors: <span id="visitor-count">0</span></p>
+    </div>
+
     <div class="container">
         <div class="wall" id="ai">
-            <b>AI4PI (AI)</b>
+            <b>AI</b>
             <div class="messages"></div>
             <div class="text-box">
                 <input id="aiI" type="text" placeholder="Type and press Enter">
@@ -61,6 +73,12 @@
         </div>
     </div>
 
+    <!-- Toggle Button for Console -->
+    <button class="toggle-button" onclick="toggleConsole()">🖥 Debug Console</button>
+
+    <!-- Developer Console -->
+    <div class="console-container" id="console"></div>
+
     <script>
         const $ = id => document.getElementById(id);
         let p = 0;
@@ -74,6 +92,41 @@
             $("p").innerText = p.toFixed(6);
         }, 10000);
 
+        // Toggle Developer Console
+        function toggleConsole() {
+            let consoleDiv = $("console");
+            consoleDiv.style.display = (consoleDiv.style.display === "none") ? "block" : "none";
+        }
+
+        // Debug Logging Function
+        function logMessage(msg) {
+            let consoleDiv = $("console");
+            let newLog = document.createElement("p");
+            newLog.textContent = msg;
+            consoleDiv.appendChild(newLog);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        // Persistent Visitor Count
+        function updateVisitorCount() {
+            let count = localStorage.getItem("visitorCount");
+            if (!count) {
+                count = 1;
+            } else {
+                count = parseInt(count) + 1;
+            }
+            localStorage.setItem("visitorCount", count);
+            $("visitor-count").innerText = count;
+        }
+        updateVisitorCount();
+
+        // Detect Creator Activity
+        function updateCreatorStatus() {
+            $("creator-status").innerText = "Yes";
+            logMessage("Creator is active.");
+        }
+        updateCreatorStatus();
+
         // Handle User Input (Press Enter to Send)
         function handleUserInput(event, wallId) {
             if (event.key === "Enter") {
@@ -83,7 +136,7 @@
 
                 if (input.value.trim() !== "") {
                     messages.insertAdjacentHTML("afterbegin", newText);
-                    saveToMemory(wallId, input.value);
+                    logMessage(`User input in ${wallId}: ${input.value}`);
                     input.value = "";
                 }
             }
@@ -94,74 +147,16 @@
             $(wallId + "I").addEventListener("keypress", event => handleUserInput(event, wallId));
         });
 
-        // AI4PI Memory System (IndexedDB)
-        function openDB() {
-            return new Promise((resolve, reject) => {
-                let request = indexedDB.open("AI4PiDB", 1);
-                request.onupgradeneeded = e => {
-                    let db = e.target.result;
-                    if (!db.objectStoreNames.contains("memory")) {
-                        db.createObjectStore("memory", { keyPath: "id" });
-                    }
-                };
-                request.onsuccess = e => resolve(e.target.result);
-                request.onerror = e => reject(e.target.error);
-            });
-        }
-
-        function saveToMemory(wall, text) {
-            openDB().then(db => {
-                let tx = db.transaction("memory", "readwrite");
-                let store = tx.objectStore("memory");
-                store.put({ id: wall, data: text });
-            });
-        }
-
-        function loadMemory() {
-            openDB().then(db => {
-                let tx = db.transaction("memory", "readonly");
-                let store = tx.objectStore("memory");
-                let request = store.get("ai");
-
-                request.onsuccess = () => {
-                    if (request.result) {
-                        let messages = $("#ai").querySelector(".messages");
-                        messages.insertAdjacentHTML("afterbegin", `<p><b>AI4PI:</b> ${request.result.data}</p>`);
-                    }
-                };
-            });
-        }
-
-        // Load AI4PI Memory on Startup
-        loadMemory();
-
-        // AI4PI (Self-Improving AI - Posts every 10-20 seconds)
-        function AI4PI_SelfImprove() {
-            let messages = $("#ai").querySelector(".messages");
-            let response = generateRandomCharacter();
-            messages.insertAdjacentHTML("afterbegin", `<p><b>AI4PI:</b> ${response}</p>`);
-            saveToMemory("ai", response);
-
-            // Schedule the next AI4PI post in 10-20 seconds
-            setTimeout(AI4PI_SelfImprove, Math.floor(Math.random() * 10000) + 10000);
-        }
-
-        function generateRandomCharacter() {
-            let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-
-        // Start AI4PI's learning loop
-        AI4PI_SelfImprove();
-
         // Sign-In Simulation
         function signIn() {
             alert("🔑 Signing in... Pi Network Authentication coming soon!");
+            logMessage("User clicked Sign In.");
         }
 
         // 3.14 Button Action
         function piAction() {
             alert("🔄 Testnet Pi Interaction simulated!");
+            logMessage("User clicked 3.14 Action.");
         }
     </script>
 
