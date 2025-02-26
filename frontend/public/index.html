@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Pi Drip System</title>
+    <title>AI4Pi - UI Fix</title>
     <style>
+        /* Global Styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -12,17 +13,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             height: 100vh;
             width: 100vw;
             background-color: #f0f0f0;
             overflow: hidden;
         }
 
-        /* Container to hold the walls */
+        /* Centered Container */
         .container {
-            width: 90%;
-            height: 90%;
+            width: 90vw;
+            height: 90vh;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(2, 1fr);
@@ -33,7 +33,7 @@
             transform: translate(-50%, -50%);
         }
 
-        /* Wall style (Quadrants) */
+        /* Walls (Quadrants) */
         .wall {
             background-color: white;
             border-radius: 8px;
@@ -46,6 +46,20 @@
             border: 3px solid;
         }
 
+        /* Individual Wall Borders */
+        .wall1 { border-color: #e6b800; }  /* Darker yellow */
+        .wall2 { border-color: #2e8b57; }  /* Darker green */
+        .wall3 { border-color: #1e90ff; }  /* Darker blue */
+        .wall4 { border-color: #6a0dad; }  /* Darker purple */
+
+        /* Wall Names */
+        .wall-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            height: 5%;
+        }
+
         /* Wall Content */
         .wall-content {
             flex-grow: 1;
@@ -53,6 +67,7 @@
             padding-right: 5px;
             display: flex;
             flex-direction: column-reverse;
+            padding-bottom: 50px; /* Creates space so messages don’t appear behind the textbox */
         }
 
         /* Centered Textbox */
@@ -70,73 +85,34 @@
             text-align: center;
             box-sizing: border-box;
         }
-
-        /* Pi Drip Section */
-        .pi-drip {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 18px;
-        }
-
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="wall" id="wall1">
+        <div class="wall wall1" id="wall1">
+            <div class="wall-name">Pi</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall1" placeholder="Type here...">
         </div>
-        <div class="wall" id="wall2">
+        <div class="wall wall2" id="wall2">
+            <div class="wall-name">Moti</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall2" placeholder="Type here...">
         </div>
-        <div class="wall" id="wall3">
+        <div class="wall wall3" id="wall3">
+            <div class="wall-name">Sol</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall3" placeholder="Type here...">
         </div>
-        <div class="wall" id="wall4">
+        <div class="wall wall4" id="wall4">
+            <div class="wall-name">Math</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall4" placeholder="Type here...">
         </div>
     </div>
 
-    <!-- Pi Drip Information -->
-    <div class="pi-drip">
-        <div>Accumulated Pi: <span id="accumulatedPi">0.000000</span></div>
-        <div>Drip Rate: <span id="dripRate">0.000476</span> Pi/10s</div>
-    </div>
-
     <script>
-        // Static base mining rate of Pi (currently this value is an estimate)
-        const baseMiningRate = 0.0476;  // Base mining rate per hour (example: 0.0476 Pi/hour)
-
-        // Calculate 1% of the base mining rate
-        let dripRate = (baseMiningRate / 60 / 60) * 0.01; // 1% per second
-        dripRate = dripRate * 10; // Drip rate for every 10 seconds
-
-        let accumulatedPi = 0;
-        const dripInterval = 10000;  // Interval in ms (10 seconds)
-
-        // Function to update Pi Drip every 10 seconds
-        function updatePiDrip() {
-            // Update accumulated Pi
-            accumulatedPi += dripRate;
-            document.getElementById("accumulatedPi").innerText = accumulatedPi.toFixed(6);
-
-            // Store the accumulated Pi in session storage
-            sessionStorage.setItem("accumulatedPi", accumulatedPi);
-        }
-
-        // Start the Pi Drip update loop
-        setInterval(updatePiDrip, dripInterval);
-
-        // Load Pi Drip from session storage if available
-        if (sessionStorage.getItem("accumulatedPi")) {
-            accumulatedPi = parseFloat(sessionStorage.getItem("accumulatedPi"));
-            document.getElementById("accumulatedPi").innerText = accumulatedPi.toFixed(6);
-        }
-
         // Handle Enter key to submit text to the correct wall
         document.querySelectorAll('.text-box').forEach(input => {
             input.addEventListener('keypress', function(event) {
