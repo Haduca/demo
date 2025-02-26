@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Input Fix & AI Learning</title>
+    <title>AI4Pi - User Input Fix</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: white; color: black; margin: 0; padding-bottom: 50px; }
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
@@ -109,9 +109,10 @@
         }
 
         // Fix User Input - Press Enter to Send Messages
-        function handleUserInput(event, wallId) {
+        function handleUserInput(event) {
             if (event.key === "Enter") {
-                let input = $(wallId + "I");
+                let input = event.target;
+                let wallId = input.id.replace("I", ""); // Extracts wall ID from input field
                 let messages = $("#" + wallId).querySelector(".messages");
                 let newText = `<p><b>You:</b> ${input.value}</p>`;
 
@@ -124,29 +125,9 @@
         }
 
         // Attach event listener for each input field
-        ["ai", "mo", "so", "ma"].forEach(wallId => {
-            $(wallId + "I").addEventListener("keypress", event => handleUserInput(event, wallId));
+        document.querySelectorAll("input").forEach(input => {
+            input.addEventListener("keypress", handleUserInput);
         });
-
-        // AI Response (Pi must respond at least once every 10 seconds)
-        function PiAIResponse() {
-            let targetWall = ["ai", "mo", "so", "ma"][Math.floor(Math.random() * 4)];
-            let messages = $("#" + targetWall).querySelector(".messages");
-            let response = generateRandomCharacter();
-            messages.insertAdjacentHTML("afterbegin", `<p><b>Pi:</b> ${response}</p>`);
-            logMessage(`Pi responded in ${targetWall} with ${response}`);
-
-            // Schedule next AI response within 10 seconds
-            setTimeout(PiAIResponse, 10000);
-        }
-
-        function generateRandomCharacter() {
-            let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-
-        // Start AI interaction loop
-        setTimeout(PiAIResponse, 5000);
 
         // Sign-In Simulation
         function signIn() {
