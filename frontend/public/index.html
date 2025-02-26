@@ -104,8 +104,7 @@
     </style>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script>
-  Pi.init({ version: "2.0", sandbox: true });
-  alert("Pi SDK initialized successfully!");
+  Pi.init({ version: "2.0", sandbox: true })
 </script>
 </head>
 <body>
@@ -198,16 +197,17 @@
     </script>
     <script>
   function signIn() {
-      alert("Sign-in button clicked!"); // Debugging Alert
-      Pi.authenticate(["username"], function(auth) {
-          if (auth && auth.user) {
-              alert(`Welcome, ${auth.user.username}!`);
-              document.getElementById("user-info").textContent = `Signed in as: ${auth.user.username}`;
-          }
-      }, function(error) {
-          console.error("Authentication failed:", error);
-          alert("Authentication failed. Please try again.");
-      });
+      Pi.authenticate({ scopes: ["username"], sandbox: true })
+          .then(auth => {
+              if (auth && auth.user) {
+                  alert(`✅ Welcome, ${auth.user.username}!`);
+                  document.getElementById("user-info").textContent = `Signed in as: ${auth.user.username}`;
+              }
+          })
+          .catch(error => {
+              console.error("❌ Authentication failed:", error);
+              alert("❌ Authentication failed. Please try again.");
+          });
   }
 </script>
 <button class="sign-in" onclick="signIn()">🔑 Sign In</button>
