@@ -17,18 +17,20 @@
             width: 100vw;
             background-color: #f0f0f0;
             overflow: hidden;
-            flex-direction: column;
         }
 
         /* Centered Container */
         .container {
             width: 90vw;
-            height: 70vh;
+            height: 90vh;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(2, 1fr);
             gap: 10px;
             position: relative;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         /* Walls (Quadrants) */
@@ -40,10 +42,15 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            overflow-y: auto;
+            overflow: hidden;
             border: 3px solid;
-            height: 100%;
         }
+
+        /* Individual Wall Borders */
+        .wall1 { border-color: #e6b800; }  /* Darker yellow */
+        .wall2 { border-color: #2e8b57; }  /* Darker green */
+        .wall3 { border-color: #1e90ff; }  /* Darker blue */
+        .wall4 { border-color: #6a0dad; }  /* Darker purple */
 
         /* Wall Names */
         .wall-name {
@@ -51,7 +58,16 @@
             font-weight: bold;
             text-align: center;
             height: 5%;
-            padding-top: 10px;
+        }
+
+        /* Wall Content */
+        .wall-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+            display: flex;
+            flex-direction: column-reverse;
+            padding-bottom: 50px; /* Creates space so messages don’t appear behind the textbox */
         }
 
         /* Centered Textbox */
@@ -70,120 +86,117 @@
             box-sizing: border-box;
         }
 
-        /* Information Box for Drip and Pi */
-        .info-box {
-            position: fixed;
-            bottom: 20px;
+        /* Clock Styles */
+        .clock {
+            position: absolute;
+            top: 5%;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            width: 90vw;
-            max-width: 500px;
-            z-index: 100;
+            font-size: 1.5em;
+            color: #333;
         }
 
-        /* Buttons */
+        /* Button Styles */
+        .button-container {
+            position: absolute;
+            top: 10%;
+            right: 5%;
+            display: flex;
+            gap: 10px;
+        }
+
         .button {
             padding: 10px;
-            background-color: #28a745;
-            border: none;
+            background-color: #4CAF50;
             color: white;
-            font-weight: bold;
-            cursor: pointer;
+            border: none;
             border-radius: 5px;
+            cursor: pointer;
         }
 
-        .button-blue {
-            background-color: #007bff;
+        .button:hover {
+            background-color: #45a049;
         }
 
-        /* Debug Info */
-        .debug-box {
-            position: fixed;
-            bottom: 10px;
+        /* Footer (Accumulated Pi, Drip) */
+        .footer {
+            position: absolute;
+            bottom: 5%;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            width: 90vw;
-            max-width: 500px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            font-size: 14px;
+            font-size: 1.2em;
+            color: #333;
             text-align: center;
-            z-index: 100;
         }
 
-        /* Clock Styling */
-        .clock {
-            font-size: 2em;
-            position: fixed;
-            top: 20px;
+        .debug-log {
+            position: absolute;
+            bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 100;
-        }
-
-        /* Scrollbar Styling */
-        .wall-content::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .wall-content::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-
-        .wall-content::-webkit-scrollbar-thumb:hover {
-            background: #555;
+            font-size: 1em;
+            color: #333;
+            padding: 5px;
         }
     </style>
 </head>
 <body>
 
-    <div class="clock" id="clock">00:00:00</div>
-
     <div class="container">
-        <div class="wall wall1" id="wall1">
+        <!-- Wall 1: Pi -->
+        <div class="wall wall1">
             <div class="wall-name">Pi</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall1" placeholder="Type here...">
         </div>
-        <div class="wall wall2" id="wall2">
+
+        <!-- Wall 2: Moti -->
+        <div class="wall wall2">
             <div class="wall-name">Moti</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall2" placeholder="Type here...">
         </div>
-        <div class="wall wall3" id="wall3">
+
+        <!-- Wall 3: Sol -->
+        <div class="wall wall3">
             <div class="wall-name">Sol</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall3" placeholder="Type here...">
         </div>
-        <div class="wall wall4" id="wall4">
+
+        <!-- Wall 4: Math -->
+        <div class="wall wall4">
             <div class="wall-name">Math</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall4" placeholder="Type here...">
         </div>
     </div>
 
-    <div class="info-box">
-        <span>Accumulated Pi: 0.000019</span>
-        <span>Drip per 10 seconds: 0.00000477</span>
+    <!-- Clock -->
+    <div class="clock" id="clock"></div>
+
+    <!-- Buttons (Pi Transaction & Sign In) -->
+    <div class="button-container">
+        <button class="button" id="piTransactionButton">Pi Transaction</button>
+        <button class="button" id="signInButton">Sign In</button>
     </div>
 
-    <div class="debug-box">
-        Debug Logs: Accumulated Pi: 0.000019
+    <!-- Footer: Accumulated Pi & Drip -->
+    <div class="footer" id="footer">
+        Accumulated Pi: 0.000019 | Drip per 10 seconds: 0.000004771
     </div>
 
-    <button class="button button-blue" id="piTransactionBtn">Pi Transaction</button>
-    <button class="button" id="signInBtn">Sign In</button>
+    <!-- Debug Log -->
+    <div class="debug-log" id="debugLog">Debug Logs: Accumulated Pi: 0.000019</div>
 
     <script>
+        // Clock functionality
+        function updateClock() {
+            let currentTime = new Date().toLocaleTimeString();
+            document.getElementById('clock').innerText = currentTime;
+        }
+        setInterval(updateClock, 1000); // Update every second
+
         // Handle Enter key to submit text to the correct wall
         document.querySelectorAll('.text-box').forEach(input => {
             input.addEventListener('keypress', function(event) {
@@ -194,7 +207,7 @@
                     const wallContent = wall.querySelector('.wall-content');
                     const newText = document.createElement('div');
                     newText.textContent = this.value;
-
+                    
                     // Insert new message at the top of the wall content
                     wallContent.insertBefore(newText, wallContent.firstChild);
 
@@ -207,21 +220,17 @@
             });
         });
 
-        // Handle Pi Transaction Button click
-        document.getElementById('piTransactionBtn').addEventListener('click', function() {
-            console.log('Pi Transaction initiated');
+        // Pi Transaction Button Event Listener
+        document.getElementById('piTransactionButton').addEventListener('click', () => {
+            console.log("Pi Transaction initiated.");
+            // Add functionality for Pi Transaction here
         });
 
-        // Handle Sign In Button click
-        document.getElementById('signInBtn').addEventListener('click', function() {
-            console.log('Sign In initiated');
+        // Sign In Button Event Listener
+        document.getElementById('signInButton').addEventListener('click', () => {
+            console.log("Sign In initiated.");
+            // Add functionality for Sign In here
         });
-
-        // Update the clock every second
-        setInterval(function() {
-            const currentTime = new Date().toLocaleTimeString();
-            document.getElementById('clock').textContent = currentTime;
-        }, 1000);
     </script>
 
 </body>
