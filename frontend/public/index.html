@@ -39,12 +39,13 @@
             justify-content: flex-end;
             position: relative;
             max-height: 70vh;
-            overflow: hidden; /* Remove scrollbar */
+            overflow: hidden;
+            border: 3px solid; /* Adding border color */
         }
-        .wall1 { background-color: #ffcc00; }
-        .wall2 { background-color: #32cd32; }
-        .wall3 { background-color: #00bfff; }
-        .wall4 { background-color: #8a2be2; }
+        .wall1 { border-color: #ffcc00; }
+        .wall2 { border-color: #32cd32; }
+        .wall3 { border-color: #00bfff; }
+        .wall4 { border-color: #8a2be2; }
         .wall-content {
             flex-grow: 1;
             overflow-y: auto;
@@ -57,11 +58,14 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
+            position: absolute;
+            bottom: 15px;  /* Positioned at the bottom of the wall */
+            text-align: center;
         }
         /* Clock and Drip Section */
         .clock, .drip, .visitor-count, .debug-info, .sign-in {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             width: 100%;
             margin-bottom: 15px;
@@ -94,10 +98,16 @@
     </style>
 </head>
 <body>
-    <div class="clock">Clock: <span id="clock">00:00:00</span></div>
-    <div class="drip">Drip Count: <span id="drip-count">0</span> Pi</div>
-    <div class="visitor-count">Total Visitors: <span id="visitor-count">0</span></div>
-    <div class="debug-info">Debug Info: <span id="debug-info">All systems go</span></div>
+    <div class="clock">
+        <span id="clock">00:00:00</span>
+    </div>
+    <div class="drip">
+        <span id="drip-count">0</span> Pi
+    </div>
+    <div class="visitor-count">
+        Total Visitors: <span id="visitor-count">0</span>
+    </div>
+    <div class="debug-info" id="debug-info">All systems go</div>
 
     <div class="container">
         <div class="wall wall1" id="wall1">
@@ -168,7 +178,8 @@
         }
 
         // Simulate visitor count and drip update every 10 seconds
-        setInterval(simulateDrip, 10000);
+        // Temporarily stop drip
+        // setInterval(simulateDrip, 10000);
         setInterval(simulateVisitorCount, 10000);
     </script>
 </body>
