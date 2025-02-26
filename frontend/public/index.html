@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Bot Network</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AI4Pi - Bot Network Fixed</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: white; color: black; }
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
@@ -37,28 +37,28 @@
             <b>AI</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="aiI"><button onclick="sendMessage('ai')">Send</button>
+                <input id="aiI" type="text"><button onclick="sendMessage('ai')">Send</button>
             </div>
         </div>
         <div class="wall" id="mo">
             <b>Motivation</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="moI"><button onclick="sendMessage('mo')">Submit</button>
+                <input id="moI" type="text"><button onclick="sendMessage('mo')">Submit</button>
             </div>
         </div>
         <div class="wall" id="so">
             <b>Solutions</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="soI"><button onclick="sendMessage('so')">Submit</button>
+                <input id="soI" type="text"><button onclick="sendMessage('so')">Submit</button>
             </div>
         </div>
         <div class="wall" id="ma">
             <b>Math</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="maI"><button onclick="sendMessage('ma')">Submit</button>
+                <input id="maI" type="text"><button onclick="sendMessage('ma')">Submit</button>
             </div>
         </div>
     </div>
@@ -79,21 +79,24 @@
 
         // Send messages & remove oldest text when limit is reached
         function sendMessage(wallId) {
-            let messages = $("#" + wallId).querySelector(".messages");
             let input = $(wallId + "I");
+            let messages = $("#" + wallId).querySelector(".messages");
             let newText = `<p><b>You:</b> ${input.value}</p>`;
 
-            messages.insertAdjacentHTML("afterbegin", newText);
+            if (input.value.trim() !== "") {
+                messages.insertAdjacentHTML("afterbegin", newText);
 
-            while (messages.children.length > 10) {
-                messages.removeChild(messages.lastChild);
+                while (messages.children.length > 10) {
+                    messages.removeChild(messages.lastChild);
+                }
+
+                input.value = "";
             }
-
-            input.value = "";
         }
 
-        // Bot AI Responses (Posts in every wall separately every 10-15 seconds)
-        function botPost(wallId) {
+        // Bot AI Responses (Posts every 10-15 seconds in different walls)
+        function botPost() {
+            let wallId = walls[Math.floor(Math.random() * walls.length)];
             let messages = $("#" + wallId).querySelector(".messages");
             let botResponse = `<p><b>${wallId.toUpperCase()} Bot:</b> ${generateRandomCharacter()}</p>`;
 
@@ -103,8 +106,8 @@
                 messages.removeChild(messages.lastChild);
             }
 
-            // Schedule next bot post in 10-15 seconds for this wall
-            setTimeout(() => botPost(wallId), Math.floor(Math.random() * 6000) + 10000);
+            // Schedule the next bot post in 10-15 seconds
+            setTimeout(botPost, Math.floor(Math.random() * 6000) + 10000);
         }
 
         function generateRandomCharacter() {
@@ -112,9 +115,9 @@
             return characters.charAt(Math.floor(Math.random() * characters.length));
         }
 
-        // Start bot activity for each wall
+        // Ensure each wall gets bot activity separately
         walls.forEach(wallId => {
-            setTimeout(() => botPost(wallId), Math.floor(Math.random() * 6000) + 10000);
+            setTimeout(botPost, Math.floor(Math.random() * 6000) + 10000);
         });
 
         // Sign-In Simulation
