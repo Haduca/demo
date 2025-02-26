@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Perfect Alignment</title>
+    <title>AI4Pi - Rebuilt Layout</title>
     <style>
-        /* Lock the entire layout - No movement, no scrolling */
+        /* Lock screen size and prevent movement */
         html, body {
             font-family: sans-serif;
             text-align: center;
@@ -15,12 +15,12 @@
             padding: 0;
             width: 100vw;
             height: 100vh;
-            overflow: hidden; /* Completely disables scrolling */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            touch-action: none; /* Prevents user from dragging screen */
+            touch-action: none;
         }
 
         /* Header Section */
@@ -30,7 +30,7 @@
             box-sizing: border-box;
         }
 
-        /* Top Buttons Section */
+        /* Top Buttons */
         .top-buttons {
             width: 100%;
             display: flex;
@@ -54,11 +54,11 @@
             background: gray;
         }
 
-        /* 2x2 Grid Layout - Based on Screenshot */
+        /* 2x2 Grid Layout - Rebuilt from Approved Version */
         .container {
             display: grid;
             width: 100vw;
-            height: calc(100vh - 120px); /* Adjusted for exact fit */
+            height: calc(100vh - 120px);
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 2px;
@@ -66,7 +66,7 @@
             padding: 0;
         }
 
-        /* Walls - Matching Screenshot */
+        /* Walls - Rebuilt to Match Approved Layout */
         .wall {
             display: flex;
             flex-direction: column;
@@ -79,7 +79,7 @@
             box-sizing: border-box;
         }
 
-        /* Text Box */
+        /* Text Box - Properly Aligned */
         .text-box {
             display: flex;
             width: 95%;
