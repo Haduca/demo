@@ -13,21 +13,28 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
             background-color: #f0f0f0;
-            flex-direction: column;
             overflow: hidden;
         }
+
+        /* Centered Container taking up 90% of the screen */
         .container {
-            width: 90%;  /* Make container slightly smaller than the screen */
-            height: 90%;  /* Make container slightly smaller than the screen */
+            width: 90vw; /* 90% of viewport width */
+            height: 90vh; /* 90% of viewport height */
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(2, auto);
             gap: 10px;
             padding: 20px;
             box-sizing: border-box;
-            height: 100%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
+
+        /* Walls */
         .wall {
             background-color: white;
             border-radius: 8px;
@@ -39,13 +46,15 @@
             position: relative;
             overflow: hidden;
             border: 3px solid;
-            height: 100%;  /* Walls take 100% of the container size */
-            width: 100%;   /* Walls take 100% of the container width */
+            height: 100%;
+            width: 100%;
         }
+
         .wall1 { border-color: #e6b800; }  /* Darker yellow */
         .wall2 { border-color: #2e8b57; }  /* Darker green */
         .wall3 { border-color: #1e90ff; }  /* Darker blue */
         .wall4 { border-color: #6a0dad; }  /* Darker purple */
+
         .wall-content {
             flex-grow: 1;
             overflow-y: auto;
@@ -54,8 +63,10 @@
             display: flex;
             flex-direction: column-reverse; /* Ensures new text goes above the textbox */
         }
+
+        /* Centered Textbox */
         .text-box {
-            width: 100%;  /* The textbox width scales with the wall width */
+            width: 80%;  /* The textbox width is now centered within the wall */
             height: 40px;  /* Fixed height for the textbox */
             padding: 10px;
             border: 1px solid #ccc;
@@ -63,6 +74,8 @@
             font-size: 14px;
             position: absolute;
             bottom: 15px;  /* Positioned at the bottom of the wall */
+            left: 50%;
+            transform: translateX(-50%);
             text-align: center;
             box-sizing: border-box;
         }
@@ -101,8 +114,8 @@
 
             // Set wall height and width to be a percentage of the container's height and width
             walls.forEach(wall => {
-                wall.style.height = `${containerHeight * 0.45}px`;  // Adjust walls to 45% of the height
-                wall.style.width = `${containerWidth * 0.45}px`;   // Adjust walls to 45% of the width
+                wall.style.height = `${containerHeight * 0.48}px`;  // Adjust walls to 48% of the height
+                wall.style.width = `${containerWidth * 0.48}px`;   // Adjust walls to 48% of the width
             });
         }
 
