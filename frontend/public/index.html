@@ -20,8 +20,8 @@
 
         /* Centered Container taking up 90% of the screen */
         .container {
-            width: 90vw; /* 90% of viewport width */
-            height: 90vh; /* 90% of viewport height */
+            width: 90vw;
+            height: 90vh;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(2, auto);
@@ -50,30 +50,43 @@
             width: 100%;
         }
 
+        /* Wall Colors */
         .wall1 { border-color: #e6b800; }  /* Darker yellow */
         .wall2 { border-color: #2e8b57; }  /* Darker green */
         .wall3 { border-color: #1e90ff; }  /* Darker blue */
         .wall4 { border-color: #6a0dad; }  /* Darker purple */
 
+        /* Wall Names */
+        .wall-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            height: 5%;
+            line-height: 2em;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        /* Wall Content */
         .wall-content {
             flex-grow: 1;
             overflow-y: auto;
             padding-right: 5px;
-            margin-bottom: 10px; /* Space for the text box */
             display: flex;
             flex-direction: column-reverse; /* Ensures new text goes above the textbox */
         }
 
         /* Centered Textbox */
         .text-box {
-            width: 80%;  /* The textbox width is now centered within the wall */
-            height: 40px;  /* Fixed height for the textbox */
+            width: 100%;
+            height: 40px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
             position: absolute;
-            bottom: 15px;  /* Positioned at the bottom of the wall */
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -85,68 +98,26 @@
 
     <div class="container">
         <div class="wall wall1" id="wall1">
+            <div class="wall-name">Pi</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall1" placeholder="Type your message...">
         </div>
         <div class="wall wall2" id="wall2">
+            <div class="wall-name">Moti</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall2" placeholder="Type your message...">
         </div>
         <div class="wall wall3" id="wall3">
+            <div class="wall-name">Sol</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall3" placeholder="Type your message...">
         </div>
         <div class="wall wall4" id="wall4">
+            <div class="wall-name">Math</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall4" placeholder="Type your message...">
         </div>
     </div>
-
-    <script>
-        const inputElements = document.querySelectorAll('.text-box');
-
-        // Adjust the walls to always fit and scale with the screen
-        function adjustWalls() {
-            const walls = document.querySelectorAll('.wall');
-            const container = document.querySelector('.container');
-            const containerHeight = container.clientHeight;
-            const containerWidth = container.clientWidth;
-
-            // Set wall height and width to be a percentage of the container's height and width
-            walls.forEach(wall => {
-                wall.style.height = `${containerHeight * 0.48}px`;  // Adjust walls to 48% of the height
-                wall.style.width = `${containerWidth * 0.48}px`;   // Adjust walls to 48% of the width
-            });
-        }
-
-        // Adjust walls on page load and resize events
-        window.addEventListener('load', adjustWalls);
-        window.addEventListener('resize', adjustWalls);
-
-        // Handle input for each wall
-        inputElements.forEach(input => {
-            input.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    const wall = this.closest('.wall');
-                    const wallContent = wall.querySelector('.wall-content');
-                    const newText = document.createElement('div');
-                    newText.textContent = this.value;
-                    wallContent.insertBefore(newText, wallContent.firstChild);
-                    this.value = ''; // Clear input after submission
-                    
-                    // Check if we need to remove old messages when wall is full
-                    const maxMessages = 20; // Define max messages per wall
-                    const allMessages = wallContent.querySelectorAll('div');
-                    if (allMessages.length > maxMessages) {
-                        wallContent.removeChild(allMessages[allMessages.length - 1]);
-                    }
-                    
-                    // Scroll the wall to the top to show the new message
-                    wallContent.scrollTop = 0;
-                }
-            });
-        });
-    </script>
 
 </body>
 </html>
