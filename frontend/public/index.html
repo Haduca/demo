@@ -196,6 +196,24 @@
         }, 15000);
     </script>
     <script>
+  function checkAppId() {
+      if (typeof Pi === "undefined") {
+          alert("❌ Pi SDK is not available. Make sure it's loaded.");
+          return;
+      }
+      alert(`✅ Pi SDK Loaded! Trying to retrieve App ID...`);
+      
+      try {
+          Pi.init({ version: "2.0", sandbox: true });
+          console.log("🔍 Pi SDK Object:", Pi);
+          alert("🔍 Check the console for the Pi SDK details.");
+      } catch (error) {
+          console.error("❌ Error initializing Pi SDK:", error);
+          alert(`❌ Pi SDK Initialization Error: ${error.message}`);
+      }
+  }
+</script>
+    <script>
   function signIn() {
       Pi.authenticate({ scopes: ["username"], sandbox: true })
           .then(auth => {
