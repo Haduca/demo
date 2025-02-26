@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Pi Drip</title>
+    <title>AI4Pi - Core UI</title>
     <style>
+        /* Global Styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -18,6 +19,7 @@
             overflow: hidden;
         }
 
+        /* Centered Container */
         .container {
             width: 90vw;
             height: 90vh;
@@ -44,12 +46,6 @@
             border: 3px solid;
         }
 
-        /* Individual Wall Borders */
-        .wall1 { border-color: #e6b800; }  /* Darker yellow */
-        .wall2 { border-color: #2e8b57; }  /* Darker green */
-        .wall3 { border-color: #1e90ff; }  /* Darker blue */
-        .wall4 { border-color: #6a0dad; }  /* Darker purple */
-
         /* Wall Names */
         .wall-name {
             font-size: 1.2em;
@@ -65,7 +61,7 @@
             padding-right: 5px;
             display: flex;
             flex-direction: column-reverse;
-            padding-bottom: 50px; /* Creates space so messages don’t appear behind the textbox */
+            padding-bottom: 50px;
         }
 
         /* Centered Textbox */
@@ -84,54 +80,50 @@
             box-sizing: border-box;
         }
 
+        /* Drip Information */
         .drip-info {
-            font-size: 1.5em;
+            font-size: 1.2em;
+            font-weight: bold;
             text-align: center;
             margin-top: 20px;
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
+    <!-- Container for 4 walls -->
     <div class="container">
-        <div class="wall wall1" id="wall1">
+        <div class="wall" id="wall1">
             <div class="wall-name">Pi</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall1" placeholder="Type here...">
         </div>
-        <div class="wall wall2" id="wall2">
+        <div class="wall" id="wall2">
             <div class="wall-name">Moti</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall2" placeholder="Type here...">
         </div>
-        <div class="wall wall3" id="wall3">
+        <div class="wall" id="wall3">
             <div class="wall-name">Sol</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall3" placeholder="Type here...">
         </div>
-        <div class="wall wall4" id="wall4">
+        <div class="wall" id="wall4">
             <div class="wall-name">Math</div>
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall4" placeholder="Type here...">
         </div>
     </div>
 
-    <!-- Pi Drip Info -->
+    <!-- Drip Information Display -->
     <div class="drip-info" id="drip-info">
-        Accumulated Pi: 0.000000 | Drip: 0.000047706 / 10s
+        Accumulated Pi: 0.000000 | Drip Rate: 0.000000
     </div>
 
+    <!-- Link to Drip Logic -->
+    <script src="js/drip.js"></script>
+
     <script>
-        const dripRate = 0.000047706; // Base Mining Rate of Pi per hour, converted to drip rate per 10 seconds
-        let accumulatedPi = 0; // Variable to track the accumulated Pi
-
-        // Function to update the drip information every 10 seconds
-        setInterval(() => {
-            accumulatedPi += dripRate * (10 / 3600); // Calculate accumulated Pi every 10 seconds
-            document.getElementById("drip-info").textContent = `Accumulated Pi: ${accumulatedPi.toFixed(6)} | Drip: ${dripRate.toFixed(9)} / 10s`;
-        }, 10000);
-
         // Handle Enter key to submit text to the correct wall
         document.querySelectorAll('.text-box').forEach(input => {
             input.addEventListener('keypress', function(event) {
@@ -142,7 +134,7 @@
                     const wallContent = wall.querySelector('.wall-content');
                     const newText = document.createElement('div');
                     newText.textContent = this.value;
-
+                    
                     // Insert new message at the top of the wall content
                     wallContent.insertBefore(newText, wallContent.firstChild);
 
