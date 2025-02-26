@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi dApp</title>
+    <title>AI4Pi - Core UI</title>
     <style>
         /* Global Styles */
         body {
@@ -15,20 +15,22 @@
             align-items: center;
             height: 100vh;
             width: 100vw;
-            background-color: #f5f5f5;
+            background-color: #f0f0f0;
             overflow: hidden;
         }
 
-        /* Container for 4 quadrants */
+        /* Centered Container */
         .container {
             width: 90vw;
-            height: 90vh;
+            height: 80vh;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(2, 1fr);
             gap: 10px;
-            position: relative;
-            box-sizing: border-box;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         /* Walls (Quadrants) */
@@ -40,32 +42,18 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
             border: 3px solid;
+            height: 100%;
         }
-
-        /* Wall Color and Border (Different colors for each wall) */
-        .wall1 { border-color: #e6b800; } /* Yellow */
-        .wall2 { border-color: #2e8b57; } /* Green */
-        .wall3 { border-color: #1e90ff; } /* Blue */
-        .wall4 { border-color: #6a0dad; } /* Purple */
 
         /* Wall Names */
         .wall-name {
             font-size: 1.2em;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 10px;
-        }
-
-        /* Wall Content Area */
-        .wall-content {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 5px;
-            padding-bottom: 50px; /* Ensures no text is hidden behind the textbox */
-            display: flex;
-            flex-direction: column-reverse;
+            height: 5%;
+            padding-top: 10px;
         }
 
         /* Centered Textbox */
@@ -80,87 +68,76 @@
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
+            text-align: center;
             box-sizing: border-box;
         }
 
-        /* Buttons and Other Elements */
-        .top-bar {
-            width: 100%;
+        /* Information Box for Drip and Pi */
+        .info-box {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
-            padding: 10px;
-            position: absolute;
-            top: 0;
-            left: 0;
+            width: 90vw;
+            max-width: 500px;
         }
 
+        /* Buttons */
         .button {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            background-color: #4CAF50;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
             color: white;
-            border-radius: 4px;
+            font-weight: bold;
             cursor: pointer;
+            border-radius: 5px;
         }
 
-        .button:hover {
-            background-color: #45a049;
-        }
-
-        /* Drip and Debug Info */
-        .drip-info {
-            font-size: 1.1em;
-            text-align: center;
-            margin-top: 20px;
+        .button-blue {
+            background-color: #007bff;
         }
     </style>
 </head>
 <body>
-
-    <div class="top-bar">
-        <div>
-            <span id="clock"></span>
-        </div>
-        <div>
-            <button class="button" id="piTransactionButton">Pi Transaction</button>
-            <button class="button" id="signInButton">Sign In</button>
-        </div>
-    </div>
-
     <div class="container">
         <div class="wall wall1" id="wall1">
             <div class="wall-name">Pi</div>
-            <div class="wall-content" id="content-wall1"></div>
+            <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall1" placeholder="Type here...">
         </div>
-
         <div class="wall wall2" id="wall2">
             <div class="wall-name">Moti</div>
-            <div class="wall-content" id="content-wall2"></div>
+            <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall2" placeholder="Type here...">
         </div>
-
         <div class="wall wall3" id="wall3">
             <div class="wall-name">Sol</div>
-            <div class="wall-content" id="content-wall3"></div>
+            <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall3" placeholder="Type here...">
         </div>
-
         <div class="wall wall4" id="wall4">
             <div class="wall-name">Math</div>
-            <div class="wall-content" id="content-wall4"></div>
+            <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall4" placeholder="Type here...">
         </div>
     </div>
 
-    <!-- Drip and Debug Info -->
-    <div class="drip-info">
-        <div>Accumulated Pi: <span id="accumulatedPi">0.000000</span></div>
-        <div>Drip per 10 seconds: <span id="dripRate">0.000000</span></div>
+    <div class="info-box">
+        <span>Accumulated Pi: 0.000019</span>
+        <span>Drip per 10 seconds: 0.00000477</span>
     </div>
 
+    <button class="button button-blue" id="piTransactionBtn">Pi Transaction</button>
+    <button class="button" id="signInBtn">Sign In</button>
+
     <script>
-        // Handle Enter key for text input in all walls
+        // Handle Enter key to submit text to the correct wall
         document.querySelectorAll('.text-box').forEach(input => {
             input.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter' && this.value.trim() !== '') {
@@ -170,7 +147,7 @@
                     const wallContent = wall.querySelector('.wall-content');
                     const newText = document.createElement('div');
                     newText.textContent = this.value;
-                    
+
                     // Insert new message at the top of the wall content
                     wallContent.insertBefore(newText, wallContent.firstChild);
 
@@ -183,31 +160,15 @@
             });
         });
 
-        // Handle the clock
-        setInterval(() => {
-            const currentTime = new Date().toLocaleTimeString();
-            document.getElementById('clock').textContent = currentTime;
-        }, 1000);
-
-        // Pi Drip System
-        let accumulatedPi = 0;
-        const dripRate = 0.000047706;  // Pi drip rate per 10 seconds
-
-        setInterval(() => {
-            accumulatedPi += dripRate;
-            document.getElementById('accumulatedPi').textContent = accumulatedPi.toFixed(6);
-            document.getElementById('dripRate').textContent = dripRate.toFixed(8);
-        }, 10000);
-
-        // Button Actions (Placeholders for Pi Network integrations)
-        document.getElementById('piTransactionButton').addEventListener('click', function() {
-            alert('Pi Transaction button clicked.');
+        // Handle Pi Transaction Button click
+        document.getElementById('piTransactionBtn').addEventListener('click', function() {
+            console.log('Pi Transaction initiated');
         });
 
-        document.getElementById('signInButton').addEventListener('click', function() {
-            alert('Sign In button clicked.');
+        // Handle Sign In Button click
+        document.getElementById('signInBtn').addEventListener('click', function() {
+            console.log('Sign In initiated');
         });
     </script>
-
 </body>
 </html>
