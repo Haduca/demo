@@ -102,6 +102,15 @@
             text-align: center;
         }
 
+        /* Add a small bottom border above the iOS home indicator */
+        .bottom-border {
+            width: 100vw;
+            height: 4px; /* Small enough to be visible but not intrusive */
+            background: black;
+            position: absolute;
+            bottom: 5px; /* Positions the border just above the iOS home indicator */
+        }
+
         /* Ensure input remains fully visible */
         input:focus {
             outline: none;
@@ -152,6 +161,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Bottom Border Above iOS Home Indicator -->
+    <div class="bottom-border"></div>
 
     <script>
         const $ = id => document.getElementById(id);
