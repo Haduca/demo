@@ -63,6 +63,7 @@
             position: absolute;
             bottom: 15px;  /* Positioned at the bottom of the wall */
             text-align: center;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -89,6 +90,27 @@
 
     <script>
         const inputElements = document.querySelectorAll('.text-box');
+
+        // Function to adjust the textbox height based on wall height
+        function adjustTextboxHeight(wallId) {
+            const wall = document.getElementById(wallId);
+            const wallHeight = wall.clientHeight;
+            const textBox = wall.querySelector('.text-box');
+            // Subtract some space for margin/padding to make it fit properly
+            const adjustedHeight = wallHeight - 30; // Adjust as needed
+
+            // Set the height of the textbox
+            textBox.style.height = adjustedHeight + 'px';
+        }
+
+        // Adjust the textbox height when page loads
+        window.addEventListener('load', () => {
+            adjustTextboxHeight('wall1');
+            adjustTextboxHeight('wall2');
+            adjustTextboxHeight('wall3');
+            adjustTextboxHeight('wall4');
+        });
+
         inputElements.forEach(input => {
             input.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
@@ -110,6 +132,14 @@
                     wallContent.scrollTop = 0;
                 }
             });
+        });
+
+        // Keep checking the wall size and adjust text box accordingly (on resize)
+        window.addEventListener('resize', () => {
+            adjustTextboxHeight('wall1');
+            adjustTextboxHeight('wall2');
+            adjustTextboxHeight('wall3');
+            adjustTextboxHeight('wall4');
         });
     </script>
 
