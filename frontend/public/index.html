@@ -18,6 +18,8 @@
             overflow: hidden;
         }
         .container {
+            width: 100%;
+            height: 100%;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(2, auto);
@@ -25,7 +27,6 @@
             padding: 20px;
             box-sizing: border-box;
             height: 100%;
-            width: 100%;
         }
         .wall {
             background-color: white;
@@ -38,9 +39,9 @@
             position: relative;
             overflow: hidden;
             border: 3px solid;
-            /* Walls will always be the same size, in relation to each other */
-            height: 45%; /* Adjust this as needed for balance */
-            width: 45%; /* Same width for all walls */
+            /* Walls always scale together */
+            height: 100%;  /* Adjust dynamically */
+            width: 100%;   /* Adjust dynamically */
         }
         .wall1 { border-color: #e6b800; }  /* Darker yellow */
         .wall2 { border-color: #2e8b57; }  /* Darker green */
@@ -55,7 +56,7 @@
             flex-direction: column-reverse; /* Ensures new text goes above the textbox */
         }
         .text-box {
-            width: 100%;
+            width: 100%;  /* The textbox width scales with the wall width */
             height: 40px;  /* Fixed height for the textbox */
             padding: 10px;
             border: 1px solid #ccc;
@@ -92,24 +93,25 @@
     <script>
         const inputElements = document.querySelectorAll('.text-box');
 
-        // Adjust the walls to always be the same size, taking up equal portions of the screen
+        // Adjust the walls to always fit and scale with the screen
         function adjustWalls() {
             const walls = document.querySelectorAll('.wall');
             const container = document.querySelector('.container');
             const containerHeight = container.clientHeight;
             const containerWidth = container.clientWidth;
 
-            // Set wall height and width to be a percentage of the container
+            // Set wall height and width to be a percentage of the container's height and width
             walls.forEach(wall => {
-                wall.style.height = `${containerHeight * 0.45}px`;  // 45% of screen height
-                wall.style.width = `${containerWidth * 0.45}px`;   // 45% of screen width
+                wall.style.height = `${containerHeight * 0.45}px`;  // Adjust walls to 45% of the height
+                wall.style.width = `${containerWidth * 0.45}px`;   // Adjust walls to 45% of the width
             });
         }
 
-        // Call the adjustWalls function initially and whenever the window is resized
+        // Adjust walls on page load and resize events
         window.addEventListener('load', adjustWalls);
         window.addEventListener('resize', adjustWalls);
 
+        // Handle input for each wall
         inputElements.forEach(input => {
             input.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
