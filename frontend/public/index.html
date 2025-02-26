@@ -3,117 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi</title>
+    <title>AI4Pi Interface</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-        }
-        #container {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 10px;
             padding: 20px;
+            box-sizing: border-box;
+            height: 100%;
+            overflow-y: auto;
         }
         .wall {
-            width: 48%;
-            height: 400px;
             background-color: #fff;
-            border: 1px solid #ddd;
-            margin: 10px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
-            box-sizing: border-box;
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
         }
         .text-box {
             width: 100%;
             padding: 10px;
             margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             font-size: 14px;
-            border: 1px solid #ddd;
-            box-sizing: border-box;
         }
-        #drip, #traffic {
-            margin-top: 20px;
+        .clock, .debug, .drip, .sign-in {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
         }
-        #drip span, #traffic span {
-            font-weight: bold;
+        .debug-info {
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 5px;
+        }
+        .drip-count, .visitor-count {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .clock {
+            font-size: 18px;
+        }
+        .sign-in {
+            font-size: 14px;
+            color: #555;
         }
     </style>
 </head>
 <body>
+    <div class="clock">Clock: <span id="clock">00:00:00</span></div>
+    <div class="drip">Drip Count: <span id="drip-count">0</span></div>
+    <div class="visitor-count">Total Visitors: <span id="visitor-count">0</span></div>
+    <div class="debug-info">Debug Info: <span id="debug-info">All systems go</span></div>
 
-<div id="container">
-    <div class="wall" id="wall1">
-        <div id="wall1-content"></div>
-        <input type="text" id="wall1-input" class="text-box" placeholder="Type here..." onkeydown="handleInput(event, 'wall1')">
+    <div class="container">
+        <div class="wall" id="wall1">
+            <div class="wall-content"></div>
+            <input type="text" class="text-box" id="input-wall1" placeholder="Type your message...">
+        </div>
+        <div class="wall" id="wall2">
+            <div class="wall-content"></div>
+            <input type="text" class="text-box" id="input-wall2" placeholder="Type your message...">
+        </div>
+        <div class="wall" id="wall3">
+            <div class="wall-content"></div>
+            <input type="text" class="text-box" id="input-wall3" placeholder="Type your message...">
+        </div>
+        <div class="wall" id="wall4">
+            <div class="wall-content"></div>
+            <input type="text" class="text-box" id="input-wall4" placeholder="Type your message...">
+        </div>
     </div>
-    <div class="wall" id="wall2">
-        <div id="wall2-content"></div>
-        <input type="text" id="wall2-input" class="text-box" placeholder="Type here..." onkeydown="handleInput(event, 'wall2')">
-    </div>
-    <div class="wall" id="wall3">
-        <div id="wall3-content"></div>
-        <input type="text" id="wall3-input" class="text-box" placeholder="Type here..." onkeydown="handleInput(event, 'wall3')">
-    </div>
-    <div class="wall" id="wall4">
-        <div id="wall4-content"></div>
-        <input type="text" id="wall4-input" class="text-box" placeholder="Type here..." onkeydown="handleInput(event, 'wall4')">
-    </div>
-</div>
 
-<div id="drip">
-    <span>PI Drip: </span><span id="pi-drip">0.00</span> PI
-</div>
-<div id="traffic">
-    <span>Traffic Count: </span><span id="visitor-count">0</span>
-</div>
+    <script>
+        const inputElements = document.querySelectorAll('.text-box');
+        inputElements.forEach(input => {
+            input.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    const wall = this.closest('.wall');
+                    const wallContent = wall.querySelector('.wall-content');
+                    const newText = document.createElement('div');
+                    newText.textContent = this.value;
+                    wallContent.insertBefore(newText, wallContent.firstChild);
+                    this.value = ''; // Clear input after submission
+                }
+            });
+        });
 
-<script>
-    let visitorCount = 0;
-    let piDripRate = 0.01;  // 1% of the base rate of Pi mining
-    let piDripAmount = 0.00;
-
-    // Store content for each wall
-    let wallContents = {
-        'wall1': [],
-        'wall2': [],
-        'wall3': [],
-        'wall4': []
-    };
-
-    // Handle user input in walls
-    function handleInput(event, wallId) {
-        if (event.key === 'Enter') {
-            const input = document.getElementById(`${wallId}-input`);
-            if (input.value.trim() !== "") {
-                wallContents[wallId].unshift(input.value.trim()); // Add to top
-                updateWallContent(wallId);
-                input.value = ""; // Clear input after submission
-            }
+        // Clock update function
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
         }
-    }
+        setInterval(updateClock, 1000);
 
-    // Update the content of each wall
-    function updateWallContent(wallId) {
-        const contentElement = document.getElementById(`${wallId}-content`);
-        contentElement.innerHTML = wallContents[wallId].join('<br>');
-    }
+        // Debug info simulation
+        function updateDebugInfo(message) {
+            document.getElementById('debug-info').textContent = message;
+        }
 
-    // Simulate PI drip and traffic count every 10 seconds
-    setInterval(() => {
-        // Update PI drip
-        piDripAmount += piDripRate;
-        document.getElementById("pi-drip").textContent = piDripAmount.toFixed(2);
+        // Drip and Visitor Count simulation
+        let dripCount = 0;
+        let visitorCount = 0;
 
-        // Update visitor count
-        visitorCount += 1;
-        document.getElementById("visitor-count").textContent = visitorCount;
-    }, 10000);
+        function simulateDrip() {
+            dripCount++;
+            document.getElementById('drip-count').textContent = dripCount;
+        }
 
-</script>
+        function simulateVisitorCount() {
+            visitorCount++;
+            document.getElementById('visitor-count').textContent = visitorCount;
+        }
 
+        // Simulate visitor count and drip update every 10 seconds
+        setInterval(simulateDrip, 10000);
+        setInterval(simulateVisitorCount, 10000);
+    </script>
 </body>
 </html>
