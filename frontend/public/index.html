@@ -2,74 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Optimized UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI4Pi Interface</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            justify-content: flex-start;
             height: 100vh;
             background-color: #f0f0f0;
+            flex-direction: column;
             overflow: hidden;
         }
-
-        /* Top Bar Layout */
-        .top-bar {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
-        }
-
-        .top-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 50px;
-            width: 100%;
-        }
-
-        .status-bar {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            width: 100%;
-            max-width: 1200px;
-            padding: 10px;
-        }
-
-        .status-item {
-            background: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .visitor-count {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .debug-info {
-            background: #333;
-            color: white;
-        }
-
-        /* Container for Message Walls */
         .container {
             width: 100%;
             max-width: 1200px;
@@ -79,68 +26,93 @@
             gap: 10px;
             padding: 20px;
             box-sizing: border-box;
-            margin-top: 30px;
+            height: 100%;
+            overflow-y: auto;
         }
-
         .wall {
-            background-color: #fff;
+            background-color: white;
             border-radius: 8px;
             padding: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-end;
             position: relative;
-            height: 250px; /* Adjusted height for visibility */
+            max-height: 70vh;
+            overflow: hidden; /* Remove scrollbar */
         }
-
+        .wall1 { background-color: #ffcc00; }
+        .wall2 { background-color: #32cd32; }
+        .wall3 { background-color: #00bfff; }
+        .wall4 { background-color: #8a2be2; }
         .wall-content {
             flex-grow: 1;
             overflow-y: auto;
-            overflow-x: hidden;
             padding-right: 5px;
+            margin-bottom: 10px; /* Space for the text box */
         }
-
         .text-box {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
-            position: absolute;
-            bottom: 10px;
         }
-
+        /* Clock and Drip Section */
+        .clock, .drip, .visitor-count, .debug-info, .sign-in {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .debug-info {
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 5px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+        .drip-count, .visitor-count {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .clock {
+            font-size: 18px;
+            text-align: center;
+        }
+        .sign-in {
+            font-size: 14px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
-
-    <div class="top-bar">
-        <div>Clock: <span id="clock">00:00:00</span></div>
-        <div class="status-item visitor-count">Total Visitors: <span id="visitor-count">0</span></div>
-        <div class="status-item debug-info">Debug Info: <span id="debug-info">All systems go</span></div>
-    </div>
-
-    <div class="top-section">
-        <div class="status-bar">
-            <div class="status-item">Drip Count: <span id="drip-count">0</span></div>
-        </div>
-    </div>
+    <div class="clock">Clock: <span id="clock">00:00:00</span></div>
+    <div class="drip">Drip Count: <span id="drip-count">0</span> Pi</div>
+    <div class="visitor-count">Total Visitors: <span id="visitor-count">0</span></div>
+    <div class="debug-info">Debug Info: <span id="debug-info">All systems go</span></div>
 
     <div class="container">
-        <div class="wall" id="wall1">
+        <div class="wall wall1" id="wall1">
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall1" placeholder="Type your message...">
         </div>
-        <div class="wall" id="wall2">
+        <div class="wall wall2" id="wall2">
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall2" placeholder="Type your message...">
         </div>
-        <div class="wall" id="wall3">
+        <div class="wall wall3" id="wall3">
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall3" placeholder="Type your message...">
         </div>
-        <div class="wall" id="wall4">
+        <div class="wall wall4" id="wall4">
             <div class="wall-content"></div>
             <input type="text" class="text-box" id="input-wall4" placeholder="Type your message...">
         </div>
@@ -156,15 +128,16 @@
                     const newText = document.createElement('div');
                     newText.textContent = this.value;
                     wallContent.insertBefore(newText, wallContent.firstChild);
-                    this.value = '';
-
-                    // Remove oldest messages if wall is full
-                    const maxMessages = 20;
+                    this.value = ''; // Clear input after submission
+                    
+                    // Check if we need to remove old messages when wall is full
+                    const maxMessages = 20; // Define max messages per wall
                     const allMessages = wallContent.querySelectorAll('div');
                     if (allMessages.length > maxMessages) {
                         wallContent.removeChild(allMessages[allMessages.length - 1]);
                     }
                     
+                    // Scroll the wall to the top to show the new message
                     wallContent.scrollTop = 0;
                 }
             });
@@ -180,11 +153,6 @@
         }
         setInterval(updateClock, 1000);
 
-        // Debug info simulation
-        function updateDebugInfo(message) {
-            document.getElementById('debug-info').textContent = message;
-        }
-
         // Drip and Visitor Count simulation
         let dripCount = 0;
         let visitorCount = 0;
@@ -199,9 +167,9 @@
             document.getElementById('visitor-count').textContent = visitorCount;
         }
 
+        // Simulate visitor count and drip update every 10 seconds
         setInterval(simulateDrip, 10000);
         setInterval(simulateVisitorCount, 10000);
     </script>
-
 </body>
 </html>
