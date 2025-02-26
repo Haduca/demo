@@ -198,6 +198,7 @@
     </script>
     <script>
   function signIn() {
+      alert("Sign-in button clicked!"); // Debugging Alert
       Pi.authenticate(["username"], function(auth) {
           if (auth && auth.user) {
               alert(`Welcome, ${auth.user.username}!`);
