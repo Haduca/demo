@@ -2,162 +2,139 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Debug & Traffic Tracking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI4Pi - UI Fix</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: white; color: black; margin: 0; padding-bottom: 50px; }
-        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
-        
-        /* Walls */
-        .wall { border-radius: 8px; padding: 10px; height: 200px; overflow-y: auto; display: flex; flex-direction: column-reverse; background: white; border: 2px solid black; }
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
 
-        /* Text Box */
-        .text-box { display: flex; margin-top: 5px; }
-        input { flex-grow: 1; padding: 5px; border-radius: 5px; border: 1px solid black; background: white; color: black; }
-        
-        /* Debug Console */
-        .console-container { position: fixed; bottom: 0; width: 100%; background: black; color: lime; font-size: 12px; padding: 5px; height: 100px; overflow-y: auto; display: none; }
-        
-        /* Toggle Button */
-        .toggle-button { position: fixed; bottom: 110px; right: 10px; padding: 5px; background: black; color: white; border: none; cursor: pointer; }
+        /* Centered Container */
+        .container {
+            width: 90vw;
+            height: 90vh;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 10px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
-        /* Traffic Indicators */
-        .traffic-container { position: fixed; top: 10px; right: 10px; background: lightgray; padding: 10px; border-radius: 5px; }
+        /* Walls (Quadrants) */
+        .wall {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid;
+        }
+
+        /* Individual Wall Borders */
+        .wall1 { border-color: #e6b800; }  /* Darker yellow */
+        .wall2 { border-color: #2e8b57; }  /* Darker green */
+        .wall3 { border-color: #1e90ff; }  /* Darker blue */
+        .wall4 { border-color: #6a0dad; }  /* Darker purple */
+
+        /* Wall Names */
+        .wall-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            height: 5%;
+        }
+
+        /* Wall Content */
+        .wall-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+            display: flex;
+            flex-direction: column-reverse;
+            padding-bottom: 50px; /* Creates space so messages don’t appear behind the textbox */
+        }
+
+        /* Centered Textbox */
+        .text-box {
+            width: 90%;
+            height: 40px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
 
-    <h2 id="t"></h2>
-    <h3>💰 Pi: <span id="p">0.000000</span> (Drip: 0.002000/10s)</h3>
-
-    <!-- Sign-In & 3.14 Button -->
-    <div class="top-buttons">
-        <button onclick="signIn()">🔑 Sign In</button>
-        <button onclick="piAction()">🔄 3.14 Action</button>
-    </div>
-
-    <!-- Traffic Indicators -->
-    <div class="traffic-container">
-        <p>🟢 Creator Active: <span id="creator-status">Yes</span></p>
-        <p>🌍 Total Visitors: <span id="visitor-count">0</span></p>
-    </div>
-
     <div class="container">
-        <div class="wall" id="ai">
-            <b>AI</b>
-            <div class="messages"></div>
-            <div class="text-box">
-                <input id="aiI" type="text" placeholder="Type and press Enter">
-            </div>
+        <div class="wall wall1" id="wall1">
+            <div class="wall-name">Pi</div>
+            <div class="wall-content"></div>
+            <input type="text" class="text-box" id="input-wall1" placeholder="Type here...">
         </div>
-        <div class="wall" id="mo">
-            <b>Moti</b>
-            <div class="messages"></div>
-            <div class="text-box">
-                <input id="moI" type="text" placeholder="Type and press Enter">
-            </div>
+        <div class="wall wall2" id="wall2">
+            <div class="wall-name">Moti</div>
+            <div class="wall-content"></div>
+            <input type="text" class="text-box" id="input-wall2" placeholder="Type here...">
         </div>
-        <div class="wall" id="so">
-            <b>Sol</b>
-            <div class="messages"></div>
-            <div class="text-box">
-                <input id="soI" type="text" placeholder="Type and press Enter">
-            </div>
+        <div class="wall wall3" id="wall3">
+            <div class="wall-name">Sol</div>
+            <div class="wall-content"></div>
+            <input type="text" class="text-box" id="input-wall3" placeholder="Type here...">
         </div>
-        <div class="wall" id="ma">
-            <b>Math</b>
-            <div class="messages"></div>
-            <div class="text-box">
-                <input id="maI" type="text" placeholder="Type and press Enter">
-            </div>
+        <div class="wall wall4" id="wall4">
+            <div class="wall-name">Math</div>
+            <div class="wall-content"></div>
+            <input type="text" class="text-box" id="input-wall4" placeholder="Type here...">
         </div>
     </div>
-
-    <!-- Toggle Button for Console -->
-    <button class="toggle-button" onclick="toggleConsole()">🖥 Debug Console</button>
-
-    <!-- Developer Console -->
-    <div class="console-container" id="console"></div>
 
     <script>
-        const $ = id => document.getElementById(id);
-        let p = 0;
+        // Handle Enter key to submit text to the correct wall
+        document.querySelectorAll('.text-box').forEach(input => {
+            input.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter' && this.value.trim() !== '') {
+                    event.preventDefault(); // Prevent form submission
 
-        // Display real-time clock
-        setInterval(() => $("t").innerText = new Date().toLocaleTimeString(), 1000);
+                    const wall = this.closest('.wall');
+                    const wallContent = wall.querySelector('.wall-content');
+                    const newText = document.createElement('div');
+                    newText.textContent = this.value;
+                    
+                    // Insert new message at the top of the wall content
+                    wallContent.insertBefore(newText, wallContent.firstChild);
 
-        // Pi Drip System
-        setInterval(() => {
-            p += 0.002;
-            $("p").innerText = p.toFixed(6);
-        }, 10000);
+                    // Clear input field after submission
+                    this.value = ''; 
 
-        // Toggle Developer Console
-        function toggleConsole() {
-            let consoleDiv = $("console");
-            consoleDiv.style.display = (consoleDiv.style.display === "none") ? "block" : "none";
-        }
-
-        // Debug Logging Function
-        function logMessage(msg) {
-            let consoleDiv = $("console");
-            let newLog = document.createElement("p");
-            newLog.textContent = msg;
-            consoleDiv.appendChild(newLog);
-            consoleDiv.scrollTop = consoleDiv.scrollHeight;
-        }
-
-        // Persistent Visitor Count
-        function updateVisitorCount() {
-            let count = localStorage.getItem("visitorCount");
-            if (!count) {
-                count = 1;
-            } else {
-                count = parseInt(count) + 1;
-            }
-            localStorage.setItem("visitorCount", count);
-            $("visitor-count").innerText = count;
-        }
-        updateVisitorCount();
-
-        // Detect Creator Activity
-        function updateCreatorStatus() {
-            $("creator-status").innerText = "Yes";
-            logMessage("Creator is active.");
-        }
-        updateCreatorStatus();
-
-        // Handle User Input (Press Enter to Send)
-        function handleUserInput(event, wallId) {
-            if (event.key === "Enter") {
-                let input = $(wallId + "I");
-                let messages = $("#" + wallId).querySelector(".messages");
-                let newText = `<p><b>You:</b> ${input.value}</p>`;
-
-                if (input.value.trim() !== "") {
-                    messages.insertAdjacentHTML("afterbegin", newText);
-                    logMessage(`User input in ${wallId}: ${input.value}`);
-                    input.value = "";
+                    // Ensure the latest message is visible at the top
+                    wallContent.scrollTop = 0;
                 }
-            }
-        }
-
-        // Attach event listener for each input field
-        ["ai", "mo", "so", "ma"].forEach(wallId => {
-            $(wallId + "I").addEventListener("keypress", event => handleUserInput(event, wallId));
+            });
         });
-
-        // Sign-In Simulation
-        function signIn() {
-            alert("🔑 Signing in... Pi Network Authentication coming soon!");
-            logMessage("User clicked Sign In.");
-        }
-
-        // 3.14 Button Action
-        function piAction() {
-            alert("🔄 Testnet Pi Interaction simulated!");
-            logMessage("User clicked 3.14 Action.");
-        }
     </script>
 
 </body>
