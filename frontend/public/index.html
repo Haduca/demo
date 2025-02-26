@@ -196,6 +196,21 @@
             document.getElementById("visitor-count").textContent = visitorCount;
         }, 15000);
     </script>
+    <script>
+  function signIn() {
+      Pi.authenticate(["username"], function(auth) {
+          if (auth && auth.user) {
+              alert(`Welcome, ${auth.user.username}!`);
+              document.getElementById("user-info").textContent = `Signed in as: ${auth.user.username}`;
+          }
+      }, function(error) {
+          console.error("Authentication failed:", error);
+          alert("Authentication failed. Please try again.");
+      });
+  }
+</script>
+<button class="sign-in" onclick="signIn()">🔑 Sign In</button>
+<div id="user-info" style="margin-top: 10px; font-weight: bold;"></div>
 
 </body>
 </html>
