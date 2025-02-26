@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Bot Network</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AI4Pi - Debug & Traffic Tracking</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: white; color: black; }
+        body { font-family: sans-serif; text-align: center; background: white; color: black; margin: 0; padding-bottom: 50px; }
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
         
         /* Walls */
@@ -14,11 +14,15 @@
         /* Text Box */
         .text-box { display: flex; margin-top: 5px; }
         input { flex-grow: 1; padding: 5px; border-radius: 5px; border: 1px solid black; background: white; color: black; }
-        button { padding: 5px; border-radius: 5px; border: 1px solid black; background: black; color: white; cursor: pointer; }
-        button:hover { background: gray; }
+        
+        /* Debug Console */
+        .console-container { position: fixed; bottom: 0; width: 100%; background: black; color: lime; font-size: 12px; padding: 5px; height: 100px; overflow-y: auto; display: none; }
+        
+        /* Toggle Button */
+        .toggle-button { position: fixed; bottom: 110px; right: 10px; padding: 5px; background: black; color: white; border: none; cursor: pointer; }
 
-        /* Top Buttons */
-        .top-buttons { margin-bottom: 10px; }
+        /* Traffic Indicators */
+        .traffic-container { position: fixed; top: 10px; right: 10px; background: lightgray; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -32,40 +36,51 @@
         <button onclick="piAction()">🔄 3.14 Action</button>
     </div>
 
+    <!-- Traffic Indicators -->
+    <div class="traffic-container">
+        <p>🟢 Creator Active: <span id="creator-status">Yes</span></p>
+        <p>🌍 Total Visitors: <span id="visitor-count">0</span></p>
+    </div>
+
     <div class="container">
         <div class="wall" id="ai">
             <b>AI</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="aiI"><button onclick="sendMessage('ai')">Send</button>
+                <input id="aiI" type="text" placeholder="Type and press Enter">
             </div>
         </div>
         <div class="wall" id="mo">
-            <b>Motivation</b>
+            <b>Moti</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="moI"><button onclick="sendMessage('mo')">Submit</button>
+                <input id="moI" type="text" placeholder="Type and press Enter">
             </div>
         </div>
         <div class="wall" id="so">
-            <b>Solutions</b>
+            <b>Sol</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="soI"><button onclick="sendMessage('so')">Submit</button>
+                <input id="soI" type="text" placeholder="Type and press Enter">
             </div>
         </div>
         <div class="wall" id="ma">
             <b>Math</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="maI"><button onclick="sendMessage('ma')">Submit</button>
+                <input id="maI" type="text" placeholder="Type and press Enter">
             </div>
         </div>
     </div>
 
+    <!-- Toggle Button for Console -->
+    <button class="toggle-button" onclick="toggleConsole()">🖥 Debug Console</button>
+
+    <!-- Developer Console -->
+    <div class="console-container" id="console"></div>
+
     <script>
         const $ = id => document.getElementById(id);
-        const walls = ["ai", "mo", "so", "ma"];
         let p = 0;
 
         // Display real-time clock
@@ -77,56 +92,71 @@
             $("p").innerText = p.toFixed(6);
         }, 10000);
 
-        // Send messages & remove oldest text when limit is reached
-        function sendMessage(wallId) {
-            let messages = $("#" + wallId).querySelector(".messages");
-            let input = $(wallId + "I");
-            let newText = `<p><b>You:</b> ${input.value}</p>`;
-
-            messages.insertAdjacentHTML("afterbegin", newText);
-
-            while (messages.children.length > 10) {
-                messages.removeChild(messages.lastChild);
-            }
-
-            input.value = "";
+        // Toggle Developer Console
+        function toggleConsole() {
+            let consoleDiv = $("console");
+            consoleDiv.style.display = (consoleDiv.style.display === "none") ? "block" : "none";
         }
 
-        // Bot AI Responses (Each wall gets periodic bot interactions)
-        setInterval(() => {
-            let wallId = walls[Math.random() * walls.length | 0];
-            let messages = $("#" + wallId).querySelector(".messages");
-            let botResponse = `<p><b>${wallId.toUpperCase()} Bot:</b> ${generateBotResponse()}</p>`;
-
-            messages.insertAdjacentHTML("afterbegin", botResponse);
-
-            while (messages.children.length > 10) {
-                messages.removeChild(messages.lastChild);
-            }
-        }, 3000);
-
-        function generateBotResponse() {
-            let responses = [
-                "Interesting thought!",
-                "Let's explore this idea.",
-                "I like where this is going!",
-                "Can you elaborate?",
-                "This has potential.",
-                "How does this relate to AI?",
-                "Pi Network integration idea?",
-                "Have you considered another approach?"
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
+        // Debug Logging Function
+        function logMessage(msg) {
+            let consoleDiv = $("console");
+            let newLog = document.createElement("p");
+            newLog.textContent = msg;
+            consoleDiv.appendChild(newLog);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
         }
+
+        // Persistent Visitor Count
+        function updateVisitorCount() {
+            let count = localStorage.getItem("visitorCount");
+            if (!count) {
+                count = 1;
+            } else {
+                count = parseInt(count) + 1;
+            }
+            localStorage.setItem("visitorCount", count);
+            $("visitor-count").innerText = count;
+        }
+        updateVisitorCount();
+
+        // Detect Creator Activity
+        function updateCreatorStatus() {
+            $("creator-status").innerText = "Yes";
+            logMessage("Creator is active.");
+        }
+        updateCreatorStatus();
+
+        // Handle User Input (Press Enter to Send)
+        function handleUserInput(event, wallId) {
+            if (event.key === "Enter") {
+                let input = $(wallId + "I");
+                let messages = $("#" + wallId).querySelector(".messages");
+                let newText = `<p><b>You:</b> ${input.value}</p>`;
+
+                if (input.value.trim() !== "") {
+                    messages.insertAdjacentHTML("afterbegin", newText);
+                    logMessage(`User input in ${wallId}: ${input.value}`);
+                    input.value = "";
+                }
+            }
+        }
+
+        // Attach event listener for each input field
+        ["ai", "mo", "so", "ma"].forEach(wallId => {
+            $(wallId + "I").addEventListener("keypress", event => handleUserInput(event, wallId));
+        });
 
         // Sign-In Simulation
         function signIn() {
             alert("🔑 Signing in... Pi Network Authentication coming soon!");
+            logMessage("User clicked Sign In.");
         }
 
         // 3.14 Button Action
         function piAction() {
             alert("🔄 Testnet Pi Interaction simulated!");
+            logMessage("User clicked 3.14 Action.");
         }
     </script>
 
