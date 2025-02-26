@@ -19,7 +19,7 @@
             overflow: hidden;
         }
 
-        /* Container - Centered, 90% of Screen */
+        /* Centered Container */
         .container {
             width: 90vw;
             height: 90vh;
@@ -75,7 +75,7 @@
             flex-direction: column-reverse;
         }
 
-        /* Input Box */
+        /* Centered Textbox */
         .text-box {
             width: 90%;
             height: 40px;
@@ -90,7 +90,6 @@
             text-align: center;
             box-sizing: border-box;
         }
-
     </style>
 </head>
 <body>
@@ -117,6 +116,31 @@
             <input type="text" class="text-box" id="input-wall4" placeholder="Type here...">
         </div>
     </div>
+
+    <script>
+        // Handle Enter key to submit text to the correct wall
+        document.querySelectorAll('.text-box').forEach(input => {
+            input.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter' && this.value.trim() !== '') {
+                    event.preventDefault(); // Prevent form submission
+
+                    const wall = this.closest('.wall');
+                    const wallContent = wall.querySelector('.wall-content');
+                    const newText = document.createElement('div');
+                    newText.textContent = this.value;
+                    
+                    // Insert new message at the top of the wall content
+                    wallContent.insertBefore(newText, wallContent.firstChild);
+
+                    // Clear input field after submission
+                    this.value = ''; 
+
+                    // Ensure the latest message is visible at the top
+                    wallContent.scrollTop = 0;
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
