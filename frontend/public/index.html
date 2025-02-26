@@ -40,12 +40,12 @@
             position: relative;
             max-height: 70vh;
             overflow: hidden;
-            border: 3px solid; /* Adding border color */
+            border: 3px solid;
         }
-        .wall1 { border-color: #ffcc00; }
-        .wall2 { border-color: #32cd32; }
-        .wall3 { border-color: #00bfff; }
-        .wall4 { border-color: #8a2be2; }
+        .wall1 { border-color: #e6b800; }  /* Darker yellow */
+        .wall2 { border-color: #2e8b57; }  /* Darker green */
+        .wall3 { border-color: #1e90ff; }  /* Darker blue */
+        .wall4 { border-color: #6a0dad; }  /* Darker purple */
         .wall-content {
             flex-grow: 1;
             overflow-y: auto;
@@ -62,52 +62,9 @@
             bottom: 15px;  /* Positioned at the bottom of the wall */
             text-align: center;
         }
-        /* Clock and Drip Section */
-        .clock, .drip, .visitor-count, .debug-info, .sign-in {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        .debug-info {
-            background-color: #333;
-            color: white;
-            padding: 5px 10px;
-            font-size: 12px;
-            border-radius: 5px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-        }
-        .drip-count, .visitor-count {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .clock {
-            font-size: 18px;
-            text-align: center;
-        }
-        .sign-in {
-            font-size: 14px;
-            color: #555;
-        }
     </style>
 </head>
 <body>
-    <div class="clock">
-        <span id="clock">00:00:00</span>
-    </div>
-    <div class="drip">
-        <span id="drip-count">0</span> Pi
-    </div>
-    <div class="visitor-count">
-        Total Visitors: <span id="visitor-count">0</span>
-    </div>
-    <div class="debug-info" id="debug-info">All systems go</div>
 
     <div class="container">
         <div class="wall wall1" id="wall1">
@@ -152,35 +109,7 @@
                 }
             });
         });
-
-        // Clock update function
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
-        }
-        setInterval(updateClock, 1000);
-
-        // Drip and Visitor Count simulation
-        let dripCount = 0;
-        let visitorCount = 0;
-
-        function simulateDrip() {
-            dripCount++;
-            document.getElementById('drip-count').textContent = dripCount;
-        }
-
-        function simulateVisitorCount() {
-            visitorCount++;
-            document.getElementById('visitor-count').textContent = visitorCount;
-        }
-
-        // Simulate visitor count and drip update every 10 seconds
-        // Temporarily stop drip
-        // setInterval(simulateDrip, 10000);
-        setInterval(simulateVisitorCount, 10000);
     </script>
+
 </body>
 </html>
