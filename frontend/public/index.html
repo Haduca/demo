@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Perfected Layout</title>
+    <title>AI4Pi - Restored Layout</title>
     <style>
-        /* Lock the entire layout - No movement, no scrolling */
+        /* Lock screen size, remove scrolling */
         html, body {
             font-family: sans-serif;
             text-align: center;
@@ -15,22 +15,22 @@
             padding: 0;
             width: 100vw;
             height: 100vh;
-            overflow: hidden; /* Completely disables scrolling */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            touch-action: none; /* Prevents user from dragging screen */
+            touch-action: none;
         }
 
-        /* Header Section - Compact */
+        /* Header Section */
         .header {
             width: 100%;
             padding: 5px 0;
             box-sizing: border-box;
         }
 
-        /* Top Buttons Section */
+        /* Top Buttons */
         .top-buttons {
             width: 100%;
             display: flex;
@@ -44,7 +44,6 @@
             margin: 2px;
             padding: 8px;
             font-size: 14px;
-            border-radius: 3px;
             border: 1px solid black;
             background: black;
             color: white;
@@ -55,19 +54,19 @@
             background: gray;
         }
 
-        /* Exact 2x2 Grid Layout - Equal Quadrants */
+        /* 2x2 Grid Layout - Based on Yesterday’s Screenshot */
         .container {
             display: grid;
             width: 100vw;
-            height: calc(100vh - 120px); /* Adjusted for exact fit */
+            height: calc(100vh - 120px);
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            gap: 1px;
+            gap: 2px;
             box-sizing: border-box;
             padding: 0;
         }
 
-        /* Walls - Perfectly Equal */
+        /* Walls - Matching Previous Layout */
         .wall {
             display: flex;
             flex-direction: column;
@@ -80,7 +79,7 @@
             box-sizing: border-box;
         }
 
-        /* Text Box - Always Accessible */
+        /* Text Box */
         .text-box {
             display: flex;
             width: 95%;
@@ -93,7 +92,6 @@
         input {
             width: 100%;
             padding: 6px;
-            border-radius: 3px;
             border: 1px solid black;
             background: white;
             color: black;
