@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Optimized Fit</title>
+    <title>AI4Pi - Pi Network dApp</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
     <style>
-        /* Lock screen size and remove scrolling */
+        /* Lock layout, prevent scrolling */
         html, body {
             font-family: sans-serif;
             text-align: center;
@@ -23,10 +24,10 @@
             touch-action: none;
         }
 
-        /* Header Section */
+        /* Header */
         .header {
             width: 100%;
-            padding: 3px 0;
+            padding: 5px 0;
             box-sizing: border-box;
         }
 
@@ -35,15 +36,15 @@
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 2px 0;
+            padding: 3px 0;
             box-sizing: border-box;
         }
 
         .top-buttons button {
             flex: 1;
-            margin: 1px;
-            padding: 6px;
-            font-size: 12px;
+            margin: 2px;
+            padding: 8px;
+            font-size: 14px;
             border: 1px solid black;
             background: black;
             color: white;
@@ -54,19 +55,19 @@
             background: gray;
         }
 
-        /* 2x2 Grid Layout - Adjusted Heights */
+        /* 2x2 Grid Layout */
         .container {
             display: grid;
             width: 100vw;
-            height: calc(100vh - 100px); /* Reduced height to fit fully */
+            height: calc(100vh - 120px);
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            gap: 1px;
+            gap: 2px;
             box-sizing: border-box;
             padding: 0;
         }
 
-        /* Walls - Shortened to Fit */
+        /* Walls */
         .wall {
             display: flex;
             flex-direction: column;
@@ -82,8 +83,8 @@
         /* Text Box */
         .text-box {
             display: flex;
-            width: 90%;
-            padding: 2px;
+            width: 95%;
+            padding: 3px;
             box-sizing: border-box;
             justify-content: center;
             align-items: center;
@@ -91,11 +92,11 @@
 
         input {
             width: 100%;
-            padding: 5px;
+            padding: 6px;
             border: 1px solid black;
             background: white;
             color: black;
-            font-size: 12px;
+            font-size: 14px;
             text-align: center;
         }
 
@@ -113,7 +114,7 @@
         <h3>💰 Pi: <span id="p">0.000000</span> (Drip: 0.002000/10s)</h3>
     </div>
 
-    <!-- Sign-In & 3.14 Buttons -->
+    <!-- Pi Network Authentication -->
     <div class="top-buttons">
         <button onclick="signIn()">🔑 Sign In</button>
         <button onclick="piAction()">🔄 3.14 Action</button>
@@ -179,12 +180,14 @@
             input.value = "";
         }
 
-        // Sign-In Simulation
+        // Pi Network Authentication
         function signIn() {
-            alert("🔑 Signing in... Pi Network Authentication coming soon!");
+            Pi.authenticate(["username", "payments"], function (auth) {
+                alert(`Welcome, ${auth.user.username}!`);
+            });
         }
 
-        // 3.14 Button Action
+        // Pi Network 3.14 Button Action
         function piAction() {
             alert("🔄 Testnet Pi Interaction simulated!");
         }
