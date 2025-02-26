@@ -17,12 +17,13 @@
             width: 100vw;
             background-color: #f0f0f0;
             overflow: hidden;
+            flex-direction: column;
         }
 
         /* Centered Container */
         .container {
             width: 90vw;
-            height: 75vh;
+            height: 70vh;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(2, 1fr);
@@ -101,6 +102,33 @@
             background-color: #007bff;
         }
 
+        /* Debug Info */
+        .debug-box {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            width: 90vw;
+            max-width: 500px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        /* Clock Styling */
+        .clock {
+            font-size: 2em;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+
         /* Scrollbar Styling */
         .wall-content::-webkit-scrollbar {
             width: 8px;
@@ -117,6 +145,8 @@
     </style>
 </head>
 <body>
+
+    <div class="clock" id="clock">00:00:00</div>
 
     <div class="container">
         <div class="wall wall1" id="wall1">
@@ -144,6 +174,10 @@
     <div class="info-box">
         <span>Accumulated Pi: 0.000019</span>
         <span>Drip per 10 seconds: 0.00000477</span>
+    </div>
+
+    <div class="debug-box">
+        Debug Logs: Accumulated Pi: 0.000019
     </div>
 
     <button class="button button-blue" id="piTransactionBtn">Pi Transaction</button>
@@ -182,6 +216,12 @@
         document.getElementById('signInBtn').addEventListener('click', function() {
             console.log('Sign In initiated');
         });
+
+        // Update the clock every second
+        setInterval(function() {
+            const currentTime = new Date().toLocaleTimeString();
+            document.getElementById('clock').textContent = currentTime;
+        }, 1000);
     </script>
 
 </body>
