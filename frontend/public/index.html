@@ -86,28 +86,23 @@
             box-sizing: border-box;
         }
 
-        /* Drip Info */
+        /* Drip Information */
         .drip-info {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 14px;
-            color: #333;
+            font-size: 1.1em;
             text-align: center;
-            z-index: 10;
-            margin-top: 10px;
+            position: absolute;
+            bottom: 10%;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            box-sizing: border-box;
+            font-weight: bold;
         }
-
-        .drip-text {
-            font-size: 12px;
-            color: #666;
-        }
-
     </style>
 </head>
 <body>
 
+    <!-- Container for the walls -->
     <div class="container">
         <div class="wall wall1" id="wall1">
             <div class="wall-name">Pi</div>
@@ -131,10 +126,10 @@
         </div>
     </div>
 
-    <!-- Drip info -->
+    <!-- Drip Information Section -->
     <div class="drip-info">
-        <div>Accumulated Pi: <span id="drip-amount">0.000000</span></div>
-        <div class="drip-text">Drip per 10 seconds: 0.000047706</div>
+        <div>Accumulated Pi: <span id="accumulated-pi">0.000000</span></div>
+        <div>Drip per 10 seconds: <span id="drip-rate">0.000047706</span></div>
     </div>
 
     <script>
@@ -161,12 +156,14 @@
             });
         });
 
-        // Drip System - Updating every 10 seconds
+        // Pi Drip System
         let accumulatedPi = 0;
+        let dripRate = 0.000047706; // Based on the base mining rate for Pi
         setInterval(() => {
-            accumulatedPi += 0.000047706; // Drip rate
-            document.getElementById('drip-amount').textContent = accumulatedPi.toFixed(6);
-        }, 10000);  // Every 10 seconds
+            accumulatedPi += dripRate;
+            document.getElementById('accumulated-pi').textContent = accumulatedPi.toFixed(6);
+            document.getElementById('drip-rate').textContent = dripRate.toFixed(9);
+        }, 10000); // Update every 10 seconds
     </script>
 
 </body>
