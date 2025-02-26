@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - AI Bot Network</title>
+    <title>AI4Pi - Active Bot Network</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: white; color: black; }
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
@@ -14,9 +14,7 @@
         /* Text Box */
         .text-box { display: flex; margin-top: 5px; }
         input { flex-grow: 1; padding: 5px; border-radius: 5px; border: 1px solid black; background: white; color: black; }
-        button { padding: 5px; border-radius: 5px; border: 1px solid black; background: black; color: white; cursor: pointer; }
-        button:hover { background: gray; }
-
+        
         /* Top Buttons */
         .top-buttons { margin-bottom: 10px; }
     </style>
@@ -37,28 +35,28 @@
             <b>AI</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="aiI" type="text"><button onclick="sendMessage('ai')">Send</button>
+                <input id="aiI" type="text" placeholder="Type and press Enter">
             </div>
         </div>
         <div class="wall" id="mo">
             <b>Moti</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="moI" type="text"><button onclick="sendMessage('mo')">Submit</button>
+                <input id="moI" type="text" placeholder="Type and press Enter">
             </div>
         </div>
         <div class="wall" id="so">
             <b>Sol</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="soI" type="text"><button onclick="sendMessage('so')">Submit</button>
+                <input id="soI" type="text" placeholder="Type and press Enter">
             </div>
         </div>
         <div class="wall" id="ma">
             <b>Math</b>
             <div class="messages"></div>
             <div class="text-box">
-                <input id="maI" type="text"><button onclick="sendMessage('ma')">Submit</button>
+                <input id="maI" type="text" placeholder="Type and press Enter">
             </div>
         </div>
     </div>
@@ -77,26 +75,33 @@
             $("p").innerText = p.toFixed(6);
         }, 10000);
 
-        // Fix input issue - ensure users can type and submit
-        function sendMessage(wallId) {
-            let input = $(wallId + "I");
-            let messages = $("#" + wallId).querySelector(".messages");
-            let newText = `<p><b>You:</b> ${input.value}</p>`;
+        // Fix input issue - enable Enter to send messages
+        function handleUserInput(event, wallId) {
+            if (event.key === "Enter") {
+                let input = $(wallId + "I");
+                let messages = $("#" + wallId).querySelector(".messages");
+                let newText = `<p><b>You:</b> ${input.value}</p>`;
 
-            if (input.value.trim() !== "") {
-                messages.insertAdjacentHTML("afterbegin", newText);
+                if (input.value.trim() !== "") {
+                    messages.insertAdjacentHTML("afterbegin", newText);
 
-                while (messages.children.length > 10) {
-                    messages.removeChild(messages.lastChild);
+                    while (messages.children.length > 10) {
+                        messages.removeChild(messages.lastChild);
+                    }
+
+                    input.value = "";
                 }
-
-                input.value = "";
             }
         }
 
-        // Bot AI Responses (Posts on its own or another wall every 5-15 seconds)
+        // Attach event listener for each input field
+        walls.forEach(wallId => {
+            $(wallId + "I").addEventListener("keypress", event => handleUserInput(event, wallId));
+        });
+
+        // Bot AI Responses (More frequent posts in any wall every 3-8 seconds)
         function botPost(botWall) {
-            let targetWall = walls[Math.floor(Math.random() * walls.length)]; // Bots can post in any wall
+            let targetWall = walls[Math.floor(Math.random() * walls.length)];
             let messages = $("#" + targetWall).querySelector(".messages");
             let botResponse = `<p><b>${botWall.toUpperCase()} Bot:</b> ${generateRandomCharacter()}</p>`;
 
@@ -106,8 +111,8 @@
                 messages.removeChild(messages.lastChild);
             }
 
-            // Schedule the next bot post in 5-15 seconds
-            setTimeout(() => botPost(botWall), Math.floor(Math.random() * 10000) + 5000);
+            // Schedule the next bot post in 3-8 seconds
+            setTimeout(() => botPost(botWall), Math.floor(Math.random() * 5000) + 3000);
         }
 
         function generateRandomCharacter() {
