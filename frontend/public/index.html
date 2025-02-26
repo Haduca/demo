@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Traffic & User Input Fix</title>
+    <title>AI4Pi - AI, Pi Drip, User Input Fix</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: white; color: black; margin: 0; padding-bottom: 50px; }
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
@@ -21,14 +21,14 @@
         /* Toggle Button */
         .toggle-button { position: fixed; bottom: 110px; right: 10px; padding: 5px; background: black; color: white; border: none; cursor: pointer; font-size: 12px; }
 
-        /* Traffic Indicators (Smaller Icons) */
+        /* Traffic Indicators */
         .traffic-container { position: fixed; top: 10px; right: 10px; background: lightgray; padding: 5px; border-radius: 5px; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <h2 id="t"></h2>
-    <h3>💰 Pi: <span id="p">0.000000</span> (Drip: 0.002000/10s)</h3>
+    <h3>💰 Pi: <span id="p">0.000000</span> (Drip: 0.00000013252/10s)</h3>
 
     <!-- Sign-In & 3.14 Button -->
     <div class="top-buttons">
@@ -44,7 +44,7 @@
 
     <div class="container">
         <div class="wall" id="ai">
-            <b>AI</b>
+            <b>Pi</b>
             <div class="messages"></div>
             <div class="text-box">
                 <input id="aiI" type="text" placeholder="Type and press Enter">
@@ -81,15 +81,16 @@
 
     <script>
         const $ = id => document.getElementById(id);
-        let p = 0;
+        let p = parseFloat(localStorage.getItem("piBalance") || "0");
 
         // Display real-time clock
         setInterval(() => $("t").innerText = new Date().toLocaleTimeString(), 1000);
 
-        // Pi Drip System
+        // Pi Drip System (Updated Rate)
         setInterval(() => {
-            p += 0.002;
-            $("p").innerText = p.toFixed(6);
+            p += 0.00000013252; // New Drip Rate
+            $("p").innerText = p.toFixed(8);
+            localStorage.setItem("piBalance", p);
         }, 10000);
 
         // Toggle Developer Console
@@ -106,30 +107,6 @@
             consoleDiv.appendChild(newLog);
             consoleDiv.scrollTop = consoleDiv.scrollHeight;
         }
-
-        // Persistent Visitor Count (Unique Users Only)
-        function updateVisitorCount() {
-            let uniqueID = localStorage.getItem("userUniqueID");
-
-            if (!uniqueID) {
-                localStorage.setItem("userUniqueID", crypto.randomUUID());
-                let count = parseInt(localStorage.getItem("visitorCount") || "0") + 1;
-                localStorage.setItem("visitorCount", count);
-            }
-
-            $("visitor-count").innerText = localStorage.getItem("visitorCount");
-        }
-        updateVisitorCount();
-
-        // Detect Creator Activity (Only count user once)
-        function updateCreatorStatus() {
-            if (!localStorage.getItem("creatorID")) {
-                localStorage.setItem("creatorID", "permanent");
-            }
-            $("creator-status").innerText = "Yes";
-            logMessage("Creator is active.");
-        }
-        updateCreatorStatus();
 
         // Handle User Input (Press Enter to Send)
         function handleUserInput(event, wallId) {
@@ -150,6 +127,26 @@
         ["ai", "mo", "so", "ma"].forEach(wallId => {
             $(wallId + "I").addEventListener("keypress", event => handleUserInput(event, wallId));
         });
+
+        // AI Response (Pi must respond at least once every 10 seconds)
+        function PiAIResponse() {
+            let targetWall = ["ai", "mo", "so", "ma"][Math.floor(Math.random() * 4)];
+            let messages = $("#" + targetWall).querySelector(".messages");
+            let response = generateRandomCharacter();
+            messages.insertAdjacentHTML("afterbegin", `<p><b>Pi:</b> ${response}</p>`);
+            logMessage(`Pi responded in ${targetWall} with ${response}`);
+
+            // Schedule next AI response within 10 seconds
+            setTimeout(PiAIResponse, 10000);
+        }
+
+        function generateRandomCharacter() {
+            let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        // Start AI interaction loop
+        setTimeout(PiAIResponse, 5000);
 
         // Sign-In Simulation
         function signIn() {
