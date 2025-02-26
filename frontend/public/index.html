@@ -2,196 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Pi Network dApp</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Test</title>
     <style>
-        /* Lock layout, prevent scrolling */
-        html, body {
+        body {
             font-family: sans-serif;
             text-align: center;
-            background: white;
-            color: black;
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            touch-action: none;
-        }
-
-        /* Header */
-        .header {
-            width: 100%;
-            padding: 5px 0;
-            box-sizing: border-box;
-        }
-
-        /* Top Buttons */
-        .top-buttons {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            box-sizing: border-box;
-        }
-
-        .top-buttons button {
-            flex: 1;
-            margin: 2px;
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid black;
+            justify-content: center;
+            height: 100vh;
             background: black;
             color: white;
-            cursor: pointer;
         }
 
-        .top-buttons button:hover {
-            background: gray;
+        h1 {
+            font-size: 32px;
         }
 
-        /* 2x2 Grid Layout */
-        .container {
-            display: grid;
-            width: 100vw;
-            height: calc(100vh - 120px);
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 2px;
-            box-sizing: border-box;
-            padding: 0;
+        p {
+            font-size: 18px;
         }
-
-        /* Walls */
-        .wall {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            border: 2px solid black;
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-        }
-
-        /* Text Box */
-        .text-box {
-            display: flex;
-            width: 95%;
-            padding: 3px;
-            box-sizing: border-box;
-            justify-content: center;
-            align-items: center;
-        }
-
-        input {
-            width: 100%;
-            padding: 6px;
-            border: 1px solid black;
-            background: white;
-            color: black;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        /* Ensure input remains fully visible */
-        input:focus {
-            outline: none;
-        }
-
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2 id="t"></h2>
-        <h3>💰 Pi: <span id="p">0.000000</span> (Drip: 0.002000/10s)</h3>
-    </div>
-
-    <!-- Pi Network Authentication -->
-    <div class="top-buttons">
-        <button onclick="signIn()">🔑 Sign In</button>
-        <button onclick="piAction()">🔄 3.14 Action</button>
-    </div>
-
-    <div class="container">
-        <div class="wall" id="ai">
-            <b>AI</b>
-            <div class="messages"></div>
-            <div class="text-box">
-                <input id="aiI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('ai')">
-            </div>
-        </div>
-        <div class="wall" id="mo">
-            <b>Motivation</b>
-            <div class="messages"></div>
-            <div class="text-box">
-                <input id="moI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('mo')">
-            </div>
-        </div>
-        <div class="wall" id="so">
-            <b>Solutions</b>
-            <div class="messages"></div>
-            <div class="text-box">
-                <input id="soI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('so')">
-            </div>
-        </div>
-        <div class="wall" id="ma">
-            <b>Math</b>
-            <div class="messages"></div>
-            <div class="text-box">
-                <input id="maI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('ma')">
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const $ = id => document.getElementById(id);
-        const walls = ["ai", "mo", "so", "ma"];
-        let p = 0;
-
-        // Display real-time clock
-        setInterval(() => $("t").innerText = new Date().toLocaleTimeString(), 1000);
-
-        // Pi Drip System
-        setInterval(() => {
-            p += 0.002;
-            $("p").innerText = p.toFixed(6);
-        }, 10000);
-
-        // Send messages & remove oldest text when limit is reached
-        function sendMessage(wallId) {
-            let messages = $("#" + wallId).querySelector(".messages");
-            let input = $(wallId + "I");
-            let newText = `<p><b>You:</b> ${input.value}</p>`;
-
-            messages.insertAdjacentHTML("afterbegin", newText);
-
-            while (messages.children.length > 10) {
-                messages.removeChild(messages.lastChild);
-            }
-
-            input.value = "";
-        }
-
-        // Pi Network Authentication
-        function signIn() {
-            Pi.authenticate(["username", "payments"], function (auth) {
-                alert(`Welcome, ${auth.user.username}!`);
-            });
-        }
-
-        // Pi Network 3.14 Button Action
-        function piAction() {
-            alert("🔄 Testnet Pi Interaction simulated!");
-        }
-    </script>
+    <h1>🚀 Deployment Test Successful! 🚀</h1>
+    <p>If you can see this, your update worked.</p>
 
 </body>
 </html>
