@@ -92,11 +92,10 @@
             input.value = "";
         }
 
-        // Bot AI Responses (Post on random walls between 10-15 seconds)
-        function botPost() {
-            let wallId = walls[Math.floor(Math.random() * walls.length)];
+        // Bot AI Responses (Posts in every wall separately every 10-15 seconds)
+        function botPost(wallId) {
             let messages = $("#" + wallId).querySelector(".messages");
-            let botResponse = `<p><b>${wallId.toUpperCase()} Bot:</b> ${generateBotResponse()}</p>`;
+            let botResponse = `<p><b>${wallId.toUpperCase()} Bot:</b> ${generateRandomCharacter()}</p>`;
 
             messages.insertAdjacentHTML("afterbegin", botResponse);
 
@@ -104,26 +103,19 @@
                 messages.removeChild(messages.lastChild);
             }
 
-            // Schedule the next bot post in 10-15 seconds
-            setTimeout(botPost, Math.floor(Math.random() * 6000) + 10000);
+            // Schedule next bot post in 10-15 seconds for this wall
+            setTimeout(() => botPost(wallId), Math.floor(Math.random() * 6000) + 10000);
         }
 
-        function generateBotResponse() {
-            let responses = [
-                "Interesting thought!",
-                "Let's explore this idea.",
-                "I like where this is going!",
-                "Can you elaborate?",
-                "This has potential.",
-                "How does this relate to AI?",
-                "Pi Network integration idea?",
-                "Have you considered another approach?"
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
+        function generateRandomCharacter() {
+            let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return characters.charAt(Math.floor(Math.random() * characters.length));
         }
 
-        // Start bot activity
-        setTimeout(botPost, Math.floor(Math.random() * 6000) + 10000);
+        // Start bot activity for each wall
+        walls.forEach(wallId => {
+            setTimeout(() => botPost(wallId), Math.floor(Math.random() * 6000) + 10000);
+        });
 
         // Sign-In Simulation
         function signIn() {
