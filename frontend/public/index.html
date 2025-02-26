@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Optimized Layout</title>
+    <title>AI4Pi - Fixed Layout</title>
     <style>
-        /* Lock screen size and remove unnecessary space */
+        /* Lock the entire layout to prevent any scrolling */
         html, body {
             font-family: sans-serif;
             text-align: center;
@@ -15,17 +15,18 @@
             padding: 0;
             width: 100vw;
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Completely disables scrolling */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
+            touch-action: none; /* Prevents user from dragging screen */
         }
 
-        /* Header with less space */
+        /* Header Section */
         .header {
             width: 100%;
-            padding: 5px;
+            padding: 0px;
             box-sizing: border-box;
         }
 
@@ -34,7 +35,7 @@
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 3px;
+            padding: 0px;
             box-sizing: border-box;
         }
 
@@ -54,22 +55,22 @@
             background: gray;
         }
 
-        /* 2x2 Grid Layout - Perfectly Scaled */
+        /* Fixed 2x2 Grid Layout - No Scrolling */
         .container {
             display: grid;
-            width: 98vw;
-            height: calc(100vh - 110px); /* Adjusted height to fit everything */
+            width: 100vw;
+            height: calc(100vh - 90px); /* Adjusted height to remove any gaps */
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            gap: 2px;
+            gap: 1px;
             box-sizing: border-box;
-            padding: 2px;
+            padding: 0px;
         }
 
-        /* Walls - Perfect Alignment */
+        /* Walls - Fully Locked in Place */
         .wall {
-            border-radius: 5px;
-            padding: 5px;
+            border-radius: 0px;
+            padding: 0px;
             width: 100%;
             height: 100%;
             display: flex;
@@ -81,11 +82,11 @@
             box-sizing: border-box;
         }
 
-        /* Text Box - Fully Visible */
+        /* Text Box - Fully Contained Inside Walls */
         .text-box {
             display: flex;
-            width: 96%;
-            padding: 3px;
+            width: 95%;
+            padding: 0px;
             box-sizing: border-box;
             justify-content: center;
         }
@@ -179,33 +180,6 @@
             }
 
             input.value = "";
-        }
-
-        // Bot AI Responses (Each wall gets periodic bot interactions)
-        setInterval(() => {
-            let wallId = walls[Math.random() * walls.length | 0];
-            let messages = $("#" + wallId).querySelector(".messages");
-            let botResponse = `<p><b>${wallId.toUpperCase()} Bot:</b> ${generateBotResponse()}</p>`;
-
-            messages.insertAdjacentHTML("afterbegin", botResponse);
-
-            while (messages.children.length > 10) {
-                messages.removeChild(messages.lastChild);
-            }
-        }, 3000);
-
-        function generateBotResponse() {
-            let responses = [
-                "Interesting thought!",
-                "Let's explore this idea.",
-                "I like where this is going!",
-                "Can you elaborate?",
-                "This has potential.",
-                "How does this relate to AI?",
-                "Pi Network integration idea?",
-                "Have you considered another approach?"
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
         }
 
         // Sign-In Simulation
