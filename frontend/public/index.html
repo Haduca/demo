@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Active Bot Network</title>
+    <title>AI4Pi - AI4PI First Autonomous AI</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: white; color: black; }
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 80%; margin: auto; }
@@ -32,7 +32,7 @@
 
     <div class="container">
         <div class="wall" id="ai">
-            <b>AI</b>
+            <b>AI4PI (AI)</b>
             <div class="messages"></div>
             <div class="text-box">
                 <input id="aiI" type="text" placeholder="Type and press Enter">
@@ -63,7 +63,6 @@
 
     <script>
         const $ = id => document.getElementById(id);
-        const walls = ["ai", "mo", "so", "ma"];
         let p = 0;
 
         // Display real-time clock
@@ -75,7 +74,7 @@
             $("p").innerText = p.toFixed(6);
         }, 10000);
 
-        // Fix input issue - enable Enter to send messages
+        // Handle User Input (Press Enter to Send)
         function handleUserInput(event, wallId) {
             if (event.key === "Enter") {
                 let input = $(wallId + "I");
@@ -84,35 +83,67 @@
 
                 if (input.value.trim() !== "") {
                     messages.insertAdjacentHTML("afterbegin", newText);
-
-                    while (messages.children.length > 10) {
-                        messages.removeChild(messages.lastChild);
-                    }
-
+                    saveToMemory(wallId, input.value);
                     input.value = "";
                 }
             }
         }
 
         // Attach event listener for each input field
-        walls.forEach(wallId => {
+        ["ai", "mo", "so", "ma"].forEach(wallId => {
             $(wallId + "I").addEventListener("keypress", event => handleUserInput(event, wallId));
         });
 
-        // Bot AI Responses (More frequent posts in any wall every 3-8 seconds)
-        function botPost(botWall) {
-            let targetWall = walls[Math.floor(Math.random() * walls.length)];
-            let messages = $("#" + targetWall).querySelector(".messages");
-            let botResponse = `<p><b>${botWall.toUpperCase()} Bot:</b> ${generateRandomCharacter()}</p>`;
+        // AI4PI Memory System (IndexedDB)
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                let request = indexedDB.open("AI4PiDB", 1);
+                request.onupgradeneeded = e => {
+                    let db = e.target.result;
+                    if (!db.objectStoreNames.contains("memory")) {
+                        db.createObjectStore("memory", { keyPath: "id" });
+                    }
+                };
+                request.onsuccess = e => resolve(e.target.result);
+                request.onerror = e => reject(e.target.error);
+            });
+        }
 
-            messages.insertAdjacentHTML("afterbegin", botResponse);
+        function saveToMemory(wall, text) {
+            openDB().then(db => {
+                let tx = db.transaction("memory", "readwrite");
+                let store = tx.objectStore("memory");
+                store.put({ id: wall, data: text });
+            });
+        }
 
-            while (messages.children.length > 10) {
-                messages.removeChild(messages.lastChild);
-            }
+        function loadMemory() {
+            openDB().then(db => {
+                let tx = db.transaction("memory", "readonly");
+                let store = tx.objectStore("memory");
+                let request = store.get("ai");
 
-            // Schedule the next bot post in 3-8 seconds
-            setTimeout(() => botPost(botWall), Math.floor(Math.random() * 5000) + 3000);
+                request.onsuccess = () => {
+                    if (request.result) {
+                        let messages = $("#ai").querySelector(".messages");
+                        messages.insertAdjacentHTML("afterbegin", `<p><b>AI4PI:</b> ${request.result.data}</p>`);
+                    }
+                };
+            });
+        }
+
+        // Load AI4PI Memory on Startup
+        loadMemory();
+
+        // AI4PI (Self-Improving AI - Posts every 10-20 seconds)
+        function AI4PI_SelfImprove() {
+            let messages = $("#ai").querySelector(".messages");
+            let response = generateRandomCharacter();
+            messages.insertAdjacentHTML("afterbegin", `<p><b>AI4PI:</b> ${response}</p>`);
+            saveToMemory("ai", response);
+
+            // Schedule the next AI4PI post in 10-20 seconds
+            setTimeout(AI4PI_SelfImprove, Math.floor(Math.random() * 10000) + 10000);
         }
 
         function generateRandomCharacter() {
@@ -120,11 +151,8 @@
             return characters.charAt(Math.floor(Math.random() * characters.length));
         }
 
-        // Start bot activity for each bot separately
-        botPost("ai");
-        botPost("mo");
-        botPost("so");
-        botPost("ma");
+        // Start AI4PI's learning loop
+        AI4PI_SelfImprove();
 
         // Sign-In Simulation
         function signIn() {
