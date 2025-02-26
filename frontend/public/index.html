@@ -2,21 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi Interface</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+    <title>AI4Pi - Optimized UI</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
             height: 100vh;
             background-color: #f0f0f0;
-            flex-direction: column;
             overflow: hidden;
         }
+
+        /* Top Bar Layout */
+        .top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .top-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+            width: 100%;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            padding: 10px;
+        }
+
+        .status-item {
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .visitor-count {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .debug-info {
+            background: #333;
+            color: white;
+        }
+
+        /* Container for Message Walls */
         .container {
             width: 100%;
             max-width: 1200px;
@@ -26,9 +79,9 @@
             gap: 10px;
             padding: 20px;
             box-sizing: border-box;
-            height: 100%;
-            overflow-y: auto;
+            margin-top: 30px;
         }
+
         .wall {
             background-color: #fff;
             border-radius: 8px;
@@ -38,15 +91,16 @@
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            max-height: 70vh; /* Set maximum height */
-            overflow-y: auto; /* Vertical scroll for text overflow */
+            height: 250px; /* Adjusted height for visibility */
         }
+
         .wall-content {
             flex-grow: 1;
-            overflow-y: auto; /* Scroll only vertical */
-            overflow-x: hidden; /* Prevent horizontal scrolling */
-            padding-right: 5px; /* Ensure text doesn't touch the wall's edge */
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 5px;
         }
+
         .text-box {
             width: 100%;
             padding: 10px;
@@ -54,42 +108,24 @@
             border-radius: 4px;
             font-size: 14px;
             position: absolute;
-            bottom: 15px;  /* Positioned at the bottom of the wall */
+            bottom: 10px;
         }
-        .clock, .debug, .drip, .sign-in {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        .debug-info {
-            background-color: #333;
-            color: white;
-            padding: 5px 10px;
-            font-size: 12px;
-            border-radius: 5px;
-        }
-        .drip-count, .visitor-count {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .clock {
-            font-size: 18px;
-        }
-        .sign-in {
-            font-size: 14px;
-            color: #555;
-        }
+
     </style>
 </head>
 <body>
-    <div class="clock">Clock: <span id="clock">00:00:00</span></div>
-    <div class="drip">Drip Count: <span id="drip-count">0</span></div>
-    <div class="visitor-count">Total Visitors: <span id="visitor-count">0</span></div>
-    <div class="debug-info">Debug Info: <span id="debug-info">All systems go</span></div>
+
+    <div class="top-bar">
+        <div>Clock: <span id="clock">00:00:00</span></div>
+        <div class="status-item visitor-count">Total Visitors: <span id="visitor-count">0</span></div>
+        <div class="status-item debug-info">Debug Info: <span id="debug-info">All systems go</span></div>
+    </div>
+
+    <div class="top-section">
+        <div class="status-bar">
+            <div class="status-item">Drip Count: <span id="drip-count">0</span></div>
+        </div>
+    </div>
 
     <div class="container">
         <div class="wall" id="wall1">
@@ -120,16 +156,15 @@
                     const newText = document.createElement('div');
                     newText.textContent = this.value;
                     wallContent.insertBefore(newText, wallContent.firstChild);
-                    this.value = ''; // Clear input after submission
-                    
-                    // Check if we need to remove old messages when wall is full
-                    const maxMessages = 20; // Define max messages per wall
+                    this.value = '';
+
+                    // Remove oldest messages if wall is full
+                    const maxMessages = 20;
                     const allMessages = wallContent.querySelectorAll('div');
                     if (allMessages.length > maxMessages) {
                         wallContent.removeChild(allMessages[allMessages.length - 1]);
                     }
                     
-                    // Scroll the wall to the bottom to show the new message
                     wallContent.scrollTop = 0;
                 }
             });
@@ -164,9 +199,9 @@
             document.getElementById('visitor-count').textContent = visitorCount;
         }
 
-        // Simulate visitor count and drip update every 10 seconds
         setInterval(simulateDrip, 10000);
         setInterval(simulateVisitorCount, 10000);
     </script>
+
 </body>
 </html>
