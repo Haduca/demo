@@ -22,15 +22,12 @@
         /* Centered Container */
         .container {
             width: 90vw;
-            height: 80vh;
+            height: 75vh;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(2, 1fr);
             gap: 10px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: relative;
         }
 
         /* Walls (Quadrants) */
@@ -75,7 +72,7 @@
         /* Information Box for Drip and Pi */
         .info-box {
             position: fixed;
-            bottom: 0;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background-color: #ffffff;
@@ -86,6 +83,7 @@
             justify-content: space-between;
             width: 90vw;
             max-width: 500px;
+            z-index: 100;
         }
 
         /* Buttons */
@@ -102,9 +100,24 @@
         .button-blue {
             background-color: #007bff;
         }
+
+        /* Scrollbar Styling */
+        .wall-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .wall-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .wall-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     </style>
 </head>
 <body>
+
     <div class="container">
         <div class="wall wall1" id="wall1">
             <div class="wall-name">Pi</div>
@@ -170,5 +183,6 @@
             console.log('Sign In initiated');
         });
     </script>
+
 </body>
 </html>
