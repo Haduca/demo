@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Fixed Layout</title>
+    <title>AI4Pi - Perfected Layout</title>
     <style>
-        /* Lock the entire layout to prevent any scrolling */
+        /* Lock the entire layout - No movement, no scrolling */
         html, body {
             font-family: sans-serif;
             text-align: center;
@@ -23,10 +23,10 @@
             touch-action: none; /* Prevents user from dragging screen */
         }
 
-        /* Header Section */
+        /* Header Section - Compact */
         .header {
             width: 100%;
-            padding: 0px;
+            padding: 5px 0;
             box-sizing: border-box;
         }
 
@@ -35,7 +35,7 @@
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 0px;
+            padding: 3px 0;
             box-sizing: border-box;
         }
 
@@ -55,40 +55,39 @@
             background: gray;
         }
 
-        /* Fixed 2x2 Grid Layout - No Scrolling */
+        /* Exact 2x2 Grid Layout - Equal Quadrants */
         .container {
             display: grid;
             width: 100vw;
-            height: calc(100vh - 90px); /* Adjusted height to remove any gaps */
+            height: calc(100vh - 120px); /* Adjusted for exact fit */
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             gap: 1px;
             box-sizing: border-box;
-            padding: 0px;
+            padding: 0;
         }
 
-        /* Walls - Fully Locked in Place */
+        /* Walls - Perfectly Equal */
         .wall {
-            border-radius: 0px;
-            padding: 0px;
-            width: 100%;
-            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             background: white;
             border: 2px solid black;
+            width: 100%;
+            height: 100%;
             box-sizing: border-box;
         }
 
-        /* Text Box - Fully Contained Inside Walls */
+        /* Text Box - Always Accessible */
         .text-box {
             display: flex;
             width: 95%;
-            padding: 0px;
+            padding: 3px;
             box-sizing: border-box;
             justify-content: center;
+            align-items: center;
         }
 
         input {
@@ -100,15 +99,6 @@
             color: black;
             font-size: 14px;
             text-align: center;
-        }
-
-        /* Add a small bottom border above the iOS home indicator */
-        .bottom-border {
-            width: 100vw;
-            height: 4px; /* Small enough to be visible but not intrusive */
-            background: black;
-            position: absolute;
-            bottom: 5px; /* Positions the border just above the iOS home indicator */
         }
 
         /* Ensure input remains fully visible */
@@ -161,9 +151,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Bottom Border Above iOS Home Indicator -->
-    <div class="bottom-border"></div>
 
     <script>
         const $ = id => document.getElementById(id);
