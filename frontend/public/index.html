@@ -158,28 +158,44 @@
             });
         }
 
-        function completePayment(paymentId) {
-            logMessage(`🔄 Completing payment: ${paymentId}...`);
+        <script>
+  function completePayment(paymentId) {
+      logMessage(`🔄 Completing pending payment: ${paymentId}...`);
 
-            fetch("https://api.minepi.com/v2/payments/" + paymentId + "/complete", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Key ${apiKey}`,
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    logMessage(`✅ Payment completed successfully.`);
-                } else {
-                    logMessage(`❌ Payment completion failed: ${data.error}`);
-                }
-            })
-            .catch(error => {
-                logMessage(`❌ API request failed: ${error.message}`);
-            });
-        }
+      const apiKey = "YOUR_API_KEY_HERE"; // Replace with your actual API Key
+
+      fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
+          method: "POST",
+          headers: {
+              "Authorization": `Key ${apiKey}`,
+              "Content-Type": "application/json"
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              logMessage(`✅ Payment marked as completed.`);
+          } else {
+              logMessage(`❌ Payment completion failed: ${data.error}`);
+          }
+      })
+      .catch(error => {
+          logMessage(`❌ API request failed: ${error.message}`);
+      });
+  }
+
+// Automatically check for pending payments and complete them
+  function checkForPendingPayments() {
+      Pi.getPayment().then(payment => {
+          if (payment && payment.identifier) {
+              logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
+              completePayment(payment.identifier);
+          }
+      }).catch(error => {
+          logMessage(`✅ No pending payments found.`);
+      });
+  }
+</script>
     </script>
 </head>
 <body>
