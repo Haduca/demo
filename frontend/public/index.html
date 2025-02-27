@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Elite Pi Network dApp</title>
+    <title>AI4Pi - Pi Transactions</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
     <style>
         body {
@@ -53,8 +53,7 @@
     </style>
     <script>
         let userData = null;
-        let currentPayment = null;
-        let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // This must be set automatically
+        let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Ensure correct wallet address
 
         function logMessage(message) {
             let outputDiv = document.getElementById("output");
@@ -90,71 +89,50 @@
         }
 
         function sendPiToAI4Pi() {
-    if (!userData) {
-        logMessage("❌ You must log in before sending Pi.");
-        return;
-    }
-
-    let amount = parseFloat(document.getElementById("amountInput").value);
-    if (isNaN(amount) || amount <= 0) {
-        logMessage("❌ Invalid Pi amount. Please enter a valid number.");
-        return;
-    }
-
-    if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
-        logMessage("⚠️ Transaction canceled by user.");
-        return;
-    }
-
-    logMessage(`🔄 Preparing to send ${amount} Pi to AI4Pi...`);
-
-    try {
-        logMessage("🔵 Attempting `Pi.createPayment()` now...");
-
-        Pi.createPayment({
-            amount: amount,
-            memo: "Transfer to AI4Pi",
-            metadata: { transactionType: "userToAI4Pi" },
-            to_address: "YOUR_AI4PI_WALLET_ADDRESS_HERE" // Make sure this is correct!
-        })
-        .then(payment => {
-            if (!payment || !payment.identifier) {
-                logMessage("❌ Transaction did not return a valid Payment ID.");
+            if (!userData) {
+                logMessage("❌ You must log in before sending Pi.");
                 return;
             }
 
-            logMessage(`✅ Transaction started! Payment ID: ${payment.identifier}`);
-            logMessage("🔄 Checking blockchain status...");
+            let amount = parseFloat(document.getElementById("amountInput").value);
+            if (isNaN(amount) || amount <= 0) {
+                logMessage("❌ Invalid Pi amount. Please enter a valid number.");
+                return;
+            }
 
-            trackTransaction(payment.identifier);
-        })
-        .catch(error => {
-            logMessage(`❌ Payment failed: ${error.message}`);
-        });
+            if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
+                logMessage("⚠️ Transaction canceled by user.");
+                return;
+            }
 
-    } catch (error) {
-        logMessage(`❌ Critical error before transaction started: ${error.message}`);
-    }
+            logMessage(`🔄 Preparing to send ${amount} Pi to AI4Pi...`);
 
-    setTimeout(() => {
-        logMessage("⏳ If nothing happened, `Pi.createPayment()` may not be executing at all.");
-    }, 8000);
-}
+            try {
+                logMessage("🔵 Attempting `Pi.createPayment()` now...");
 
-
-        function trackTransaction(paymentId) {
-            Pi.getPayment(paymentId)
-                .then(payment => {
-                    logMessage(`🔄 Transaction Status: ${payment.status}`);
-                    if (payment.status === "completed") {
-                        logMessage("✅ Transaction successful!");
-                    } else {
-                        setTimeout(() => trackTransaction(paymentId), 5000);
+                Pi.createPayment({
+                    amount: amount,
+                    memo: "Transfer to AI4Pi",
+                    metadata: { transactionType: "userToAI4Pi" },
+                    to_address: ai4piWallet
+                }, {
+                    onReady: payment => {
+                        logMessage(`✅ Payment request ready. Payment ID: ${payment.identifier}`);
+                    },
+                    onCancel: () => {
+                        logMessage("⚠️ Payment was canceled by the user.");
+                    },
+                    onError: error => {
+                        logMessage(`❌ Payment error: ${error.message}`);
                     }
-                })
-                .catch(error => {
-                    logMessage(`❌ Error tracking transaction: ${error.message}`);
                 });
+            } catch (error) {
+                logMessage(`❌ Critical error before transaction started: ${error.message}`);
+            }
+
+            setTimeout(() => {
+                logMessage("⏳ If nothing happened, `Pi.createPayment()` may not be executing properly.");
+            }, 8000);
         }
     </script>
 </head>
