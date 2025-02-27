@@ -76,16 +76,16 @@ function fetchAppID() {
         return;
     }
 
-    // Ensure Pi SDK is initialized first
-    Pi.init({ version: "2.0", sandbox: true })
-        .then(() => {
-            logMessage("✅ Pi SDK reinitialized before authentication.");
-            logMessage("➡️ Now click 'Sign In' to trigger authentication.");
-        })
-        .catch(error => {
-            logMessage(`❌ Error during SDK initialization: ${error.message}`);
-        });
+    logMessage("🔍 Checking if Pi SDK is ready...");
+
+    if (!Pi.authenticate || typeof Pi.authenticate !== "function") {
+        logMessage("❌ Pi SDK is loaded but authentication is not available.");
+        return;
+    }
+
+    logMessage("✅ Pi SDK is ready! Now click 'Sign In' to test authentication.");
 }
+
 
 // NEW FUNCTION: Manually Trigger Authentication
 function manualSignIn() {
