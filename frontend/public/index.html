@@ -58,31 +58,26 @@ function verifyAppID() {
         return;
     }
 
-    logMessage("🔄 Initializing SDK to verify App ID...");
+    logMessage("🔄 Sending a basic SDK request...");
 
-    Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
-        .then(() => {
-            logMessage("✅ SDK initialized successfully with App ID: aiphub2360");
+    fetch("https://api.minepi.com/v2/apps", {
+        method: "GET",
+        headers: {
+            "Authorization": `Key your-api-key-here`, // Replace with a valid API Key
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        logMessage("✅ Pi API responded! The SDK might be working.");
+        console.log("✅ API Response:", data);
+    })
+    .catch(error => {
+        logMessage(`❌ Pi API request failed: ${error.message}`);
+    });
 
-            if (!Pi.authenticate || typeof Pi.authenticate !== "function") {
-                logMessage("❌ `Pi.authenticate()` is missing or not recognized in the SDK.");
-                return;
-            }
-
-            logMessage("🔵 Calling `Pi.openShareDialog()` as a test...");
-
-            return Pi.openShareDialog("Testing Pi SDK function in Testnet.");
-        })
-        .then(() => {
-            logMessage("✅ `Pi.openShareDialog()` worked! The SDK is responding.");
-        })
-        .catch(error => {
-            logMessage(`❌ Error when calling `Pi.openShareDialog()`: ${error.message}`);
-        });
-
-    // Add a timeout to detect if this function is also unresponsive
     setTimeout(() => {
-        logMessage("⏳ If nothing happened, the SDK might not be processing any requests.");
+        logMessage("⏳ If nothing happened, the SDK may be fully blocked.");
     }, 8000);
 }
 
