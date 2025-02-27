@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Key Validator</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
+    <title>Testnet App ID Finder</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Testnet SDK -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,9 +47,9 @@
     </style>
 </head>
 <body>
-    <h1>API Key Validator</h1>
-    <input type="text" id="apiKey" placeholder="Enter API Key" style="padding:10px; width: 300px;">
-    <button onclick="validateAPIKey()">🔍 Validate API Key</button>
+    <h1>Find Your Testnet App ID</h1>
+    <button onclick="initializePiSDK()">🔍 Initialize Pi SDK</button>
+    <button onclick="fetchAppID()">🔍 Get App ID</button>
     <div class="output" id="output">[Logs will appear here]</div>
 
     <script>
@@ -60,36 +60,30 @@
             console.log(message);
         }
 
-        function validateAPIKey() {
-            const apiKey = document.getElementById("apiKey").value.trim();
-            if (!apiKey) {
-                logMessage("❌ Please enter an API Key.");
+        function initializePiSDK() {
+            if (typeof Pi === "undefined") {
+                logMessage("❌ Pi SDK is not available. Make sure you are running in Pi Browser or using the correct script.");
                 return;
             }
 
-            fetch("https://api.minepi.com/v2/me", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Key ${apiKey}`,
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.app && data.app.id) {
-                    logMessage(`✅ Valid API Key! App ID: ${data.app.id}`);
-                } else {
-                    logMessage("❌ Failed to retrieve App ID. API response invalid.");
-                }
-            })
-            .catch(error => {
-                logMessage(`❌ Error retrieving App ID: ${error.message}`);
-            });
+            Pi.init({ version: "2.0", sandbox: true })
+                .then(() => logMessage("✅ Pi SDK Initialized in Testnet Mode!"))
+                .catch(error => logMessage(`❌ SDK Initialization Failed: ${error.message}`));
+        }
+
+        function fetchAppID() {
+            if (typeof Pi === "undefined") {
+                logMessage("❌ Pi SDK is not available. Initialize first.");
+                return;
+            }
+
+            Pi.getAppInfo()
+                .then(appInfo => {
+                    logMessage(`✅ Your App ID: ${appInfo.id}`);
+                })
+                .catch(error => {
+                    logMessage(`❌ Error retrieving App ID: ${error.message}`);
+                });
         }
     </script>
 </body>
