@@ -38,7 +38,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             if (typeof Pi !== "undefined") {
-                Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360.pinet.com" });
+                Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" });
                 console.log("✅ Pi SDK Initialized!");
             } else {
                 console.error("❌ Pi SDK failed to load.");
@@ -62,10 +62,33 @@
                     alert("❌ Authentication failed. Please try again.");
                 });
         }
+
+        function getAppID() {
+            const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual API key
+            
+            fetch("https://api.minepi.com/v2/me", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("🔍 Your App ID:", data.app.id);
+                alert(`🔍 Your App ID: ${data.app.id}`);
+            })
+            .catch(error => {
+                console.error("❌ Error retrieving App ID:", error);
+                alert("❌ Failed to retrieve App ID. Check the console for details.");
+            });
+        }
     </script>
 </head>
 <body>
     <img src="logo.png" alt="AI4Pi Logo">
     <button onclick="signIn()">🔑 Sign In with Pi Network</button>
+    <br>
+    <button onclick="getAppID()">🔍 Get App ID</button>
 </body>
 </html>
