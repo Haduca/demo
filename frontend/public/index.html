@@ -54,7 +54,7 @@
     <script>
         let userData = null;
         let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Ensure correct wallet address
-        const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual Pi API Key
+        const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Integrated API Key
 
         function logMessage(message) {
             let outputDiv = document.getElementById("output");
@@ -140,7 +140,7 @@
         }
 
         function approvePayment(paymentId) {
-            logMessage(`🔄 Approving pending payment: ${paymentId}...`);
+            logMessage(`🔄 Approving payment: ${paymentId}...`);
 
             fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
                 method: "POST",
@@ -189,17 +189,6 @@
             })
             .catch(error => {
                 logMessage(`❌ API request failed: ${error.message}`);
-            });
-        }
-
-        function checkForPendingPayments() {
-            Pi.getPayment().then(payment => {
-                if (payment && payment.identifier) {
-                    logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
-                    completePayment(payment.identifier);
-                }
-            }).catch(error => {
-                logMessage(`✅ No pending payments found.`);
             });
         }
     </script>
