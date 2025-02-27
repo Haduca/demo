@@ -14,7 +14,7 @@
             return;
         }
 
-        Pi.authenticate(["username"], true)
+        Pi.authenticate({ scopes: ["username"], sandbox: true })
             .then(auth => {
                 if (auth && auth.user) {
                     alert(`✅ Signed in as: ${auth.user.username}`);
