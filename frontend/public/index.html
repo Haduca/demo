@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Sign In</title>
+    <title>AI4Pi - Pi Payment Test</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
     <style>
         body {
@@ -22,14 +22,14 @@
             padding: 10px 20px;
             font-size: 16px;
             border: none;
-            background-color: #007BFF;
+            background-color: #28a745;
             color: white;
             cursor: pointer;
             border-radius: 5px;
             margin: 10px;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
         .output {
             margin-top: 20px;
@@ -53,52 +53,36 @@
             console.log(message);
         }
 
-function manualSignIn() {
-    if (typeof Pi === "undefined") {
-        logMessage("❌ Pi SDK is not available.");
-        return;
-    }
-
-    logMessage("🔄 Reinitializing SDK with authorized Sandbox credentials...");
-
-    Pi.init({ version: "2.0", sandbox: true, appId: "ai4pi" }) // Ensure Sandbox App ID is used
-        .then(() => {
-            logMessage("✅ SDK Reinitialized in Sandbox. Checking `Pi.authenticate()`...");
-
-            if (!Pi.authenticate || typeof Pi.authenticate !== "function") {
-                logMessage("❌ `Pi.authenticate()` is missing or not recognized in the SDK.");
+        function processPiPayment() {
+            if (typeof Pi === "undefined") {
+                logMessage("❌ Pi SDK is not available.");
                 return;
             }
 
-            logMessage("🔵 Calling `Pi.authenticate()` now...");
+            logMessage("🔄 Initializing Pi Payment...");
 
-            return Pi.authenticate(["username"]);
-        })
-        .then(auth => {
-            logMessage("🔵 `Pi.authenticate()` function was called. Waiting for response...");
+            Pi.init({ version: "2.0", sandbox: true, appId: "ai4pi" }) 
+                .then(() => {
+                    logMessage("✅ SDK Initialized. Requesting payment...");
 
-            if (auth && auth.user) {
-                logMessage(`✅ Signed in as: ${auth.user.username}`);
-            } else {
-                logMessage("❌ Authentication failed, no user data received.");
-            }
-        })
-        .catch(error => {
-            logMessage(`❌ Error during authentication: ${error.message}`);
-        });
-
-    setTimeout(() => {
-        logMessage("⏳ If nothing happened, `Pi.authenticate()` may be blocked in the Sandbox.");
-    }, 8000);
-}
-
-
-        
+                    return Pi.createPayment({
+                        amount: 0.01, // Small test payment
+                        memo: "Test Payment for AI4Pi",
+                        metadata: { testTransaction: true }
+                    });
+                })
+                .then(payment => {
+                    logMessage(`✅ Payment initiated! Payment ID: ${payment.identifier}`);
+                })
+                .catch(error => {
+                    logMessage(`❌ Payment failed: ${error.message}`);
+                });
+        }
     </script>
 </head>
 <body>
-    <h1>AI4Pi - Sign In</h1>
-    <button onclick="manualSignIn()">🔑 Sign In with Pi Network</button>
+    <h1>AI4Pi - Process Pi Payment</h1>
+    <button onclick="processPiPayment()">💰 Process Test Payment</button>
     <div class="output" id="output">[Logs will appear here]</div>
 </body>
 </html>
