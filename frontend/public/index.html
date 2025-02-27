@@ -1,28 +1,71 @@
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        if (typeof Pi !== "undefined") {
-            Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" }); // Use your actual App ID
-            console.log("✅ Pi SDK Initialized!");
-        } else {
-            console.error("❌ Pi SDK failed to load.");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI4Pi - Sign In</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
         }
-    });
-
-    function signIn() {
-        if (typeof Pi === "undefined") {
-            alert("❌ Pi SDK is not available. Check if the script is loaded.");
-            return;
+        img {
+            width: 150px;
+            margin-bottom: 20px;
         }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof Pi !== "undefined") {
+                Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" });
+                console.log("✅ Pi SDK Initialized!");
+            } else {
+                console.error("❌ Pi SDK failed to load.");
+            }
+        });
 
-        Pi.authenticate({ scopes: ["username"], sandbox: true })
-            .then(auth => {
-                if (auth && auth.user) {
-                    alert(`✅ Signed in as: ${auth.user.username}`);
-                }
-            })
-            .catch(error => {
-                console.error("❌ Authentication failed:", error);
-                alert("❌ Authentication failed. Please try again.");
-            });
-    }
-</script>
+        function signIn() {
+            if (typeof Pi === "undefined") {
+                alert("❌ Pi SDK is not available. Check if the script is loaded.");
+                return;
+            }
+
+            Pi.authenticate({ scopes: ["username"], sandbox: true })
+                .then(auth => {
+                    if (auth && auth.user) {
+                        alert(`✅ Signed in as: ${auth.user.username}`);
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ Authentication failed:", error);
+                    alert("❌ Authentication failed. Please try again.");
+                });
+        }
+    </script>
+</head>
+<body>
+    <img src="logo.png" alt="AI4Pi Logo">
+    <button onclick="signIn()">🔑 Sign In with Pi Network</button>
+</body>
+</html>
