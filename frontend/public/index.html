@@ -30,42 +30,72 @@
             color: white;
             cursor: pointer;
             border-radius: 5px;
+            margin: 5px;
         }
         button:hover {
             background-color: #45a049;
         }
+        /* Developer Console Styling */
+        .dev-console {
+            width: 80%;
+            max-width: 600px;
+            height: 200px;
+            background: black;
+            color: limegreen;
+            font-family: monospace;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: left;
+            margin-top: 20px;
+        }
     </style>
+</head>
+<body>
+    <img src="logo.png" alt="AI4Pi Logo">
+    <button onclick="signIn()">🔑 Sign In with Pi Network</button>
+    <button onclick="getAppID()">🔍 Get App ID</button>
+
+    <!-- Developer Console Box -->
+    <div class="dev-console" id="devConsole">[AI4Pi Developer Console]</div>
+
     <script>
+        function logToConsole(message) {
+            let consoleBox = document.getElementById("devConsole");
+            consoleBox.innerHTML += `<br>> ${message}`;
+            consoleBox.scrollTop = consoleBox.scrollHeight; // Auto-scroll to latest log
+            console.log(message); // Also log to browser console
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             if (typeof Pi !== "undefined") {
                 Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" });
-                console.log("✅ Pi SDK Initialized!");
+                logToConsole("✅ Pi SDK Initialized!");
             } else {
-                console.error("❌ Pi SDK failed to load.");
+                logToConsole("❌ Pi SDK failed to load.");
             }
         });
 
         function signIn() {
             if (typeof Pi === "undefined") {
-                alert("❌ Pi SDK is not available. Check if the script is loaded.");
+                logToConsole("❌ Pi SDK is not available.");
                 return;
             }
 
             Pi.authenticate({ scopes: ["username"], sandbox: true })
                 .then(auth => {
                     if (auth && auth.user) {
-                        alert(`✅ Signed in as: ${auth.user.username}`);
+                        logToConsole(`✅ Signed in as: ${auth.user.username}`);
                     }
                 })
                 .catch(error => {
-                    console.error("❌ Authentication failed:", error);
-                    alert("❌ Authentication failed. Please try again.");
+                    logToConsole(`❌ Authentication failed: ${error.message}`);
                 });
         }
 
         function getAppID() {
             const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual API key
-            
+
             fetch("https://api.minepi.com/v2/me", {
                 method: "GET",
                 headers: {
@@ -75,20 +105,16 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log("🔍 Your App ID:", data.app.id);
-                alert(`🔍 Your App ID: ${data.app.id}`);
+                if (data.app && data.app.id) {
+                    logToConsole(`🔍 Your App ID: ${data.app.id}`);
+                } else {
+                    logToConsole("❌ Failed to retrieve App ID. API response invalid.");
+                }
             })
             .catch(error => {
-                console.error("❌ Error retrieving App ID:", error);
-                alert("❌ Failed to retrieve App ID. Check the console for details.");
+                logToConsole(`❌ Error retrieving App ID: ${error.message}`);
             });
         }
     </script>
-</head>
-<body>
-    <img src="logo.png" alt="AI4Pi Logo">
-    <button onclick="signIn()">🔑 Sign In with Pi Network</button>
-    <br>
-    <button onclick="getAppID()">🔍 Get App ID</button>
 </body>
 </html>
