@@ -54,7 +54,7 @@
     <script>
         let userData = null;
         let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Ensure correct wallet address
-        const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual Pi API Key
+        const apiKey = "YOUR_API_KEY_HERE"; // Replace with your actual Pi API Key
 
         function logMessage(message) {
             let outputDiv = document.getElementById("output");
@@ -80,6 +80,7 @@
                     if (auth && auth.user) {
                         userData = auth.user;
                         logMessage(`✅ Signed in as: ${auth.user.username}`);
+                        checkForPendingPayments(); // Check for pending payments upon login
                     } else {
                         logMessage("❌ Authentication failed, no user data received.");
                     }
@@ -135,9 +136,9 @@
         }
 
         function approvePayment(paymentId) {
-            logMessage(`🔄 Approving payment with API Key: ${paymentId}...`);
+            logMessage(`🔄 Approving pending payment: ${paymentId}...`);
 
-            fetch("https://api.minepi.com/v2/payments/" + paymentId + "/approve", {
+            fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Key ${apiKey}`,
@@ -158,44 +159,45 @@
             });
         }
 
-        <script>
-  function completePayment(paymentId) {
-      logMessage(`🔄 Completing pending payment: ${paymentId}...`);
+        function completePayment(paymentId, txid) {
+            if (!txid) {
+                logMessage(`❌ Error: Missing transaction ID (txid). Payment cannot be completed.`);
+                return;
+            }
 
-      const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual API Key
+            logMessage(`🔄 Completing payment: ${paymentId} with txid: ${txid}...`);
 
-      fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
-          method: "POST",
-          headers: {
-              "Authorization": `Key ${apiKey}`,
-              "Content-Type": "application/json"
-          }
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.success) {
-              logMessage(`✅ Payment marked as completed.`);
-          } else {
-              logMessage(`❌ Payment completion failed: ${data.error}`);
-          }
-      })
-      .catch(error => {
-          logMessage(`❌ API request failed: ${error.message}`);
-      });
-  }
+            fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Key ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ txid: txid }) // Ensure txid is sent properly
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    logMessage(`✅ Payment marked as completed.`);
+                } else {
+                    logMessage(`❌ Payment completion failed: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                logMessage(`❌ API request failed: ${error.message}`);
+            });
+        }
 
-// Automatically check for pending payments and complete them
-  function checkForPendingPayments() {
-      Pi.getPayment().then(payment => {
-          if (payment && payment.identifier) {
-              logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
-              completePayment(payment.identifier);
-          }
-      }).catch(error => {
-          logMessage(`✅ No pending payments found.`);
-      });
-  }
-</script>
+        function checkForPendingPayments() {
+            Pi.getPayment().then(payment => {
+                if (payment && payment.identifier) {
+                    logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
+                    completePayment(payment.identifier);
+                }
+            }).catch(error => {
+                logMessage(`✅ No pending payments found.`);
+            });
+        }
     </script>
 </head>
 <body>
