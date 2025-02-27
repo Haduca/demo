@@ -90,38 +90,57 @@
         }
 
         function sendPiToAI4Pi() {
-            if (!userData) {
-                logMessage("❌ You must log in before sending Pi.");
+    if (!userData) {
+        logMessage("❌ You must log in before sending Pi.");
+        return;
+    }
+
+    let amount = parseFloat(document.getElementById("amountInput").value);
+    if (isNaN(amount) || amount <= 0) {
+        logMessage("❌ Invalid Pi amount. Please enter a valid number.");
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
+        logMessage("⚠️ Transaction canceled by user.");
+        return;
+    }
+
+    logMessage(`🔄 Preparing to send ${amount} Pi to AI4Pi...`);
+
+    try {
+        logMessage("🔵 Attempting `Pi.createPayment()` now...");
+
+        Pi.createPayment({
+            amount: amount,
+            memo: "Transfer to AI4Pi",
+            metadata: { transactionType: "userToAI4Pi" },
+            to_address: "YOUR_AI4PI_WALLET_ADDRESS_HERE" // Make sure this is correct!
+        })
+        .then(payment => {
+            if (!payment || !payment.identifier) {
+                logMessage("❌ Transaction did not return a valid Payment ID.");
                 return;
             }
 
-            let amount = parseFloat(document.getElementById("amountInput").value);
-            if (isNaN(amount) || amount <= 0) {
-                logMessage("❌ Invalid Pi amount. Please enter a valid number.");
-                return;
-            }
+            logMessage(`✅ Transaction started! Payment ID: ${payment.identifier}`);
+            logMessage("🔄 Checking blockchain status...");
 
-            if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
-                logMessage("⚠️ Transaction canceled by user.");
-                return;
-            }
+            trackTransaction(payment.identifier);
+        })
+        .catch(error => {
+            logMessage(`❌ Payment failed: ${error.message}`);
+        });
 
-            logMessage(`🔄 Sending ${amount} Pi to AI4Pi wallet...`);
+    } catch (error) {
+        logMessage(`❌ Critical error before transaction started: ${error.message}`);
+    }
 
-            Pi.createPayment({
-                amount: amount,
-                memo: "Transfer to AI4Pi",
-                metadata: { transactionType: "userToAI4Pi" },
-                to_address: ai4piWallet
-            })
-            .then(payment => {
-                logMessage(`✅ Transaction initiated! Payment ID: ${payment.identifier}`);
-                trackTransaction(payment.identifier);
-            })
-            .catch(error => {
-                logMessage(`❌ Transaction failed: ${error.message}`);
-            });
-        }
+    setTimeout(() => {
+        logMessage("⏳ If nothing happened, `Pi.createPayment()` may not be executing at all.");
+    }, 8000);
+}
+
 
         function trackTransaction(paymentId) {
             Pi.getPayment(paymentId)
