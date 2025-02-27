@@ -80,10 +80,23 @@ function fetchAppID() {
     Pi.init({ version: "2.0", sandbox: true })
         .then(() => {
             logMessage("✅ Pi SDK reinitialized before authentication.");
-            
-            // Attempt authentication
-            return Pi.authenticate(["username"]);
+            logMessage("➡️ Now click 'Sign In' to trigger authentication.");
         })
+        .catch(error => {
+            logMessage(`❌ Error during SDK initialization: ${error.message}`);
+        });
+}
+
+// NEW FUNCTION: Manually Trigger Authentication
+function manualSignIn() {
+    if (typeof Pi === "undefined") {
+        logMessage("❌ Pi SDK is not available.");
+        return;
+    }
+
+    logMessage("🔄 Attempting authentication...");
+    
+    Pi.authenticate(["username"])
         .then(auth => {
             if (auth && auth.user) {
                 logMessage(`✅ Signed in as: ${auth.user.username}`);
@@ -94,15 +107,12 @@ function fetchAppID() {
         })
         .catch(error => {
             logMessage(`❌ Error during authentication: ${error.message}`);
-            console.error("Full Authentication Error:", error);
         });
-
-    // Add a delay log to detect if the function stops executing
-    setTimeout(() => {
-        logMessage("⚠️ If nothing happened, authentication may not be triggering.");
-    }, 5000);
 }
 
+
     </script>
+<button onclick="manualSignIn()">🔑 Sign In</button>
+
 </body>
 </html>
