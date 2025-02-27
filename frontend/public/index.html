@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Pi Transactions</title>
+    <title>AI4Pi - Elite Pi Network dApp</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
     <style>
         body {
@@ -45,7 +45,7 @@
             font-family: monospace;
             width: 80%;
             max-width: 600px;
-            height: 200px;
+            height: 250px;
             overflow-y: auto;
             border-radius: 5px;
             text-align: left;
@@ -54,7 +54,7 @@
     <script>
         let userData = null;
         let currentPayment = null;
-        let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Replace with AI4Pi’s actual wallet address.
+        let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // This must be set automatically
 
         function logMessage(message) {
             let outputDiv = document.getElementById("output");
@@ -116,7 +116,6 @@
             })
             .then(payment => {
                 logMessage(`✅ Transaction initiated! Payment ID: ${payment.identifier}`);
-                currentPayment = payment;
                 trackTransaction(payment.identifier);
             })
             .catch(error => {
