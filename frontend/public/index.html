@@ -94,7 +94,7 @@
         return;
     }
 
-    let amount = parseFloat(document.getElementById("amountInput").value);
+    const amount = parseFloat(document.getElementById("amountInput").value);
     if (isNaN(amount) || amount <= 0) {
         logMessage("❌ Invalid Pi amount. Please enter a valid number.");
         return;
@@ -115,23 +115,25 @@
                 amount: amount,
                 memo: "Transfer to AI4Pi",
                 metadata: { transactionType: "userToAI4Pi" },
+                // Ensure you've replaced this with the actual AI4Pi wallet address
                 to_address: "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"
             },
             {
-                onReady: function(payment) {
-                    logMessage(`✅ Payment request ready. Payment ID: ${payment.identifier}`);
+                onReadyForServerApproval: function(paymentId) {
+                    logMessage(`✅ Payment request ready for server approval. Payment ID: ${paymentId}`);
+                    // Send paymentId to your server for approval
                 },
-                onPaymentIdReceived: function(paymentId) {
-                    logMessage(`🔄 Payment ID received: ${paymentId}. Waiting for confirmation...`);
+                onReadyForServerCompletion: function(paymentId, txid) {
+                    logMessage(`✅ Payment approved by user. Payment ID: ${paymentId}, TxID: ${txid}`);
+                    // Send paymentId and txid to your server for completion
                 },
-                onCancelled: function() {
-                    logMessage("⚠️ Payment was canceled by the user.");
+                onCancel: function(paymentId) {
+                    logMessage(`⚠️ Payment canceled by user. Payment ID: ${paymentId}`);
+                    // Handle payment cancellation
                 },
-                onError: function(error) {
+                onError: function(error, payment) {
                     logMessage(`❌ Payment error: ${error.message}`);
-                },
-                onCompleted: function(payment) {
-                    logMessage(`✅ Payment successful! Payment ID: ${payment.identifier}, Status: ${payment.status}`);
+                    // Handle payment error
                 }
             }
         );
@@ -143,6 +145,7 @@
         logMessage("⏳ If nothing happened, `Pi.createPayment()` may not be executing properly.");
     }, 8000);
 }
+
 
 
     </script>
