@@ -4,16 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Your Pi App ID</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Ensure SDK is loaded -->
     <script>
         function displayAppID() {
             let hostname = window.location.hostname; // Get full hostname
             document.getElementById("appIDDisplay").textContent = `🔍 Full Hostname: ${hostname}`;
             console.log("🔍 Full Hostname:", hostname);
         }
+
+        function fetchAppID() {
+            if (typeof Pi === "undefined") {
+                document.getElementById("appIDSDK").textContent = "❌ Pi SDK is not available.";
+                return;
+            }
+
+            Pi.init({ version: "2.0", sandbox: true })
+                .then(() => {
+                    console.log("✅ Pi SDK Initialized.");
+                    document.getElementById("appIDSDK").textContent = "✅ Pi SDK Initialized. Attempting to retrieve App ID...";
+
+                    return Pi.authenticate(["username"]);
+                })
+                .then(auth => {
+                    if (auth && auth.user) {
+                        document.getElementById("appIDSDK").textContent = `✅ Signed in as: ${auth.user.username}. This App ID may be: ${window.location.hostname.split('.')[0]}`;
+                    } else {
+                        document.getElementById("appIDSDK").textContent = "❌ Authentication failed, no user data received.";
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("appIDSDK").textContent = `❌ Error retrieving App ID via SDK: ${error.message}`;
+                });
+        }
     </script>
 </head>
 <body onload="displayAppID()">
     <h1>Find Your Pi App ID</h1>
-    <p id="appIDDisplay">🔄 Loading App ID...</p>
+    <p id="appIDDisplay">🔄 Loading Full Hostname...</p>
+    <p id="appIDSDK">🔄 Press the button to retrieve App ID via Pi SDK.</p>
+    <button onclick="fetchAppID()">🔍 Get App ID from Pi SDK</button>
 </body>
 </html>
