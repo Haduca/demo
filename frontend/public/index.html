@@ -118,19 +118,19 @@
                 to_address: "YOUR_AI4PI_WALLET_ADDRESS_HERE"
             },
             {
-                onReady: payment => {
+                onReady: function(payment) {
                     logMessage(`✅ Payment request ready. Payment ID: ${payment.identifier}`);
                 },
-                onPaymentIdReceived: paymentId => {
+                onPaymentIdReceived: function(paymentId) {
                     logMessage(`🔄 Payment ID received: ${paymentId}. Waiting for confirmation...`);
                 },
-                onCancelled: () => {
+                onCancelled: function() {
                     logMessage("⚠️ Payment was canceled by the user.");
                 },
-                onError: error => {
+                onError: function(error) {
                     logMessage(`❌ Payment error: ${error.message}`);
                 },
-                onCompleted: payment => {
+                onCompleted: function(payment) {
                     logMessage(`✅ Payment successful! Payment ID: ${payment.identifier}, Status: ${payment.status}`);
                 }
             }
@@ -143,6 +143,7 @@
         logMessage("⏳ If nothing happened, `Pi.createPayment()` may not be executing properly.");
     }, 8000);
 }
+
 
     </script>
 </head>
