@@ -54,7 +54,7 @@
     <script>
         let userData = null;
         let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Ensure correct wallet address
-        const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual Pi API Key
+        const apiKey = "YOUR_API_KEY_HERE"; // Replace with your actual Pi API Key
 
         function logMessage(message) {
             let outputDiv = document.getElementById("output");
@@ -117,6 +117,10 @@
                     to_address: ai4piWallet
                 },
                 {
+                    onIncompletePaymentFound: function(payment) {
+                        logMessage(`⚠️ Found incomplete payment: ${payment.identifier}`);
+                        resolvePendingPayment(payment.identifier);
+                    },
                     onReadyForServerApproval: function(paymentId) {
                         logMessage(`✅ Payment request ready. Auto-approving...`);
                         approvePayment(paymentId);
@@ -188,50 +192,16 @@
             });
         }
 
-        
-  function checkForPendingPayments() {
-      Pi.getPayment()
-          .then(payment => {
-              if (payment && payment.identifier) {
-                  logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
-
-                  // Try to complete the payment first
-                  completePayment(payment.identifier);
-
-                  // If completion fails, cancel the payment
-                  setTimeout(() => {
-                      cancelPendingPayment(payment.identifier);
-                  }, 10000); // Wait 10 seconds before attempting cancel
-              }
-          })
-          .catch(error => {
-              logMessage(`✅ No pending payments found.`);
-          });
-  }
-
-  function cancelPendingPayment(paymentId) {
-      logMessage(`🔄 Canceling pending payment: ${paymentId}...`);
-
-      fetch(`https://api.minepi.com/v2/payments/${paymentId}/cancel`, {
-          method: "POST",
-          headers: {
-              "Authorization": `Key YOUR_API_KEY_HERE`,
-              "Content-Type": "application/json"
-          }
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.success) {
-              logMessage(`✅ Payment successfully canceled.`);
-          } else {
-              logMessage(`❌ Payment cancellation failed: ${data.error}`);
-          }
-      })
-      .catch(error => {
-          logMessage(`❌ API request failed: ${error.message}`);
-      });
-  }
-
+        function checkForPendingPayments() {
+            Pi.getPayment().then(payment => {
+                if (payment && payment.identifier) {
+                    logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
+                    completePayment(payment.identifier);
+                }
+            }).catch(error => {
+                logMessage(`✅ No pending payments found.`);
+            });
+        }
     </script>
 </head>
 <body>
