@@ -2,244 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-    <title>AI4Pi - Pi Network dApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI4Pi - Pi Network Test</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Header and Status Bar */
-        .top-bar {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: black;
-            color: white;
-        }
-
-        /* Action Buttons */
-        .buttons {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            padding: 10px;
-        }
-
-        .buttons button {
-            padding: 10px 15px;
-            font-size: 14px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .sign-in { background: #4CAF50; color: white; }
-        .action-btn { background: #007BFF; color: white; }
-
-        /* Message Wall Layout */
-        .container {
-            width: 95%;
-            max-width: 1200px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 10px;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-
-        .wall {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 250px;
-            overflow-y: auto;
-        }
-
-        .text-box {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        /* Status & Debug Info */
-        .status {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            padding: 10px;
-        }
-
-        .status div {
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .visitor-count { background: #4CAF50; color: white; }
-        .debug-info { background: #333; color: white; }
-    </style>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script>
-  Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360.app" });
-</script>
 </head>
 <body>
-
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div>⏰ Clock: <span id="clock">00:00:00</span></div>
-        <div class="visitor-count">👥 Visitors: <span id="visitor-count">0</span></div>
-        <div class="debug-info">🛠 Debug: <span id="debug-info">Initializing...</span></div>
+    <h1 style="text-align: center; margin-top: 20%;">AI4Pi</h1>
+    <div style="text-align: center; margin-top: 20px;">
+        <button onclick="signIn()">🔑 Sign In with Pi Network</button>
     </div>
-
-    <!-- Buttons -->
-    <div class="buttons">
-        <button class="sign-in" onclick="signIn()">🔑 Sign In</button>
-        <button class="action-btn" onclick="piAction()">⚡ 3.14 Action</button>
-    </div>
-
-    <!-- Pi Drip Status -->
-    <div class="status">
-        <div>💰 Pi Balance: <span id="pi-balance">0.000</span></div>
-        <div>🔄 Drip Rate: <span id="drip-rate">0.002 Pi/10s</span></div>
-    </div>
-
-    <!-- Interactive Walls -->
-    <div class="container">
-        <div class="wall" id="ai">
-            <b>🤖 AI</b>
-            <div class="messages"></div>
-            <input class="text-box" id="aiI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('ai')">
-        </div>
-        <div class="wall" id="mo">
-            <b>🚀 Motivation</b>
-            <div class="messages"></div>
-            <input class="text-box" id="moI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('mo')">
-        </div>
-        <div class="wall" id="so">
-            <b>🛠 Solutions</b>
-            <div class="messages"></div>
-            <input class="text-box" id="soI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('so')">
-        </div>
-        <div class="wall" id="ma">
-            <b>📊 Math</b>
-            <div class="messages"></div>
-            <input class="text-box" id="maI" placeholder="Type here..." onkeydown="if(event.key==='Enter') sendMessage('ma')">
-        </div>
-    </div>
-
     <script>
-        // Update Clock
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleTimeString();
-        }, 1000);
-
-        // Message Sending
-        function sendMessage(wallId) {
-            let input = document.getElementById(wallId + "I");
-            let messages = document.getElementById(wallId).querySelector(".messages");
-            let newText = document.createElement("p");
-            newText.textContent = input.value;
-            messages.appendChild(newText);
-            input.value = "";
-        }
-
-        // Pi Authentication
         function signIn() {
-            Pi.authenticate(["username", "payments"], function(auth) {
-                alert(`Signed in as: ${auth.user.username}`);
-            });
+            if (typeof Pi === "undefined") {
+                alert("❌ Pi SDK is not available. Check if the script is loaded correctly.");
+                return;
+            }
+            
+            Pi.authenticate({ scopes: ["username"], sandbox: true })
+                .then(auth => {
+                    if (auth && auth.user) {
+                        alert(`✅ Signed in as: ${auth.user.username}`);
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ Authentication failed:", error);
+                    alert("❌ Authentication failed. Please try again.");
+                });
         }
-
-        // Pi Action Test
-        function piAction() {
-            alert("Pi Network interaction simulated!");
-        }
-
-        // Simulated Pi Drip
-        let piBalance = 0.000;
-        setInterval(() => {
-            piBalance += 0.002;
-            document.getElementById("pi-balance").textContent = piBalance.toFixed(3);
-        }, 10000);
-
-        // Simulated Visitor Count
-        let visitorCount = 1;
-        setInterval(() => {
-            visitorCount++;
-            document.getElementById("visitor-count").textContent = visitorCount;
-        }, 15000);
     </script>
-    <script>
-  function checkAppId() {
-      if (typeof Pi === "undefined") {
-          alert("❌ Pi SDK is not available. Make sure it's loaded.");
-          return;
-      }
-      alert(`✅ Pi SDK Loaded! Trying to retrieve App ID...`);
-      
-      try {
-          Pi.init({ version: "2.0", sandbox: true });
-          console.log("🔍 Pi SDK Object:", Pi);
-          alert("🔍 Check the console for the Pi SDK details.");
-      } catch (error) {
-          console.error("❌ Error initializing Pi SDK:", error);
-          alert(`❌ Pi SDK Initialization Error: ${error.message}`);
-      }
-  }
-</script>
-    <script>
-  function signIn() {
-      Pi.authenticate({ scopes: ["username"], sandbox: true })
-          .then(auth => {
-              if (auth && auth.user) {
-                  alert(`✅ Welcome, ${auth.user.username}!`);
-                  document.getElementById("user-info").textContent = `Signed in as: ${auth.user.username}`;
-              }
-          })
-          .catch(error => {
-              console.error("❌ Authentication failed:", error);
-              alert("❌ Authentication failed. Please try again.");
-          });
-  }
-</script>
-<button class="sign-in" onclick="signIn()">🔑 Sign In</button>
-<div id="user-info" style="margin-top: 10px; font-weight: bold;"></div>
-<div id="user-info" style="margin-top: 10px; font-weight: bold;">Not signed in</div>
-<button onclick="checkAppId()">🔍 Check Pi SDK & App ID</button>
-<script>
-  // Check if Pi SDK is available
-  if (typeof Pi !== "undefined" && Pi.getAppID) {
-    console.log("Pi App ID:", Pi.getAppID());
-  } else {
-    console.log("Pi SDK is not available or not initialized.");
-  }
-</script>
-
 </body>
 </html>
