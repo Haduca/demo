@@ -80,7 +80,7 @@
                     if (auth && auth.user) {
                         userData = auth.user;
                         logMessage(`✅ Signed in as: ${auth.user.username}`);
-                        checkForPendingPayments(); // Check for pending payments upon login
+                        checkForPendingPayments(); // Fixes previous error
                     } else {
                         logMessage("❌ Authentication failed, no user data received.");
                     }
@@ -190,6 +190,23 @@
             .catch(error => {
                 logMessage(`❌ API request failed: ${error.message}`);
             });
+        }
+
+        function checkForPendingPayments() {
+            logMessage("🔍 Checking for pending payments...");
+
+            Pi.getPayment()
+                .then(payment => {
+                    if (payment && payment.identifier) {
+                        logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
+                        completePayment(payment.identifier);
+                    } else {
+                        logMessage("✅ No pending payments found.");
+                    }
+                })
+                .catch(error => {
+                    logMessage(`❌ Error checking pending payments: ${error.message}`);
+                });
         }
     </script>
 </head>
