@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Sign In</title>
+    <title>Verify Pi App ID</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
     <style>
         body {
@@ -53,35 +53,46 @@
             console.log(message);
         }
 
-        function manualSignIn() {
+        function verifyAppID() {
             if (typeof Pi === "undefined") {
                 logMessage("❌ Pi SDK is not available.");
                 return;
             }
 
-            logMessage("🔄 Ensuring SDK is fully initialized...");
+            logMessage("🔄 Initializing SDK to verify App ID...");
 
-            Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" }) // Use the confirmed App ID
+            Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
                 .then(() => {
-                    logMessage("✅ SDK Initialization complete. Attempting authentication...");
+                    logMessage("✅ SDK initialized successfully with App ID: aiphub2360");
+
+                    if (!Pi.authenticate || typeof Pi.authenticate !== "function") {
+                        logMessage("❌ `Pi.authenticate()` is missing or not recognized in the SDK.");
+                        return;
+                    }
+
+                    logMessage("🔵 Testing authentication request with this App ID...");
                     return Pi.authenticate(["username"]);
                 })
                 .then(auth => {
                     if (auth && auth.user) {
-                        logMessage(`✅ Signed in as: ${auth.user.username}`);
+                        logMessage(`✅ Authentication SUCCESS! This confirms App ID is correct.`);
                     } else {
-                        logMessage("❌ Authentication failed, no user data received.");
+                        logMessage("❌ Authentication failed, but App ID was accepted.");
                     }
                 })
                 .catch(error => {
-                    logMessage(`❌ Error during authentication: ${error.message}`);
+                    if (error.message.includes("Invalid App ID")) {
+                        logMessage("❌ App ID is INVALID. We need to find another one.");
+                    } else {
+                        logMessage(`❌ Error during authentication: ${error.message}`);
+                    }
                 });
         }
     </script>
 </head>
 <body>
-    <h1>AI4Pi - Sign In</h1>
-    <button onclick="manualSignIn()">🔑 Sign In with Pi Network</button>
+    <h1>Verify Pi App ID</h1>
+    <button onclick="verifyAppID()">🔍 Verify App ID</button>
     <div class="output" id="output">[Logs will appear here]</div>
 </body>
 </html>
