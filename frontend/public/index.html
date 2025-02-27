@@ -69,25 +69,20 @@ function verifyAppID() {
                 return;
             }
 
-            logMessage("🔵 Calling `Pi.authenticate()` now...");
-            return Pi.authenticate(["username"]);
-        })
-        .then(auth => {
-            logMessage("🔵 `Pi.authenticate()` function was called. Waiting for response...");
+            logMessage("🔵 Calling `Pi.openShareDialog()` as a test...");
 
-            if (auth && auth.user) {
-                logMessage(`✅ Authentication SUCCESS! Signed in as: ${auth.user.username}`);
-            } else {
-                logMessage("❌ Authentication failed, no user data received.");
-            }
+            return Pi.openShareDialog("Testing Pi SDK function in Testnet.");
+        })
+        .then(() => {
+            logMessage("✅ `Pi.openShareDialog()` worked! The SDK is responding.");
         })
         .catch(error => {
-            logMessage(`❌ Error during authentication: ${error.message}`);
+            logMessage(`❌ Error when calling `Pi.openShareDialog()`: ${error.message}`);
         });
 
-    // Add a timeout check to detect if authentication is not responding at all
+    // Add a timeout to detect if this function is also unresponsive
     setTimeout(() => {
-        logMessage("⏳ If nothing happened, `Pi.authenticate()` is not responding.");
+        logMessage("⏳ If nothing happened, the SDK might not be processing any requests.");
     }, 8000);
 }
 
