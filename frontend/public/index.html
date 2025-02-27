@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Pi Payment Test</title>
+    <title>AI4Pi - Pi Payment</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
     <style>
         body {
@@ -22,14 +22,20 @@
             padding: 10px 20px;
             font-size: 16px;
             border: none;
-            background-color: #28a745;
+            background-color: #007BFF;
             color: white;
             cursor: pointer;
             border-radius: 5px;
             margin: 10px;
         }
         button:hover {
-            background-color: #218838;
+            background-color: #0056b3;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            margin: 10px;
         }
         .output {
             margin-top: 20px;
@@ -46,6 +52,8 @@
         }
     </style>
     <script>
+        let userData = null;
+
         function logMessage(message) {
             let outputDiv = document.getElementById("output");
             outputDiv.innerHTML += `<br>> ${message}`;
@@ -53,36 +61,70 @@
             console.log(message);
         }
 
-        function processPiPayment() {
+        function loginUser() {
             if (typeof Pi === "undefined") {
                 logMessage("❌ Pi SDK is not available.");
                 return;
             }
 
-            logMessage("🔄 Initializing Pi Payment...");
+            logMessage("🔄 Initializing SDK for authentication...");
 
-            Pi.init({ version: "2.0", sandbox: true, appId: "ai4pi" }) 
+            Pi.init({ version: "2.0", sandbox: true, appId: "ai4pi" })
                 .then(() => {
-                    logMessage("✅ SDK Initialized. Requesting payment...");
-
-                    return Pi.createPayment({
-                        amount: 0.01, // Small test payment
-                        memo: "Test Payment for AI4Pi",
-                        metadata: { testTransaction: true }
-                    });
+                    logMessage("✅ SDK Initialized. Attempting login...");
+                    return Pi.authenticate(["username", "payments"]);
                 })
-                .then(payment => {
-                    logMessage(`✅ Payment initiated! Payment ID: ${payment.identifier}`);
+                .then(auth => {
+                    if (auth && auth.user) {
+                        userData = auth.user;
+                        logMessage(`✅ Signed in as: ${auth.user.username}`);
+                    } else {
+                        logMessage("❌ Authentication failed, no user data received.");
+                    }
                 })
                 .catch(error => {
-                    logMessage(`❌ Payment failed: ${error.message}`);
+                    logMessage(`❌ Error during authentication: ${error.message}`);
                 });
+        }
+
+        function processPiPayment() {
+            if (!userData) {
+                logMessage("❌ You must log in before making a payment.");
+                return;
+            }
+
+            let amount = parseFloat(document.getElementById("amountInput").value);
+            if (isNaN(amount) || amount <= 0) {
+                logMessage("❌ Invalid Pi amount. Please enter a valid number.");
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to pay ${amount} Pi?`)) {
+                logMessage("⚠️ Payment canceled by user.");
+                return;
+            }
+
+            logMessage(`🔄 Processing payment of ${amount} Pi...`);
+
+            Pi.createPayment({
+                amount: amount,
+                memo: "Test Payment for AI4Pi",
+                metadata: { testTransaction: true }
+            })
+            .then(payment => {
+                logMessage(`✅ Payment initiated! Payment ID: ${payment.identifier}`);
+            })
+            .catch(error => {
+                logMessage(`❌ Payment failed: ${error.message}`);
+            });
         }
     </script>
 </head>
 <body>
-    <h1>AI4Pi - Process Pi Payment</h1>
-    <button onclick="processPiPayment()">💰 Process Test Payment</button>
+    <h1>AI4Pi - Pi Payment</h1>
+    <button onclick="loginUser()">🔑 Log In with Pi Network</button>
+    <input type="number" id="amountInput" placeholder="Enter Pi amount">
+    <button onclick="processPiPayment()">💰 Process Payment</button>
     <div class="output" id="output">[Logs will appear here]</div>
 </body>
 </html>
