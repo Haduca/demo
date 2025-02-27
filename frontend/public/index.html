@@ -52,31 +52,47 @@
             outputDiv.scrollTop = outputDiv.scrollHeight;
             console.log(message);
         }
+function manualSignIn() {
+    if (typeof Pi === "undefined") {
+        logMessage("❌ Pi SDK is not available.");
+        return;
+    }
 
-        function manualSignIn() {
-            if (typeof Pi === "undefined") {
-                logMessage("❌ Pi SDK is not available.");
+    logMessage("🔄 Reinitializing SDK with authorized Sandbox credentials...");
+
+    Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
+        .then(() => {
+            logMessage("✅ SDK Reinitialized. Checking if `Pi.authenticate()` exists...");
+
+            if (!Pi.authenticate || typeof Pi.authenticate !== "function") {
+                logMessage("❌ `Pi.authenticate()` is missing or not recognized in the SDK.");
                 return;
             }
 
-            logMessage("🔄 Reinitializing SDK with authorized Sandbox credentials...");
+            logMessage("🔵 Calling `Pi.authenticate()` now...");
+            
+            return Pi.authenticate(["username"]);
+        })
+        .then(auth => {
+            logMessage("🔵 `Pi.authenticate()` function was called. Waiting for response...");
 
-            Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" }) // Your confirmed App ID
-                .then(() => {
-                    logMessage("✅ SDK Reinitialized. Attempting authentication...");
-                    return Pi.authenticate(["username"]);
-                })
-                .then(auth => {
-                    if (auth && auth.user) {
-                        logMessage(`✅ Signed in as: ${auth.user.username}`);
-                    } else {
-                        logMessage("❌ Authentication failed, no user data received.");
-                    }
-                })
-                .catch(error => {
-                    logMessage(`❌ Error during authentication: ${error.message}`);
-                });
-        }
+            if (auth && auth.user) {
+                logMessage(`✅ Signed in as: ${auth.user.username}`);
+            } else {
+                logMessage("❌ Authentication failed, no user data received.");
+            }
+        })
+        .catch(error => {
+            logMessage(`❌ Error during authentication: ${error.message}`);
+        });
+
+    // Add a timeout to detect if authentication never responds
+    setTimeout(() => {
+        logMessage("⏳ If nothing happened, `Pi.authenticate()` is not responding.");
+    }, 8000);
+}
+
+        
     </script>
 </head>
 <body>
