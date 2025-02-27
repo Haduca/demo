@@ -52,6 +52,7 @@
             outputDiv.scrollTop = outputDiv.scrollHeight;
             console.log(message);
         }
+
 function manualSignIn() {
     if (typeof Pi === "undefined") {
         logMessage("❌ Pi SDK is not available.");
@@ -60,9 +61,9 @@ function manualSignIn() {
 
     logMessage("🔄 Reinitializing SDK with authorized Sandbox credentials...");
 
-    Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
+    Pi.init({ version: "2.0", sandbox: true, appId: "ai4pi" }) // Ensure Sandbox App ID is used
         .then(() => {
-            logMessage("✅ SDK Reinitialized. Checking if `Pi.authenticate()` exists...");
+            logMessage("✅ SDK Reinitialized in Sandbox. Checking `Pi.authenticate()`...");
 
             if (!Pi.authenticate || typeof Pi.authenticate !== "function") {
                 logMessage("❌ `Pi.authenticate()` is missing or not recognized in the SDK.");
@@ -71,21 +72,23 @@ function manualSignIn() {
 
             logMessage("🔵 Calling `Pi.authenticate()` now...");
 
-            return Pi.authenticate(["username"], function(auth) {
-                logMessage("🔵 Inside callback function for `Pi.authenticate()`...");
-                if (auth && auth.user) {
-                    logMessage(`✅ Authentication SUCCESS! Signed in as: ${auth.user.username}`);
-                } else {
-                    logMessage("❌ Authentication failed, no user data received.");
-                }
-            });
+            return Pi.authenticate(["username"]);
+        })
+        .then(auth => {
+            logMessage("🔵 `Pi.authenticate()` function was called. Waiting for response...");
+
+            if (auth && auth.user) {
+                logMessage(`✅ Signed in as: ${auth.user.username}`);
+            } else {
+                logMessage("❌ Authentication failed, no user data received.");
+            }
         })
         .catch(error => {
             logMessage(`❌ Error during authentication: ${error.message}`);
         });
 
     setTimeout(() => {
-        logMessage("⏳ If nothing happened, `Pi.authenticate()` is not responding.");
+        logMessage("⏳ If nothing happened, `Pi.authenticate()` may be blocked in the Sandbox.");
     }, 8000);
 }
 
