@@ -52,42 +52,46 @@
             outputDiv.scrollTop = outputDiv.scrollHeight;
             console.log(message);
         }
+function verifyAppID() {
+    if (typeof Pi === "undefined") {
+        logMessage("❌ Pi SDK is not available.");
+        return;
+    }
 
-        function verifyAppID() {
-            if (typeof Pi === "undefined") {
-                logMessage("❌ Pi SDK is not available.");
+    logMessage("🔄 Initializing SDK to verify App ID...");
+
+    Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
+        .then(() => {
+            logMessage("✅ SDK initialized successfully with App ID: aiphub2360");
+
+            if (!Pi.authenticate || typeof Pi.authenticate !== "function") {
+                logMessage("❌ `Pi.authenticate()` is missing or not recognized in the SDK.");
                 return;
             }
 
-            logMessage("🔄 Initializing SDK to verify App ID...");
+            logMessage("🔵 Calling `Pi.authenticate()` now...");
+            return Pi.authenticate(["username"]);
+        })
+        .then(auth => {
+            logMessage("🔵 `Pi.authenticate()` function was called. Waiting for response...");
 
-            Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
-                .then(() => {
-                    logMessage("✅ SDK initialized successfully with App ID: aiphub2360");
+            if (auth && auth.user) {
+                logMessage(`✅ Authentication SUCCESS! Signed in as: ${auth.user.username}`);
+            } else {
+                logMessage("❌ Authentication failed, no user data received.");
+            }
+        })
+        .catch(error => {
+            logMessage(`❌ Error during authentication: ${error.message}`);
+        });
 
-                    if (!Pi.authenticate || typeof Pi.authenticate !== "function") {
-                        logMessage("❌ `Pi.authenticate()` is missing or not recognized in the SDK.");
-                        return;
-                    }
+    // Add a timeout check to detect if authentication is not responding at all
+    setTimeout(() => {
+        logMessage("⏳ If nothing happened, `Pi.authenticate()` is not responding.");
+    }, 8000);
+}
 
-                    logMessage("🔵 Testing authentication request with this App ID...");
-                    return Pi.authenticate(["username"]);
-                })
-                .then(auth => {
-                    if (auth && auth.user) {
-                        logMessage(`✅ Authentication SUCCESS! This confirms App ID is correct.`);
-                    } else {
-                        logMessage("❌ Authentication failed, but App ID was accepted.");
-                    }
-                })
-                .catch(error => {
-                    if (error.message.includes("Invalid App ID")) {
-                        logMessage("❌ App ID is INVALID. We need to find another one.");
-                    } else {
-                        logMessage(`❌ Error during authentication: ${error.message}`);
-                    }
-                });
-        }
+        
     </script>
 </head>
 <body>
