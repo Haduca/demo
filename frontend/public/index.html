@@ -6,7 +6,9 @@
     <title>Find Your Pi App ID</title>
     <script>
         function displayAppID() {
-            let appID = window.location.hostname.split('.')[0]; // Extracts subdomain
+            let hostname = window.location.hostname;
+            let appID = hostname.includes("netlify") ? "Pi Browser may be required for the real App ID" : hostname.split('.')[0];
+
             document.getElementById("appIDDisplay").textContent = `🔍 Your App ID might be: ${appID}`;
             console.log("🔍 Extracted App ID:", appID);
         }
