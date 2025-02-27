@@ -92,29 +92,40 @@
                     logToConsole(`❌ Authentication failed: ${error.message}`);
                 });
         }
-
+       
         function getAppID() {
-            const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual API key
+    const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; 
 
-            fetch("https://api.minepi.com/v2/me", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${apiKey}`,
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.app && data.app.id) {
-                    logToConsole(`🔍 Your App ID: ${data.app.id}`);
-                } else {
-                    logToConsole("❌ Failed to retrieve App ID. API response invalid.");
-                }
-            })
-            .catch(error => {
-                logToConsole(`❌ Error retrieving App ID: ${error.message}`);
-            });
+    if (!apiKey || apiKey.length < 20) {
+        logToConsole("❌ Invalid API Key! Please check and try again.");
+        return;
+    }
+
+    fetch("https://api.minepi.com/v2/me", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${apiKey.trim()}`, // Ensure no spaces
+            "Content-Type": "application/json"
         }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.app && data.app.id) {
+            logToConsole(`🔍 Your App ID: ${data.app.id}`);
+        } else {
+            logToConsole("❌ Failed to retrieve App ID. API response invalid.");
+        }
+    })
+    .catch(error => {
+        logToConsole(`❌ Error retrieving App ID: ${error.message}`);
+    });
+}
+ 
     </script>
 </body>
 </html>
