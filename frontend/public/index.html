@@ -70,7 +70,6 @@
                 .then(() => logMessage("✅ Pi SDK Initialized in Testnet Mode!"))
                 .catch(error => logMessage(`❌ SDK Initialization Failed: ${error.message}`));
         }
-
 function fetchAppID() {
     if (typeof Pi === "undefined") {
         logMessage("❌ Pi SDK is not available. Initialize first.");
@@ -81,6 +80,8 @@ function fetchAppID() {
     Pi.init({ version: "2.0", sandbox: true })
         .then(() => {
             logMessage("✅ Pi SDK reinitialized before authentication.");
+            
+            // Attempt authentication
             return Pi.authenticate(["username"]);
         })
         .then(auth => {
@@ -92,10 +93,15 @@ function fetchAppID() {
             }
         })
         .catch(error => {
-            logMessage(`❌ Error retrieving App ID via authentication: ${error.message}`);
+            logMessage(`❌ Error during authentication: ${error.message}`);
+            console.error("Full Authentication Error:", error);
         });
-}
 
+    // Add a delay log to detect if the function stops executing
+    setTimeout(() => {
+        logMessage("⚠️ If nothing happened, authentication may not be triggering.");
+    }, 5000);
+}
 
     </script>
 </body>
