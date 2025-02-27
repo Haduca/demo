@@ -96,15 +96,10 @@
         function getAppID() {
     const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual API key
 
-    if (!apiKey || apiKey.length < 20) {
-        logToConsole("❌ Invalid API Key! Please check and try again.");
-        return;
-    }
-
     fetch("https://api.minepi.com/v2/me", {
         method: "GET",
         headers: {
-            "Authorization": `Key ${apiKey.trim()}`, // Use `Key` instead of `Bearer`
+            "X-API-Key": apiKey.trim(), // Use "X-API-Key" instead of "Authorization"
             "Content-Type": "application/json"
         }
     })
@@ -125,6 +120,7 @@
         logToConsole(`❌ Error retrieving App ID: ${error.message}`);
     });
 }
+
 
     </script>
 </body>
