@@ -3,45 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Your Pi App ID</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Ensure SDK is loaded -->
+    <title>AI4Pi - Sign In</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            background: black;
+            color: limegreen;
+            font-family: monospace;
+            width: 80%;
+            max-width: 600px;
+            height: 200px;
+            overflow-y: auto;
+            border-radius: 5px;
+            text-align: left;
+        }
+    </style>
     <script>
-        const possibleAppIDs = [
-            "aiphub2360",  // Inferred from PiNet subdomain
-            "exquisite-torte-fa8609", // Netlify-assigned subdomain
-            "test-app", // Generic test ID
-            "pibrowser-test", // Common test App ID
-            "pi-network-app", // Another possible ID
-            "sandbox-app", // If Pi assigns sandbox IDs
-            "pi-dapp-1234" // Random structure to test
-        ];
-        
-        let currentAttempt = 0;
-        
-        function tryNextAppID() {
-            if (currentAttempt >= possibleAppIDs.length) {
-                document.getElementById("appIDSDK").textContent = "❌ No working App ID found.";
+        function logMessage(message) {
+            let outputDiv = document.getElementById("output");
+            outputDiv.innerHTML += `<br>> ${message}`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function manualSignIn() {
+            if (typeof Pi === "undefined") {
+                logMessage("❌ Pi SDK is not available.");
                 return;
             }
 
-            let appID = possibleAppIDs[currentAttempt];
-            document.getElementById("appIDSDK").textContent = `🔄 Trying App ID: ${appID}...`;
+            logMessage("🔄 Ensuring SDK is fully initialized...");
 
-            Pi.init({ version: "2.0", sandbox: true, appId: appID })
+            Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" }) // Use the confirmed App ID
                 .then(() => {
-                    document.getElementById("appIDSDK").textContent = `✅ Pi SDK Initialized with App ID: ${appID}`;
-                    console.log(`✅ Success with App ID: ${appID}`);
+                    logMessage("✅ SDK Initialization complete. Attempting authentication...");
+                    return Pi.authenticate(["username"]);
+                })
+                .then(auth => {
+                    if (auth && auth.user) {
+                        logMessage(`✅ Signed in as: ${auth.user.username}`);
+                    } else {
+                        logMessage("❌ Authentication failed, no user data received.");
+                    }
                 })
                 .catch(error => {
-                    console.log(`❌ Failed with App ID: ${appID}, Error: ${error.message}`);
-                    currentAttempt++;
-                    setTimeout(tryNextAppID, 2000); // Wait 2 sec before next attempt
+                    logMessage(`❌ Error during authentication: ${error.message}`);
                 });
         }
     </script>
 </head>
-<body onload="tryNextAppID()">
-    <h1>Find Your Pi App ID</h1>
-    <p id="appIDSDK">🔄 Attempting to find a valid App ID...</p>
+<body>
+    <h1>AI4Pi - Sign In</h1>
+    <button onclick="manualSignIn()">🔑 Sign In with Pi Network</button>
+    <div class="output" id="output">[Logs will appear here]</div>
 </body>
 </html>
