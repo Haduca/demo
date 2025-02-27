@@ -54,6 +54,7 @@
     <script>
         let userData = null;
         let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Ensure correct wallet address
+        const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual Pi API Key
 
         function logMessage(message) {
             let outputDiv = document.getElementById("output");
@@ -70,7 +71,7 @@
 
             logMessage("🔄 Initializing SDK for authentication...");
 
-            Pi.init({ version: "2.0", sandbox: true, appId: "ai4pi" })
+            Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
                 .then(() => {
                     logMessage("✅ SDK Initialized. Attempting login...");
                     return Pi.authenticate(["username", "payments"]);
@@ -88,77 +89,97 @@
                 });
         }
 
-function sendPiToAI4Pi() {
-    if (!userData) {
-        logMessage("❌ You must log in before sending Pi.");
-        return;
-    }
-
-    let amount = parseFloat(document.getElementById("amountInput").value);
-    if (isNaN(amount) || amount <= 0) {
-        logMessage("❌ Invalid Pi amount. Please enter a valid number.");
-        return;
-    }
-
-    if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
-        logMessage("⚠️ Transaction canceled by user.");
-        return;
-    }
-
-    logMessage(`🔄 Sending ${amount} Pi to AI4Pi...`);
-
-    Pi.createPayment(
-        {
-            amount: amount,
-            memo: "Auto-approved transfer to AI4Pi",
-            metadata: { transactionType: "userToAI4Pi" },
-            to_address: "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"
-        },
-        {
-            onReadyForServerApproval: function(paymentId) {
-                logMessage(`✅ Payment request ready. Auto-approving...`);
-                approvePayment(paymentId);
-            },
-            onReadyForServerCompletion: function(paymentId, txid) {
-                logMessage(`✅ Payment approved. Finalizing transaction...`);
-                completePayment(paymentId, txid);
-            },
-            onCancel: function(paymentId) {
-                logMessage(`⚠️ Payment canceled by user. Payment ID: ${paymentId}`);
-            },
-            onError: function(error) {
-                logMessage(`❌ Payment error: ${error.message}`);
+        function sendPiToAI4Pi() {
+            if (!userData) {
+                logMessage("❌ You must log in before sending Pi.");
+                return;
             }
+
+            let amount = parseFloat(document.getElementById("amountInput").value);
+            if (isNaN(amount) || amount <= 0) {
+                logMessage("❌ Invalid Pi amount. Please enter a valid number.");
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
+                logMessage("⚠️ Transaction canceled by user.");
+                return;
+            }
+
+            logMessage(`🔄 Sending ${amount} Pi to AI4Pi...`);
+
+            Pi.createPayment(
+                {
+                    amount: amount,
+                    memo: "Auto-approved transfer to AI4Pi",
+                    metadata: { transactionType: "userToAI4Pi" },
+                    to_address: ai4piWallet
+                },
+                {
+                    onReadyForServerApproval: function(paymentId) {
+                        logMessage(`✅ Payment request ready. Auto-approving...`);
+                        approvePayment(paymentId);
+                    },
+                    onReadyForServerCompletion: function(paymentId, txid) {
+                        logMessage(`✅ Payment approved. Finalizing transaction...`);
+                        completePayment(paymentId, txid);
+                    },
+                    onCancel: function(paymentId) {
+                        logMessage(`⚠️ Payment canceled by user. Payment ID: ${paymentId}`);
+                    },
+                    onError: function(error) {
+                        logMessage(`❌ Payment error: ${error.message}`);
+                    }
+                }
+            );
         }
-    );
-}
 
-function approvePayment(paymentId) {
-    logMessage(`🔄 Approving payment: ${paymentId}...`);
-    
-    Pi.approvePayment(paymentId)
-        .then(response => {
-            logMessage(`✅ Payment approved successfully.`);
-        })
-        .catch(error => {
-            logMessage(`❌ Payment approval failed: ${error.message}`);
-        });
-}
+        function approvePayment(paymentId) {
+            logMessage(`🔄 Approving payment with API Key: ${paymentId}...`);
 
-function completePayment(paymentId, txid) {
-    logMessage(`🔄 Completing payment: ${paymentId}...`);
+            fetch("https://api.minepi.com/v2/payments/" + paymentId + "/approve", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Key ${apiKey}`,
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    logMessage(`✅ Payment approved successfully.`);
+                    completePayment(paymentId);
+                } else {
+                    logMessage(`❌ Payment approval failed: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                logMessage(`❌ API request failed: ${error.message}`);
+            });
+        }
 
-    Pi.completePayment(paymentId, txid)
-        .then(response => {
-            logMessage(`✅ Payment completed successfully.`);
-        })
-        .catch(error => {
-            logMessage(`❌ Payment completion failed: ${error.message}`);
-        });
-}
+        function completePayment(paymentId) {
+            logMessage(`🔄 Completing payment: ${paymentId}...`);
 
-
-
+            fetch("https://api.minepi.com/v2/payments/" + paymentId + "/complete", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Key ${apiKey}`,
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    logMessage(`✅ Payment completed successfully.`);
+                } else {
+                    logMessage(`❌ Payment completion failed: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                logMessage(`❌ API request failed: ${error.message}`);
+            });
+        }
     </script>
 </head>
 <body>
