@@ -89,51 +89,61 @@
         }
 
         function sendPiToAI4Pi() {
-            if (!userData) {
-                logMessage("❌ You must log in before sending Pi.");
-                return;
+    if (!userData) {
+        logMessage("❌ You must log in before sending Pi.");
+        return;
+    }
+
+    let amount = parseFloat(document.getElementById("amountInput").value);
+    if (isNaN(amount) || amount <= 0) {
+        logMessage("❌ Invalid Pi amount. Please enter a valid number.");
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
+        logMessage("⚠️ Transaction canceled by user.");
+        return;
+    }
+
+    logMessage(`🔄 Preparing to send ${amount} Pi to AI4Pi...`);
+
+    try {
+        logMessage("🔵 Attempting `Pi.createPayment()` now...");
+
+        Pi.createPayment(
+            {
+                amount: amount,
+                memo: "Transfer to AI4Pi",
+                metadata: { transactionType: "userToAI4Pi" },
+                to_address: "YOUR_AI4PI_WALLET_ADDRESS_HERE"
+            },
+            {
+                onReady: payment => {
+                    logMessage(`✅ Payment request ready. Payment ID: ${payment.identifier}`);
+                },
+                onPaymentIdReceived: paymentId => {
+                    logMessage(`🔄 Payment ID received: ${paymentId}. Waiting for confirmation...`);
+                },
+                onCancelled: () => {
+                    logMessage("⚠️ Payment was canceled by the user.");
+                },
+                onError: error => {
+                    logMessage(`❌ Payment error: ${error.message}`);
+                },
+                onCompleted: payment => {
+                    logMessage(`✅ Payment successful! Payment ID: ${payment.identifier}, Status: ${payment.status}`);
+                }
             }
+        );
+    } catch (error) {
+        logMessage(`❌ Critical error before transaction started: ${error.message}`);
+    }
 
-            let amount = parseFloat(document.getElementById("amountInput").value);
-            if (isNaN(amount) || amount <= 0) {
-                logMessage("❌ Invalid Pi amount. Please enter a valid number.");
-                return;
-            }
+    setTimeout(() => {
+        logMessage("⏳ If nothing happened, `Pi.createPayment()` may not be executing properly.");
+    }, 8000);
+}
 
-            if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
-                logMessage("⚠️ Transaction canceled by user.");
-                return;
-            }
-
-            logMessage(`🔄 Preparing to send ${amount} Pi to AI4Pi...`);
-
-            try {
-                logMessage("🔵 Attempting `Pi.createPayment()` now...");
-
-                Pi.createPayment({
-                    amount: amount,
-                    memo: "Transfer to AI4Pi",
-                    metadata: { transactionType: "userToAI4Pi" },
-                    to_address: ai4piWallet
-                }, {
-                    onReady: payment => {
-                        logMessage(`✅ Payment request ready. Payment ID: ${payment.identifier}`);
-                    },
-                    onCancel: () => {
-                        logMessage("⚠️ Payment was canceled by the user.");
-                    },
-                    onError: error => {
-                        logMessage(`❌ Payment error: ${error.message}`);
-                    }
-                });
-            } catch (error) {
-                logMessage(`❌ Critical error before transaction started: ${error.message}`);
-            }
-
-            setTimeout(() => {
-                logMessage("⏳ If nothing happened, `Pi.createPayment()` may not be executing properly.");
-            }, 8000);
-        }
     </script>
 </head>
 <body>
