@@ -188,16 +188,50 @@
             });
         }
 
-        function checkForPendingPayments() {
-            Pi.getPayment().then(payment => {
-                if (payment && payment.identifier) {
-                    logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
-                    completePayment(payment.identifier);
-                }
-            }).catch(error => {
-                logMessage(`✅ No pending payments found.`);
-            });
-        }
+        
+  function checkForPendingPayments() {
+      Pi.getPayment()
+          .then(payment => {
+              if (payment && payment.identifier) {
+                  logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
+
+                  // Try to complete the payment first
+                  completePayment(payment.identifier);
+
+                  // If completion fails, cancel the payment
+                  setTimeout(() => {
+                      cancelPendingPayment(payment.identifier);
+                  }, 10000); // Wait 10 seconds before attempting cancel
+              }
+          })
+          .catch(error => {
+              logMessage(`✅ No pending payments found.`);
+          });
+  }
+
+  function cancelPendingPayment(paymentId) {
+      logMessage(`🔄 Canceling pending payment: ${paymentId}...`);
+
+      fetch(`https://api.minepi.com/v2/payments/${paymentId}/cancel`, {
+          method: "POST",
+          headers: {
+              "Authorization": `Key YOUR_API_KEY_HERE`,
+              "Content-Type": "application/json"
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              logMessage(`✅ Payment successfully canceled.`);
+          } else {
+              logMessage(`❌ Payment cancellation failed: ${data.error}`);
+          }
+      })
+      .catch(error => {
+          logMessage(`❌ API request failed: ${error.message}`);
+      });
+  }
+
     </script>
 </head>
 <body>
