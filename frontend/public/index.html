@@ -232,5 +232,14 @@
 <div id="user-info" style="margin-top: 10px; font-weight: bold;"></div>
 <div id="user-info" style="margin-top: 10px; font-weight: bold;">Not signed in</div>
 <button onclick="checkAppId()">🔍 Check Pi SDK & App ID</button>
+<script>
+  // Check if Pi SDK is available
+  if (typeof Pi !== "undefined" && Pi.getAppID) {
+    console.log("Pi App ID:", Pi.getAppID());
+  } else {
+    console.log("Pi SDK is not available or not initialized.");
+  }
+</script>
+
 </body>
 </html>
