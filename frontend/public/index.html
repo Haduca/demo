@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Pi Payment</title>
+    <title>AI4Pi - Pi Payment System</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
     <style>
         body {
@@ -53,6 +53,8 @@
     </style>
     <script>
         let userData = null;
+        let currentPayment = null;
+        let ai4piWallet = "ai4pi_test_wallet"; // Replace with actual wallet address if needed.
 
         function logMessage(message) {
             let outputDiv = document.getElementById("output");
@@ -72,18 +74,35 @@
             Pi.init({ version: "2.0", sandbox: true, appId: "ai4pi" })
                 .then(() => {
                     logMessage("✅ SDK Initialized. Attempting login...");
-                    return Pi.authenticate(["username", "payments"]);
+                    return Pi.authenticate(["username", "payments", "wallet_address"]);
                 })
                 .then(auth => {
                     if (auth && auth.user) {
                         userData = auth.user;
                         logMessage(`✅ Signed in as: ${auth.user.username}`);
+                        fetchWalletBalance();
                     } else {
                         logMessage("❌ Authentication failed, no user data received.");
                     }
                 })
                 .catch(error => {
                     logMessage(`❌ Error during authentication: ${error.message}`);
+                });
+        }
+
+        function fetchWalletBalance() {
+            if (!userData) {
+                logMessage("❌ You must log in first.");
+                return;
+            }
+
+            Pi.getWallet()
+                .then(wallet => {
+                    logMessage(`💰 Wallet Address: ${wallet.address}`);
+                    logMessage(`💰 Balance: ${wallet.balance} Pi`);
+                })
+                .catch(error => {
+                    logMessage(`❌ Failed to retrieve wallet balance: ${error.message}`);
                 });
         }
 
@@ -104,24 +123,43 @@
                 return;
             }
 
-            logMessage(`🔄 Processing payment of ${amount} Pi...`);
+            logMessage(`🔄 Processing payment of ${amount} Pi to AI4Pi wallet...`);
 
             Pi.createPayment({
                 amount: amount,
                 memo: "Test Payment for AI4Pi",
-                metadata: { testTransaction: true }
+                metadata: { testTransaction: true },
+                to_address: ai4piWallet
             })
             .then(payment => {
                 logMessage(`✅ Payment initiated! Payment ID: ${payment.identifier}`);
+                currentPayment = payment;
+                trackPaymentStatus(payment.identifier);
             })
             .catch(error => {
                 logMessage(`❌ Payment failed: ${error.message}`);
             });
         }
+
+        function trackPaymentStatus(paymentId) {
+            Pi.getPayment(paymentId)
+                .then(payment => {
+                    logMessage(`🔄 Payment Status: ${payment.status}`);
+                    if (payment.status === "completed") {
+                        logMessage("✅ Payment successful!");
+                        fetchWalletBalance();
+                    } else {
+                        setTimeout(() => trackPaymentStatus(paymentId), 5000);
+                    }
+                })
+                .catch(error => {
+                    logMessage(`❌ Error tracking payment: ${error.message}`);
+                });
+        }
     </script>
 </head>
 <body>
-    <h1>AI4Pi - Pi Payment</h1>
+    <h1>AI4Pi - Pi Payment System</h1>
     <button onclick="loginUser()">🔑 Log In with Pi Network</button>
     <input type="number" id="amountInput" placeholder="Enter Pi amount">
     <button onclick="processPiPayment()">💰 Process Payment</button>
