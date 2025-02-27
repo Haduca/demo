@@ -72,19 +72,25 @@
         }
 
         function fetchAppID() {
-            if (typeof Pi === "undefined") {
-                logMessage("❌ Pi SDK is not available. Initialize first.");
-                return;
-            }
+    if (typeof Pi === "undefined") {
+        logMessage("❌ Pi SDK is not available. Initialize first.");
+        return;
+    }
 
-            Pi.getAppInfo()
-                .then(appInfo => {
-                    logMessage(`✅ Your App ID: ${appInfo.id}`);
-                })
-                .catch(error => {
-                    logMessage(`❌ Error retrieving App ID: ${error.message}`);
-                });
-        }
+    Pi.authenticate({ scopes: ["username"], sandbox: true })
+        .then(auth => {
+            if (auth && auth.user) {
+                logMessage(`✅ Signed in as: ${auth.user.username}`);
+                logMessage(`🔍 Your App ID might be: ${window.location.hostname.split('.')[0]}`);
+            } else {
+                logMessage("❌ Authentication failed, no user data received.");
+            }
+        })
+        .catch(error => {
+            logMessage(`❌ Error retrieving App ID via authentication: ${error.message}`);
+        });
+}
+
     </script>
 </body>
 </html>
