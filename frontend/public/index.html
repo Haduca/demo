@@ -3,123 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Testnet App ID Finder</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Testnet SDK -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-            margin: 10px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .output {
-            margin-top: 20px;
-            padding: 10px;
-            background: black;
-            color: limegreen;
-            font-family: monospace;
-            width: 80%;
-            max-width: 600px;
-            height: 200px;
-            overflow-y: auto;
-            border-radius: 5px;
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
-    <h1>Find Your Testnet App ID</h1>
-    <button onclick="initializePiSDK()">🔍 Initialize Pi SDK</button>
-    <button onclick="fetchAppID()">🔍 Get App ID</button>
-    <div class="output" id="output">[Logs will appear here]</div>
-
+    <title>Find Your Pi App ID</title>
     <script>
-        function logMessage(message) {
-            let outputDiv = document.getElementById("output");
-            outputDiv.innerHTML += `<br>> ${message}`;
-            outputDiv.scrollTop = outputDiv.scrollHeight;
-            console.log(message);
+        function displayAppID() {
+            let appID = window.location.hostname.split('.')[0]; // Extracts subdomain
+            document.getElementById("appIDDisplay").textContent = `🔍 Your App ID might be: ${appID}`;
+            console.log("🔍 Extracted App ID:", appID);
         }
-
-        function initializePiSDK() {
-            if (typeof Pi === "undefined") {
-                logMessage("❌ Pi SDK is not available. Make sure you are running in Pi Browser or using the correct script.");
-                return;
-            }
-
-            Pi.init({ version: "2.0", sandbox: true })
-                .then(() => logMessage("✅ Pi SDK Initialized in Testnet Mode!"))
-                .catch(error => logMessage(`❌ SDK Initialization Failed: ${error.message}`));
-        }
-function fetchAppID() {
-    if (typeof Pi === "undefined") {
-        logMessage("❌ Pi SDK is not available. Initialize first.");
-        return;
-    }
-
-    logMessage("🔍 Checking if Pi SDK is ready...");
-
-    if (!Pi.authenticate || typeof Pi.authenticate !== "function") {
-        logMessage("❌ Pi SDK is loaded but authentication is not available.");
-        return;
-    }
-
-    logMessage("✅ Pi SDK is ready! Now click 'Sign In' to test authentication.");
-}
-
-
-// NEW FUNCTION: Manually Trigger Authentication
-function manualSignIn() {
-    if (typeof Pi === "undefined") {
-        logMessage("❌ Pi SDK is not available.");
-        return;
-    }
-
-    logMessage("🔄 Ensuring SDK is fully initialized...");
-
-    Pi.init({ version: "2.0", sandbox: true }) // Force SDK re-initialization
-        .then(() => {
-            logMessage("✅ SDK Initialization complete. Attempting authentication...");
-
-            return Pi.authenticate(["username"]); // Now attempt authentication
-        })
-        .then(auth => {
-            if (auth && auth.user) {
-                logMessage(`✅ Signed in as: ${auth.user.username}`);
-                logMessage(`🔍 Your App ID might be: ${window.location.hostname.split('.')[0]}`);
-            } else {
-                logMessage("❌ Authentication failed, no user data received.");
-            }
-        })
-        .catch(error => {
-            logMessage(`❌ Error during authentication: ${error.message}`);
-        });
-}
-
-
-
-
     </script>
-<button onclick="manualSignIn()">🔑 Sign In</button>
-
+</head>
+<body onload="displayAppID()">
+    <h1>Find Your Pi App ID</h1>
+    <p id="appIDDisplay">🔄 Loading App ID...</p>
 </body>
 </html>
