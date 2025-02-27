@@ -1,44 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI4Pi - Pi Network Test</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Initialize Pi Network SDK
-            if (typeof Pi !== "undefined") {
-                Pi.init({ version: "2.0", sandbox: true, appId: "your-app-id-here" });
-                console.log("✅ Pi SDK Initialized!");
-            } else {
-                console.error("❌ Pi SDK failed to load.");
-            }
-        });
-
-        function signIn() {
-            if (typeof Pi === "undefined") {
-                alert("❌ Pi SDK is not available. Make sure the script is loaded.");
-                return;
-            }
-
-            Pi.authenticate({ scopes: ["username"], sandbox: true })
-                .then(auth => {
-                    if (auth && auth.user) {
-                        alert(`✅ Signed in as: ${auth.user.username}`);
-                    }
-                })
-                .catch(error => {
-                    console.error("❌ Authentication failed:", error);
-                    alert("❌ Authentication failed. Please try again.");
-                });
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof Pi !== "undefined") {
+            Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" }); // Use your actual App ID
+            console.log("✅ Pi SDK Initialized!");
+        } else {
+            console.error("❌ Pi SDK failed to load.");
         }
-    </script>
-</head>
-<body>
-    <h1 style="text-align: center; margin-top: 20%;">AI4Pi</h1>
-    <div style="text-align: center; margin-top: 20px;">
-        <button onclick="signIn()">🔑 Sign In with Pi Network</button>
-    </div>
-</body>
-</html>
+    });
+
+    function signIn() {
+        if (typeof Pi === "undefined") {
+            alert("❌ Pi SDK is not available. Check if the script is loaded.");
+            return;
+        }
+
+        Pi.authenticate(["username"], true)
+            .then(auth => {
+                if (auth && auth.user) {
+                    alert(`✅ Signed in as: ${auth.user.username}`);
+                }
+            })
+            .catch(error => {
+                console.error("❌ Authentication failed:", error);
+                alert("❌ Authentication failed. Please try again.");
+            });
+    }
+</script>
