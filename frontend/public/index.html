@@ -71,13 +71,13 @@
                 .catch(error => logMessage(`❌ SDK Initialization Failed: ${error.message}`));
         }
 
-        function fetchAppID() {
+function fetchAppID() {
     if (typeof Pi === "undefined") {
         logMessage("❌ Pi SDK is not available. Initialize first.");
         return;
     }
 
-    Pi.authenticate({ scopes: ["username"], sandbox: true })
+    Pi.authenticate(["username"]) // Use a simple scope request
         .then(auth => {
             if (auth && auth.user) {
                 logMessage(`✅ Signed in as: ${auth.user.username}`);
