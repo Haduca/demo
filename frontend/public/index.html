@@ -95,9 +95,14 @@ function manualSignIn() {
     }
 
     logMessage("🔄 Attempting authentication...");
-    
+
+    let authTimeout = setTimeout(() => {
+        logMessage("⏳ Authentication is taking too long. The SDK may not be responding.");
+    }, 10000); // 10-second timeout to detect failures
+
     Pi.authenticate(["username"])
         .then(auth => {
+            clearTimeout(authTimeout); // Stop timeout if authentication works
             if (auth && auth.user) {
                 logMessage(`✅ Signed in as: ${auth.user.username}`);
                 logMessage(`🔍 Your App ID might be: ${window.location.hostname.split('.')[0]}`);
@@ -106,9 +111,11 @@ function manualSignIn() {
             }
         })
         .catch(error => {
+            clearTimeout(authTimeout);
             logMessage(`❌ Error during authentication: ${error.message}`);
         });
 }
+
 
 
     </script>
