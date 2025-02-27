@@ -77,7 +77,12 @@ function fetchAppID() {
         return;
     }
 
-    Pi.authenticate(["username"]) // Use a simple scope request
+    // Ensure Pi SDK is initialized first
+    Pi.init({ version: "2.0", sandbox: true })
+        .then(() => {
+            logMessage("✅ Pi SDK reinitialized before authentication.");
+            return Pi.authenticate(["username"]);
+        })
         .then(auth => {
             if (auth && auth.user) {
                 logMessage(`✅ Signed in as: ${auth.user.username}`);
@@ -90,6 +95,7 @@ function fetchAppID() {
             logMessage(`❌ Error retrieving App ID via authentication: ${error.message}`);
         });
 }
+
 
     </script>
 </body>
