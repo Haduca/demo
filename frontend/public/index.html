@@ -57,6 +57,7 @@
     <button onclick="loginUser()">🔑 Log In with Pi Network</button>
     <input type="number" id="amountInput" placeholder="Enter Pi amount">
     <button onclick="sendPiToAI4Pi()">💰 Send Pi to AI4Pi</button>
+    <button onclick="approvePendingPayment()">✅ Approve Pending Payment</button>
     <div class="output" id="output">[Logs will appear here]</div>
     
     <script>
@@ -72,31 +73,13 @@
         }
 
         function loginUser() {
-    if (typeof Pi === "undefined") {
-        logMessage("❌ Pi SDK is not available.");
-        return;
-    }
-
-    logMessage("🔄 Initializing Pi SDK...");
-
-    Pi.init({ version: "2.0", sandbox: true })
-        .then(() => {
-            logMessage("✅ Pi SDK Initialized. Attempting login...");
-            return Pi.authenticate(["username", "payments"]);
-        })
-        .then(auth => {
-            if (auth && auth.user) {
+            Pi.authenticate(["username", "payments"]).then(auth => {
                 userData = auth.user;
                 logMessage(`✅ Signed in as: ${auth.user.username}`);
-            } else {
-                logMessage("❌ Authentication failed, no user data received.");
-            }
-        })
-        .catch(error => {
-            logMessage(`❌ Error during authentication: ${error.message}`);
-        });
-}
-
+            }).catch(error => {
+                logMessage(`❌ Authentication error: ${error.message}`);
+            });
+        }
 
         function sendPiToAI4Pi() {
             if (!userData) {
@@ -116,6 +99,7 @@
             }, {
                 onReadyForServerApproval: function(paymentId) {
                     logMessage(`✅ Payment ready for approval: ${paymentId}`);
+                    localStorage.setItem("pendingPayment", paymentId);
                 },
                 onReadyForServerCompletion: function(paymentId, txid) {
                     logMessage(`✅ Payment ready for completion: ${paymentId}, txid: ${txid}`);
@@ -126,6 +110,34 @@
                 onError: function(error, payment) {
                     logMessage(`❌ Payment error: ${error.message}`);
                 }
+            });
+        }
+
+        function approvePendingPayment() {
+            let paymentId = localStorage.getItem("pendingPayment");
+            if (!paymentId) {
+                logMessage("⚠️ No pending payments to approve.");
+                return;
+            }
+            logMessage(`🔄 Approving payment: ${paymentId}`);
+            fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Key ${apiKey}`,
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    logMessage(`✅ Payment ${paymentId} approved successfully.`);
+                    localStorage.removeItem("pendingPayment");
+                } else {
+                    logMessage(`❌ Payment approval failed: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                logMessage(`❌ API request failed: ${error.message}`);
             });
         }
     </script>
