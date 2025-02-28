@@ -73,12 +73,24 @@
         }
 
         function loginUser() {
-            Pi.authenticate(["username", "payments"]).then(auth => {
-                userData = auth.user;
-                logMessage(`✅ Signed in as: ${auth.user.username}`);
-            }).catch(error => {
-                logMessage(`❌ Authentication error: ${error.message}`);
-            });
+            if (typeof Pi === "undefined") {
+                logMessage("❌ Pi SDK is not available.");
+                return;
+            }
+            
+            logMessage("🔄 Initializing Pi SDK...");
+            Pi.init({ version: "2.0", sandbox: true })
+                .then(() => {
+                    logMessage("✅ Pi SDK Initialized. Attempting login...");
+                    return Pi.authenticate(["username", "payments"]);
+                })
+                .then(auth => {
+                    userData = auth.user;
+                    logMessage(`✅ Signed in as: ${auth.user.username}`);
+                })
+                .catch(error => {
+                    logMessage(`❌ Authentication error: ${error.message}`);
+                });
         }
 
         function sendPiToAI4Pi() {
