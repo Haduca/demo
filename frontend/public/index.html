@@ -104,54 +104,61 @@
                 return;
             }
             Pi.createPayment({
-                amount: amount,
-                memo: "AI4Pi Payment",
-                metadata: { transactionType: "userToAI4Pi" },
-                to_address: ai4piWallet
-            }, {
-                onReadyForServerApproval: function(paymentId) {
-                    logMessage(`✅ Payment ready for approval: ${paymentId}`);
-                    localStorage.setItem("pendingPayment", paymentId);
-                },
-                onReadyForServerCompletion: function(paymentId, txid) {
-                    logMessage(`✅ Payment ready for completion: ${paymentId}, txid: ${txid}`);
-                },
-                onCancel: function(paymentId) {
-                    logMessage(`⚠️ Payment canceled: ${paymentId}`);
-                },
-                onError: function(error, payment) {
-                    logMessage(`❌ Payment error: ${error.message}`);
-                }
-            });
-        }
+    amount: 10,
+    memo: "AI4Pi Payment",
+    metadata: { transactionType: "userToAI4Pi" },
+    to_address: ai4piWallet
+}, {
+    onIncompletePaymentFound: function(payment) {
+        console.log("⚠️ Found incomplete payment:", payment.identifier);
+        localStorage.setItem("pendingPayment", payment.identifier);
+        logMessage(`⚠️ A pending payment (${payment.identifier}) needs approval.`);
+    },
+    onReadyForServerApproval: function(paymentId) {
+        console.log("✅ Payment ready for approval:", paymentId);
+        localStorage.setItem("pendingPayment", paymentId);
+    },
+    onReadyForServerCompletion: function(paymentId, txid) {
+        console.log("✅ Payment ready for completion:", paymentId, txid);
+    },
+    onCancel: function(paymentId) {
+        console.log("⚠️ Payment canceled:", paymentId);
+    },
+    onError: function(error) {
+        console.log("❌ Payment error:", error.message);
+    }
+});
+
 
         function approvePendingPayment() {
-            let paymentId = localStorage.getItem("pendingPayment");
-            if (!paymentId) {
-                logMessage("⚠️ No pending payments to approve.");
-                return;
-            }
-            logMessage(`🔄 Approving payment: ${paymentId}`);
-            fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Key ${apiKey}`,
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    logMessage(`✅ Payment ${paymentId} approved successfully.`);
-                    localStorage.removeItem("pendingPayment");
-                } else {
-                    logMessage(`❌ Payment approval failed: ${data.error}`);
-                }
-            })
-            .catch(error => {
-                logMessage(`❌ API request failed: ${error.message}`);
-            });
+    let paymentId = localStorage.getItem("pendingPayment");
+    if (!paymentId) {
+        logMessage("⚠️ No pending payments to approve.");
+        return;
+    }
+    logMessage(`🔄 Approving payment: ${paymentId}`);
+
+    fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Key ${apiKey}`,
+            "Content-Type": "application/json"
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            logMessage(`✅ Payment ${paymentId} approved successfully.`);
+            localStorage.removeItem("pendingPayment");
+        } else {
+            logMessage(`❌ Payment approval failed: ${data.error}`);
+        }
+    })
+    .catch(error => {
+        logMessage(`❌ API request failed: ${error.message}`);
+    });
+}
+
     </script>
 </body>
 </html>
