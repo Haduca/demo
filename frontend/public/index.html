@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI4Pi - Pi Transactions</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
-    <script src="../src/debug.js"></script> <!-- Debug Logging -->
-    <script src="../src/App.js"></script> <!-- Main Payment Logic -->
-    <script src="../src/transactionLogs.js"></script> <!-- Transaction Storage -->
+    <script src="/frontend/src/debug.js" defer></script> <!-- Debug Logging -->
+    <script src="/frontend/src/App.js" defer></script> <!-- Main Payment Logic -->
+    <script src="/frontend/src/transactionLogs.js" defer></script> <!-- Transaction Storage -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -71,7 +71,10 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", enableDebugLogs);
+        document.addEventListener("DOMContentLoaded", () => {
+            enableDebugLogs();
+            checkForPendingPayments();
+        });
 
         function logMessage(message) {
             let outputDiv = document.getElementById("output");
@@ -91,14 +94,6 @@
                 document.getElementById("debugToggle").checked = true;
                 console.log("[AI4Pi] Debug Mode: ON");
             }
-        }
-
-        function loginUser() {
-            // Full login logic, ensuring users can authenticate with Pi Network
-        }
-        
-        function sendPiToAI4Pi() {
-            // Full transaction logic, ensuring users can send Pi to AI4Pi
         }
     </script>
 </body>
