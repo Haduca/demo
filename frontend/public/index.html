@@ -125,34 +125,47 @@
             });
         }
 
-        function approvePendingPayment() {
-    let paymentId = localStorage.getItem("pendingPayment");
-    if (!paymentId) {
-        logMessage("⚠️ No pending payments to approve.");
-        return;
-    }
-    logMessage(`🔄 Approving payment: ${paymentId}`);
+        function checkForPendingPayments() {
+    logMessage("🔍 Checking for pending payments...");
 
-    fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
-        method: "POST",
-        headers: {
-            "Authorization": `Key ${apiKey}`,  // ✅ API Key is now included
-            "Content-Type": "application/json"
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            logMessage(`✅ Payment ${paymentId} approved successfully.`);
-            localStorage.removeItem("pendingPayment");
-        } else {
-            logMessage(`❌ Payment approval failed: ${data.error}`);
-        }
-    })
-    .catch(error => {
-        logMessage(`❌ API request failed: ${error.message}`);
-    });
+    Pi.getPayment()
+        .then(payment => {
+            if (payment && payment.identifier) {
+                logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
+                
+                // Auto-approve the payment using Pi API
+                fetch(`https://api.minepi.com/v2/payments/${payment.identifier}/approve`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Key ${apiKey}`,  // ✅ Using API Key for authentication
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        logMessage(`✅ Payment ${payment.identifier} auto-approved.`);
+                        localStorage.removeItem("pendingPayment"); // ✅ Clear the stored pending payment
+                    } else {
+                        logMessage(`❌ Auto-approval failed: ${data.error}`);
+                    }
+                })
+                .catch(error => {
+                    logMessage(`❌ API request failed: ${error.message}`);
+                });
+
+            } else {
+                logMessage("✅ No pending payments found.");
+            }
+        })
+        .catch(error => {
+            logMessage(`❌ Error checking pending payments: ${error.message}`);
+        });
 }
+
+// Run auto-approval every 30 seconds to check for stuck payments
+setInterval(checkForPendingPayments, 30000);
+
 
     </script>
 </body>
