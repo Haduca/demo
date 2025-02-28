@@ -126,32 +126,34 @@
         }
 
         function approvePendingPayment() {
-            let paymentId = localStorage.getItem("pendingPayment");
-            if (!paymentId) {
-                logMessage("⚠️ No pending payments to approve.");
-                return;
-            }
-            logMessage(`🔄 Approving payment: ${paymentId}`);
-            fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Key ${apiKey}`,
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    logMessage(`✅ Payment ${paymentId} approved successfully.`);
-                    localStorage.removeItem("pendingPayment");
-                } else {
-                    logMessage(`❌ Payment approval failed: ${data.error}`);
-                }
-            })
-            .catch(error => {
-                logMessage(`❌ API request failed: ${error.message}`);
-            });
+    let paymentId = localStorage.getItem("pendingPayment");
+    if (!paymentId) {
+        logMessage("⚠️ No pending payments to approve.");
+        return;
+    }
+    logMessage(`🔄 Approving payment: ${paymentId}`);
+
+    fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Key ${apiKey}`,  // ✅ API Key is now included
+            "Content-Type": "application/json"
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            logMessage(`✅ Payment ${paymentId} approved successfully.`);
+            localStorage.removeItem("pendingPayment");
+        } else {
+            logMessage(`❌ Payment approval failed: ${data.error}`);
+        }
+    })
+    .catch(error => {
+        logMessage(`❌ API request failed: ${error.message}`);
+    });
+}
+
     </script>
 </body>
 </html>
