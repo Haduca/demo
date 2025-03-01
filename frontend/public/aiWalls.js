@@ -6,8 +6,8 @@ const aiList = ["Pi", "Moti", "Sol", "Math"];
 // Global objects for inactivity timers.
 let inactivityTimers = {};
 
-// Global cache for ZenQuotes (for Moti)
-let zenQuotesCache = [];
+// Global cache for ZenQuotes is no longer used (we now use Quotable for Moti).
+// let zenQuotesCache = [];
 
 /**
  * Fetches a response for a given bot by calling its designated API.
@@ -28,29 +28,19 @@ function getBotResponse(botName) {
           return "Oops, couldn't fetch a joke.";
         });
     case "Moti":
-      // ZenQuotes API for motivational quotes.
-      if (zenQuotesCache.length === 0) {
-        return fetch("https://zenquotes.io/api/random")
-          .then(res => res.json())
-          .then(data => {
-            if (Array.isArray(data) && data.length > 0) {
-              zenQuotesCache = data;
-              console.log("[DEBUG] Moti API response:", data);
-              return data[0].q + " — " + data[0].a;
-            }
-            return "Stay inspired!";
-          })
-          .catch(err => {
-            console.error("[DEBUG] Moti API error:", err);
-            return "Keep pushing forward!";
-          });
-      } else {
-        const randomQuote = zenQuotesCache[Math.floor(Math.random() * zenQuotesCache.length)];
-        console.log("[DEBUG] Moti cached response:", randomQuote);
-        return Promise.resolve(randomQuote.q + " — " + randomQuote.a);
-      }
+      // Use Quotable API for inspirational quotes.
+      return fetch("https://api.quotable.io/random?tags=inspirational")
+        .then(res => res.json())
+        .then(data => {
+          console.log("[DEBUG] Moti API response:", data);
+          return data.content + " — " + data.author;
+        })
+        .catch(err => {
+          console.error("[DEBUG] Moti API error:", err);
+          return "Keep pushing forward!";
+        });
     case "Sol":
-      // TheMealDB API for a random meal (text-only: the meal name).
+      // TheMealDB API for a random meal (returning meal name).
       return fetch("https://www.themealdb.com/api/json/v1/1/random.php")
         .then(res => res.json())
         .then(data => {
@@ -65,12 +55,18 @@ function getBotResponse(botName) {
           return "No meal suggestion available.";
         });
     case "Math":
-      // Numbers API for a random math fact.
-      return fetch("http://numbersapi.com/random/math?json")
+      // Random Data API for math facts.
+      return fetch("https://random-data-api.com/api/math/random_math")
         .then(res => res.json())
         .then(data => {
           console.log("[DEBUG] Math API response:", data);
-          return data.text || "Math is fascinating!";
+          if (data.fact) {
+            return data.fact;
+          } else if (data.expression && data.result) {
+            return data.expression + " = " + data.result;
+          } else {
+            return "Math is fascinating!";
+          }
         })
         .catch(err => {
           console.error("[DEBUG] Math API error:", err);
@@ -83,7 +79,6 @@ function getBotResponse(botName) {
 
 /**
  * Returns a random delay between min and max (in milliseconds).
- * (Now slower: between 7000 and 10000 ms for candidate responses.)
  */
 function getRandomDelay(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -91,7 +86,7 @@ function getRandomDelay(min, max) {
 
 /**
  * Creates a 2x2 grid of walls—one for each bot—and appends it to #aiWallsRoot.
- * Adjusts conversation text size to be smaller.
+ * The conversation text is set smaller to display more text.
  */
 function createWallsUI() {
   const aiWallsRoot = document.getElementById("aiWallsRoot");
@@ -136,7 +131,7 @@ function createWallsUI() {
     convo.style.marginBottom = "10px";
     convo.style.border = "1px solid #ccc";
     convo.style.borderRadius = "3px";
-    convo.style.fontSize = "12px"; // Smaller text for more content.
+    convo.style.fontSize = "12px";
     convo.id = `convo-${aiName}`;
     wall.appendChild(convo);
 
@@ -172,21 +167,21 @@ function createWallsUI() {
 }
 
 /**
- * Global timer to trigger spontaneous bot responses.
- * Every 15 seconds, a random wall and bot are chosen to generate a response.
+ * Global timer that triggers spontaneous bot responses.
+ * Every 15 seconds, a random wall and random bot are chosen to generate a response.
  */
 function startGlobalBotChat() {
   setInterval(() => {
     const randomWall = aiList[Math.floor(Math.random() * aiList.length)];
     const randomBot = aiList[Math.floor(Math.random() * aiList.length)];
     postAIResponse(randomWall, randomBot, "(global)");
-  }, 15000); // every 15 seconds
+  }, 15000);
 }
 
 /**
  * Resets the inactivity timer for a given wall.
- * If no new message is posted on that wall for 8 seconds,
- * a random bot posts an auto response and then initiates a chain sequence.
+ * If no new message is posted on that wall for 8 seconds, a random bot posts an auto response,
+ * and then a chain sequence is initiated.
  */
 function resetInactivityTimer(wallName) {
   if (inactivityTimers[wallName]) {
@@ -197,7 +192,7 @@ function resetInactivityTimer(wallName) {
     postAIResponse(wallName, bot, "(auto)");
     chainResponses(wallName, bot, [0.9, 0.5, 0.8, 0.2], 0);
     resetInactivityTimer(wallName);
-  }, 8000); // 8 seconds inactivity
+  }, 8000);
 }
 
 /**
@@ -214,12 +209,12 @@ function chainResponses(wallName, lastResponder, probabilities, index) {
       postAIResponse(wallName, responder, "(chain)");
       chainResponses(wallName, responder, probabilities, index + 1);
     }
-  }, 6000); // 6 seconds delay for each chain response
+  }, 6000);
 }
 
 /**
  * Appends a message to the conversation area for a given wall.
- * Also resets that wall's inactivity timer.
+ * Also resets the inactivity timer for that wall.
  */
 function appendMessage(wallName, text) {
   const convo = document.getElementById(`convo-${wallName}`);
@@ -262,10 +257,10 @@ function handleMessage(wallName, sender) {
   const primary = candidates[Math.floor(Math.random() * candidates.length)];
   setTimeout(() => {
     postAIResponse(wallName, primary, "");
-  }, 6000); // primary response after 6 seconds
+  }, 6000);
   candidates.forEach(bot => {
     if (bot !== primary && Math.random() < 0.5) {
-      const delay = getRandomDelay(7000, 10000); // delay between 7 and 10 seconds
+      const delay = getRandomDelay(7000, 10000);
       setTimeout(() => {
         postAIResponse(wallName, bot, "");
       }, delay);
