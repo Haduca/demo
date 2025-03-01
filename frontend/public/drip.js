@@ -1,3 +1,4 @@
+// drip.js
 console.log("Pi Drip script loaded.");
 
 // The current drip amount in Pi
@@ -7,18 +8,16 @@ let dripAmount = 0;
 let dripInterval = null;
 
 /**
- * Creates a small UI section on the page to display the drip amount.
+ * Creates a small UI section on the page to display the drip amount and a reset button.
  */
 function createDripUI() {
   const dripContainer = document.createElement("div");
   dripContainer.style.background = "#fff";
   dripContainer.style.border = "1px solid #ccc";
   dripContainer.style.padding = "10px";
-  dripContainer.style.margin = "10px";
+  dripContainer.style.margin = "10px auto";
   dripContainer.style.width = "200px";
   dripContainer.style.textAlign = "center";
-  dripContainer.style.marginLeft = "auto";
-  dripContainer.style.marginRight = "auto";
 
   // Title
   const dripTitle = document.createElement("h3");
@@ -33,7 +32,14 @@ function createDripUI() {
   dripDisplay.textContent = `Accumulated: ${dripAmount.toFixed(2)} Pi`;
   dripContainer.appendChild(dripDisplay);
 
-  // Append to the page body (or wherever you like)
+  // Reset button
+  const resetButton = document.createElement("button");
+  resetButton.textContent = "Reset Drip";
+  resetButton.style.marginTop = "10px";
+  resetButton.addEventListener("click", resetDrip);
+  dripContainer.appendChild(resetButton);
+
+  // Append to the page body (or any container you prefer)
   document.body.appendChild(dripContainer);
 }
 
@@ -52,17 +58,32 @@ function updateDripDisplay() {
  */
 function startDrip() {
   if (dripInterval) {
-    // Drip is already running, do nothing
+    // Drip is already running
     return;
   }
   dripInterval = setInterval(() => {
     dripAmount += 0.05;
+    // Save the updated amount to localStorage
+    localStorage.setItem("dripAmount", dripAmount);
     updateDripDisplay();
-  }, 10_000); // 10,000 ms = 10 seconds
+  }, 10000); // 10 seconds
 }
 
-// Create the UI and start the drip once the DOM is ready
+/**
+ * Reset the drip amount to 0, clear from localStorage, and update UI.
+ */
+function resetDrip() {
+  dripAmount = 0;
+  localStorage.removeItem("dripAmount");
+  updateDripDisplay();
+}
+
+// On page load, retrieve any saved drip amount and initialize the UI + drip timer
 window.addEventListener("DOMContentLoaded", () => {
+  const savedDrip = localStorage.getItem("dripAmount");
+  if (savedDrip) {
+    dripAmount = parseFloat(savedDrip) || 0;
+  }
   createDripUI();
   startDrip();
 });
