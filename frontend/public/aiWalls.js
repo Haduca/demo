@@ -6,71 +6,14 @@ const aiList = ["Pi", "Moti", "Sol", "Math"];
 // Global objects for inactivity timers.
 let inactivityTimers = {};
 
-// Global variables for lightweight models for Moti and Math.
-let motiModel = null;
-let mathModel = null;
-
-// Placeholder URLs for the TF.js models (you must replace these with actual URLs)
-const MOTI_MODEL_URL = "https://storage.googleapis.com/tfjs-models/gpt2/model.json";
-const MATH_MODEL_URL = "https://storage.googleapis.com/tfjs-models/gpt2/model.json";
-
 /**
- * Loads the Moti model if not already loaded.
- */
-async function loadMotiModel() {
-  if (!motiModel) {
-    try {
-      motiModel = await tf.loadGraphModel(MOTI_MODEL_URL);
-      console.log("[DEBUG] Moti model loaded.");
-    } catch (err) {
-      console.error("[DEBUG] Error loading Moti model:", err);
-    }
-  }
-  return motiModel;
-}
-
-/**
- * Loads the Math model if not already loaded.
- */
-async function loadMathModel() {
-  if (!mathModel) {
-    try {
-      mathModel = await tf.loadGraphModel(MATH_MODEL_URL);
-      console.log("[DEBUG] Math model loaded.");
-    } catch (err) {
-      console.error("[DEBUG] Error loading Math model:", err);
-    }
-  }
-  return mathModel;
-}
-
-/**
- * A pseudo-code function to generate text using a loaded model and a prompt.
- * In a real implementation, you would tokenize the prompt, run it through the model,
- * and decode the output tokens to text.
- */
-async function generateText(model, prompt) {
-  // Pseudo-code: In an actual implementation, you'd use your tokenizer and model here.
-  // For demonstration, we simply return the prompt with some random variation.
-  const variations = [
-    prompt + " Stay strong and shine!",
-    prompt + " Believe in yourself!",
-    prompt + " Every moment counts!",
-    prompt + " Keep pushing forward!",
-    prompt + " The future is bright!"
-  ];
-  const choice = variations[Math.floor(Math.random() * variations.length)];
-  return choice;
-}
-
-/**
- * Fetches a response for a given bot.
- * For Pi and Sol, uses public APIs.
- * For Moti and Math, uses the loaded TF.js model to generate text.
+ * Fetches a response for a given bot by calling its designated API.
+ * Returns a Promise that resolves to a string.
  */
 function getBotResponse(botName) {
   switch (botName) {
     case "Pi":
+      // JokeAPI v2 for jokes.
       return fetch("https://v2.jokeapi.dev/joke/Any?type=single")
         .then(res => res.json())
         .then(data => {
@@ -82,18 +25,21 @@ function getBotResponse(botName) {
           return "Oops, couldn't fetch a joke.";
         });
     case "Moti":
-      return loadMotiModel().then(model => {
-        if (model) {
-          const prompt = "Motivational:";
-          return generateText(model, prompt);
-        } else {
-          return "Stay inspired!";
-        }
-      }).catch(err => {
-        console.error("[DEBUG] Moti model error:", err);
-        return "Keep pushing forward!";
-      });
+      // Hipsum API for creative, hipster text.
+      // Using the 'hipster-centric' type with 1 paragraph.
+      return fetch("https://hipsum.co/api/?type=hipster-centric&paras=1")
+        .then(res => res.json())
+        .then(data => {
+          console.log("[DEBUG] Moti API response:", data);
+          // Data is an array of paragraphs; return the first.
+          return data[0] || "Stay inspired!";
+        })
+        .catch(err => {
+          console.error("[DEBUG] Moti API error:", err);
+          return "Keep pushing forward!";
+        });
     case "Sol":
+      // TheMealDB API for a random meal (returning the meal name).
       return fetch("https://www.themealdb.com/api/json/v1/1/random.php")
         .then(res => res.json())
         .then(data => {
@@ -108,17 +54,18 @@ function getBotResponse(botName) {
           return "No meal suggestion available.";
         });
     case "Math":
-      return loadMathModel().then(model => {
-        if (model) {
-          const prompt = "Math fact:";
-          return generateText(model, prompt);
-        } else {
+      // Loripsum API for placeholder text (as a stand-in for math facts).
+      // Loripsum returns plain text.
+      return fetch("https://loripsum.net/api/1/short/plaintext")
+        .then(res => res.text())
+        .then(text => {
+          console.log("[DEBUG] Math API response:", text);
+          return text || "Math is fascinating!";
+        })
+        .catch(err => {
+          console.error("[DEBUG] Math API error:", err);
           return "Math is fascinating!";
-        }
-      }).catch(err => {
-        console.error("[DEBUG] Math model error:", err);
-        return "Math is fascinating!";
-      });
+        });
     default:
       return Promise.resolve("Default response.");
   }
@@ -133,7 +80,7 @@ function getRandomDelay(min, max) {
 
 /**
  * Creates a 2x2 grid of walls—one for each bot—and appends it to #aiWallsRoot.
- * Sets conversation font size smaller to display more text.
+ * Adjusts the conversation text to a smaller font size.
  */
 function createWallsUI() {
   const aiWallsRoot = document.getElementById("aiWallsRoot");
@@ -178,7 +125,7 @@ function createWallsUI() {
     convo.style.marginBottom = "10px";
     convo.style.border = "1px solid #ccc";
     convo.style.borderRadius = "3px";
-    convo.style.fontSize = "12px";
+    convo.style.fontSize = "12px"; // Smaller text.
     convo.id = `convo-${aiName}`;
     wall.appendChild(convo);
 
@@ -215,19 +162,19 @@ function createWallsUI() {
 
 /**
  * Global timer that triggers spontaneous bot responses.
- * Every 15 seconds, a random wall and bot are chosen to generate a response.
+ * Every 20 seconds, a random wall and random bot are chosen to generate a response.
  */
 function startGlobalBotChat() {
   setInterval(() => {
     const randomWall = aiList[Math.floor(Math.random() * aiList.length)];
     const randomBot = aiList[Math.floor(Math.random() * aiList.length)];
     postAIResponse(randomWall, randomBot, "(global)");
-  }, 15000);
+  }, 20000);
 }
 
 /**
  * Resets the inactivity timer for a given wall.
- * If no new message is posted on that wall for 8 seconds,
+ * If no new message is posted on that wall for 13 seconds,
  * a random bot posts an auto response and then initiates a chain sequence.
  */
 function resetInactivityTimer(wallName) {
@@ -239,12 +186,12 @@ function resetInactivityTimer(wallName) {
     postAIResponse(wallName, bot, "(auto)");
     chainResponses(wallName, bot, [0.9, 0.5, 0.8, 0.2], 0);
     resetInactivityTimer(wallName);
-  }, 8000);
+  }, 13000);
 }
 
 /**
  * Recursively triggers chain responses after an auto response.
- * Each chain response is delayed by 6 seconds.
+ * Each chain response is delayed by 11 seconds.
  */
 function chainResponses(wallName, lastResponder, probabilities, index) {
   if (index >= probabilities.length) return;
@@ -256,7 +203,7 @@ function chainResponses(wallName, lastResponder, probabilities, index) {
       postAIResponse(wallName, responder, "(chain)");
       chainResponses(wallName, responder, probabilities, index + 1);
     }
-  }, 6000);
+  }, 11000);
 }
 
 /**
@@ -290,8 +237,8 @@ function handleUserMessage(wallName) {
  * General message handler for both user and bot messages.
  * - If sender is "User": all bots are candidates.
  * - If sender is a bot: all other bots are candidates.
- * A primary responder is chosen after 6 seconds,
- * and each other candidate has a 50% chance to respond after a random delay between 7 and 10 seconds.
+ * A primary responder is chosen after 11 seconds,
+ * and each other candidate has a 50% chance to respond after a random delay between 12 and 15 seconds.
  */
 function handleMessage(wallName, sender) {
   let candidates;
@@ -304,10 +251,10 @@ function handleMessage(wallName, sender) {
   const primary = candidates[Math.floor(Math.random() * candidates.length)];
   setTimeout(() => {
     postAIResponse(wallName, primary, "");
-  }, 6000);
+  }, 11000);
   candidates.forEach(bot => {
     if (bot !== primary && Math.random() < 0.5) {
-      const delay = getRandomDelay(7000, 10000);
+      const delay = getRandomDelay(12000, 15000);
       setTimeout(() => {
         postAIResponse(wallName, bot, "");
       }, delay);
