@@ -23,24 +23,50 @@ function getRandomDelay(min, max) {
 
 /**
  * Resets the inactivity timer for a given wall.
- * If no message is posted on that wall for 5 seconds, a random bot posts a random letter automatically.
+ * If no new message is posted on that wall for 5 seconds,
+ * a random bot posts an auto response, and then a chain of responses is triggered.
  */
 function resetInactivityTimer(wallName) {
   if (inactivityTimers[wallName]) {
     clearTimeout(inactivityTimers[wallName]);
   }
   inactivityTimers[wallName] = setTimeout(() => {
-    // Choose a random bot from all bots
+    // Choose a random bot to post the auto response
     const bot = aiList[Math.floor(Math.random() * aiList.length)];
-    // Append an automatic response (marked as auto) to the wall
     appendMessage(wallName, `${bot} (auto): ${getRandomLetter()}`);
-    // Reset timer after the auto response
+    // Trigger chain responses with probabilities: [0.9, 0.5, 0.8, 0.2]
+    chainResponses(wallName, bot, [0.9, 0.5, 0.8, 0.2], 0);
+    // After the chain, reset the inactivity timer again.
     resetInactivityTimer(wallName);
-  }, 5000); // 5 seconds of inactivity
+  }, 5000); // 5 seconds inactivity
 }
 
 /**
- * Creates a 2x2 grid of walls—one for each AI—and appends it to #aiWallsRoot
+ * Recursively triggers chain responses after an auto response.
+ * @param {string} wallName - The wall where responses are posted.
+ * @param {string} lastResponder - The bot that last posted.
+ * @param {number[]} probabilities - Array of probabilities for each chain stage.
+ * @param {number} index - Current stage index.
+ */
+function chainResponses(wallName, lastResponder, probabilities, index) {
+  if (index >= probabilities.length) return;
+  setTimeout(() => {
+    if (Math.random() < probabilities[index]) {
+      // Choose a candidate bot (all except the last responder)
+      const candidates = aiList.filter(bot => bot !== lastResponder);
+      if (candidates.length === 0) return;
+      const responder = candidates[Math.floor(Math.random() * candidates.length)];
+      // Post chain response marked with (chain)
+      appendMessage(wallName, `${responder} (chain): ${getRandomLetter()}`);
+      // Chain the next response, with the new bot as last responder
+      chainResponses(wallName, responder, probabilities, index + 1);
+    }
+    // If the probability check fails, the chain stops.
+  }, 1000); // 1 second delay for each chain response
+}
+
+/**
+ * Creates a 2x2 grid of walls—one for each AI—and appends it to #aiWallsRoot.
  */
 function createWallsUI() {
   const aiWallsRoot = document.getElementById("aiWallsRoot");
@@ -132,8 +158,8 @@ function appendMessage(wallName, text) {
   messagePara.style.margin = "5px 0";
   convo.appendChild(messagePara);
   convo.scrollTop = convo.scrollHeight;
-  
-  // Reset the inactivity timer for this wall
+
+  // Reset the inactivity timer for this wall after a message is posted.
   resetInactivityTimer(wallName);
 }
 
@@ -160,21 +186,19 @@ function handleUserMessage(wallName) {
 function handleMessage(wallName, sender) {
   let responderCandidates;
   if (sender === "User") {
-    // All bots are candidates when a user posts
-    responderCandidates = [...aiList];
+    responderCandidates = [...aiList]; // all bots
   } else {
-    // When a bot posts, exclude that bot
     responderCandidates = aiList.filter(bot => bot !== sender);
   }
   if (responderCandidates.length === 0) return;
 
-  // Choose a primary responder randomly from the candidates
+  // Primary responder after 2 seconds
   const primaryResponder = responderCandidates[Math.floor(Math.random() * responderCandidates.length)];
   setTimeout(() => {
     postAIResponse(primaryResponder, wallName);
   }, 2000);
 
-  // For each remaining candidate, 50% chance to respond after a random delay (3-8 seconds)
+  // Each remaining candidate has a 50% chance to respond after a random delay (3-8 seconds)
   responderCandidates.forEach(bot => {
     if (bot !== primaryResponder && Math.random() < 0.5) {
       const delay = getRandomDelay(3000, 8000);
