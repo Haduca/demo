@@ -2,8 +2,8 @@
 
 // Basic variables for Pi logic
 let userData = null;
-const apiKey = "YOUR_PI_API_KEY_HERE";   // Replace with your actual Pi Dev Portal key
-const ai4piWallet = "YOUR_AI4PI_WALLET"; // Replace with your actual wallet address
+const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr";   // Replace with your actual Pi Dev Portal key
+const ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Replace with your actual wallet address
 
 /**
  * Utility function to log messages to the #output area.
