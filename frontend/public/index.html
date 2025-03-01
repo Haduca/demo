@@ -7,24 +7,29 @@
 <body>
   <h1>AI4Pi - Pi Transactions</h1>
   
-  <!-- Simple UI Buttons -->
   <button id="loginBtn">Log in with Pi Network</button>
   <button id="sendBtn">Send Pi to AI4Pi</button>
   <button id="approvePendingBtn">Approve Pending Payment</button>
   
-  <!-- A place to show logs/messages -->
   <div id="logs" style="margin-top:20px; border:1px solid #ccc; padding:10px;"></div>
-  
-  <!-- Include the Pi SDK -->
+
+  <!-- 1) Load the Pi SDK FIRST -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  
+  <!-- 2) Then load your app script -->
   <script>
-    // Replace with your Pi Developer Key (from your Pi Developer Portal)
-    const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr";
+    // Replace with your Pi Developer Key from the Pi Dev Portal
+    const apiKey = "YOUR_PI_API_KEY_HERE";
 
-    // 1. Initialize Pi SDK
-    Pi.init({ version: "2.0" });
+    // Initialize Pi
+    Pi.init({
+      version: "2.0",
+      appId: "YOUR_APP_ID_HERE",      // from the Dev Portal
+      walletId: "YOUR_WALLET_ID_HERE", // from the Dev Portal
+      sandbox: true                   // set to false for production
+    });
 
-    // A helper function to append messages to our log box
+    // A helper function to append logs to the page
     function logMessage(msg) {
       const logsEl = document.getElementById('logs');
       const p = document.createElement('p');
@@ -33,22 +38,20 @@
       console.log(msg);
     }
 
-    // 2. Log in / authenticate with Pi
+    // Log in / authenticate
     function login() {
       Pi.authenticate(
-        { userRoles: ["username", "payments"] }, // scopes you want
-        function (auth) {
-          // onSuccess
+        { userRoles: ["username", "payments"] },
+        function(auth) {
           logMessage("Signed in as: " + auth.user.username);
         },
-        function (error) {
-          // onIncomplete or error
+        function(error) {
           logMessage("Login error: " + error);
         }
       );
     }
 
-    // 3. Approve a payment on Pi servers
+    // Approve Payment
     function approvePaymentOnServer(paymentId) {
       return fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
         method: "POST",
@@ -57,22 +60,21 @@
           "Content-Type": "application/json"
         }
       })
-      .then(response => response.json())
+      .then(r => r.json())
       .then(data => {
         if (data.success) {
           logMessage(`✅ Payment ${paymentId} approved successfully.`);
-          return data;
         } else {
           throw new Error(data.error || "Approval failed");
         }
       })
-      .catch(error => {
-        logMessage(`❌ Error approving payment: ${error.message}`);
-        throw error;
+      .catch(err => {
+        logMessage(`❌ Error approving payment: ${err.message}`);
+        throw err;
       });
     }
 
-    // 4. Complete a payment on Pi servers
+    // Complete Payment
     function completePaymentOnServer(paymentId, txid) {
       return fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
         method: "POST",
@@ -82,79 +84,65 @@
         },
         body: JSON.stringify({ txid })
       })
-      .then(response => response.json())
+      .then(r => r.json())
       .then(data => {
         if (data.success) {
           logMessage(`✅ Payment ${paymentId} completed successfully.`);
-          return data;
         } else {
           throw new Error(data.error || "Completion failed");
         }
       })
-      .catch(error => {
-        logMessage(`❌ Error completing payment: ${error.message}`);
-        throw error;
+      .catch(err => {
+        logMessage(`❌ Error completing payment: ${err.message}`);
+        throw err;
       });
     }
 
-    // 5. Create and send a new payment
+    // Create and send a new payment
     function sendPayment() {
-      // Example: sending 1 Pi, you can adjust 'amount' as needed
       Pi.createPayment({
         amount: 1,
         memo: "Payment to AI4Pi",
         metadata: { test: "123" }
       }, {
         onReadyForServerApproval: function(paymentId) {
-          // This fires when the user confirms in their Pi wallet
           logMessage(`onReadyForServerApproval: Payment ID = ${paymentId}`);
-          
-          // Approve on the server (or front-end, as shown here)
           approvePaymentOnServer(paymentId)
             .then(() => {
               logMessage("Payment approved, waiting for blockchain confirmation...");
             })
-            .catch((err) => {
+            .catch(err => {
               logMessage("Error in approving payment: " + err.message);
             });
         },
         onReadyForServerCompletion: function(paymentId, txid) {
-          // This fires when the payment is on the blockchain
           logMessage(`onReadyForServerCompletion: Payment ID = ${paymentId}, TXID = ${txid}`);
-          
-          // Complete on the server (or front-end, as shown here)
           completePaymentOnServer(paymentId, txid)
             .then(() => {
               logMessage("Payment completed successfully!");
             })
-            .catch((err) => {
+            .catch(err => {
               logMessage("Error in completing payment: " + err.message);
             });
         },
         onCancel: function(paymentId) {
-          // Payment was cancelled by the user
           logMessage(`Payment cancelled: ${paymentId}`);
         },
         onError: function(error, paymentId) {
-          // Some error occurred
           logMessage(`Payment error: ${error}, Payment ID: ${paymentId}`);
         }
       });
     }
 
-    // 6. Handle or recover any stuck/incomplete payments
+    // Check for pending/stuck payments
     function checkForPendingPayments() {
       logMessage("🔍 Checking for pending payments...");
-
       Pi.getPayment()
         .then(payment => {
           if (payment && payment.identifier) {
             logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
-            
-            // Approve if not approved
             approvePaymentOnServer(payment.identifier)
               .then(() => {
-                // If there's a txid, we can attempt to complete
                 if (payment.transaction && payment.transaction.txid) {
                   return completePaymentOnServer(payment.identifier, payment.transaction.txid);
                 }
@@ -174,12 +162,10 @@
         });
     }
 
-    // 7. Pi SDK also provides a callback for incomplete payments
+    // Pi’s own callback for incomplete payments
     Pi.onIncompletePaymentFound((payment) => {
       if (payment && payment.identifier) {
         logMessage(`⚠️ Incomplete payment found: ${payment.identifier}`);
-        
-        // Approve and/or complete it here
         approvePaymentOnServer(payment.identifier)
           .then(() => {
             if (payment.transaction && payment.transaction.txid) {
@@ -195,10 +181,10 @@
       }
     });
 
-    // 8. Automatically check for pending payments every 30 seconds
+    // Auto-check for pending payments every 30 seconds
     setInterval(checkForPendingPayments, 30000);
 
-    // 9. Wire up the buttons
+    // Wire up buttons
     document.getElementById('loginBtn').addEventListener('click', login);
     document.getElementById('sendBtn').addEventListener('click', sendPayment);
     document.getElementById('approvePendingBtn').addEventListener('click', checkForPendingPayments);
