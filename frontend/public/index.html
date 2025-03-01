@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI4Pi - Pi Transactions</title>
   
   <!-- Pi Network SDK -->
@@ -142,7 +142,7 @@
       );
     }
     
-    // Approve Payment
+    // Approve Payment with improved error logging
     function approvePayment(paymentId) {
       logMessage(`🔄 Approving payment: ${paymentId}...`);
     
@@ -157,9 +157,9 @@
       .then(data => {
         if (data.success) {
           logMessage("✅ Payment approved successfully (waiting for on-chain txid)...");
-          // Completion will happen once the txid is available
         } else {
-          logMessage(`❌ Payment approval failed: ${data.error}`);
+          // Log the entire response if error is undefined
+          logMessage(`❌ Payment approval failed: ${data.error || JSON.stringify(data)}`);
         }
       })
       .catch(error => {
@@ -167,7 +167,7 @@
       });
     }
     
-    // Complete Payment (with txid)
+    // Complete Payment with improved error logging
     function completePayment(paymentId, txid) {
       if (!txid) {
         logMessage("❌ Missing transaction ID (txid). Cannot complete payment yet.");
@@ -189,7 +189,7 @@
         if (data.success) {
           logMessage(`✅ Payment ${paymentId} marked as completed.`);
         } else {
-          logMessage(`❌ Payment completion failed: ${data.error}`);
+          logMessage(`❌ Payment completion failed: ${data.error || JSON.stringify(data)}`);
         }
       })
       .catch(error => {
@@ -197,7 +197,7 @@
       });
     }
     
-    // Unstick Payment using provided details
+    // Manual Unstick Payment Function (using your provided Payment ID and txid)
     function unstickPayment() {
       // Provided payment details from your JSON:
       const paymentId = "SM1ONeZStdnTOqnlyKK1F1Ohvbrk";
@@ -218,7 +218,7 @@
         if (data.success) {
           logMessage(`✅ Payment ${paymentId} marked as completed (unstuck).`);
         } else {
-          logMessage(`❌ Payment unsticking failed: ${data.error}`);
+          logMessage(`❌ Payment unsticking failed: ${data.error || JSON.stringify(data)}`);
         }
       })
       .catch(error => {
@@ -230,9 +230,9 @@
 <body>
   <h1>AI4Pi - Pi Transactions</h1>
   <button onclick="loginUser()">🔑 Log In with Pi Network</button>
-  <input type="number" id="amountInput" placeholder="Enter Pi amount">
+  <input type="number" id="amountInput" placeholder="Enter Pi amount" step="any" />
   <button onclick="sendPiToAI4Pi()">💰 Send Pi to AI4Pi</button>
-  <!-- Button to manually unstick payments -->
+  <!-- Button to manually unstick a payment if needed -->
   <button onclick="unstickPayment()">🔄 Unstick Payment</button>
   <div class="output" id="output">[Logs will appear here]</div>
 </body>
