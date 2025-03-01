@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI4Pi - Pi Transactions</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
+
+    <!-- Pi Network SDK -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,13 +54,14 @@
             text-align: left;
         }
     </style>
+
     <script>
         let userData = null;
         let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Ensure correct wallet address
         const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Integrated API Key
 
         function logMessage(message) {
-            let outputDiv = document.getElementById("output");
+            const outputDiv = document.getElementById("output");
             outputDiv.innerHTML += `<br>> ${message}`;
             outputDiv.scrollTop = outputDiv.scrollHeight;
             console.log(message);
@@ -71,6 +75,7 @@
 
             logMessage("🔄 Initializing SDK for authentication...");
 
+            // Initialize Pi SDK
             Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
                 .then(() => {
                     logMessage("✅ SDK Initialized. Attempting login...");
@@ -80,7 +85,7 @@
                     if (auth && auth.user) {
                         userData = auth.user;
                         logMessage(`✅ Signed in as: ${auth.user.username}`);
-                        checkForPendingPayments(); // Fixes previous error
+                        checkForPendingPayments(); // Check if any stuck payments exist
                     } else {
                         logMessage("❌ Authentication failed, no user data received.");
                     }
@@ -96,7 +101,7 @@
                 return;
             }
 
-            let amount = parseFloat(document.getElementById("amountInput").value);
+            const amount = parseFloat(document.getElementById("amountInput").value);
             if (isNaN(amount) || amount <= 0) {
                 logMessage("❌ Invalid Pi amount. Please enter a valid number.");
                 return;
@@ -109,6 +114,7 @@
 
             logMessage(`🔄 Sending ${amount} Pi to AI4Pi...`);
 
+            // Removed 'onIncompletePaymentFound' because Pi.createPayment in v2.0 doesn't support that callback
             Pi.createPayment(
                 {
                     amount: amount,
@@ -117,16 +123,12 @@
                     to_address: ai4piWallet
                 },
                 {
-                    onIncompletePaymentFound: function(payment) {
-                        logMessage(`⚠️ Found incomplete payment: ${payment.identifier}`);
-                        resolvePendingPayment(payment.identifier);
-                    },
                     onReadyForServerApproval: function(paymentId) {
                         logMessage(`✅ Payment request ready. Auto-approving...`);
                         approvePayment(paymentId);
                     },
                     onReadyForServerCompletion: function(paymentId, txid) {
-                        logMessage(`✅ Payment approved. Finalizing transaction...`);
+                        logMessage(`✅ Payment approved on chain. Finalizing transaction...`);
                         completePayment(paymentId, txid);
                     },
                     onCancel: function(paymentId) {
@@ -139,6 +141,7 @@
             );
         }
 
+        // Approve a payment (front-end call for demo)
         function approvePayment(paymentId) {
             logMessage(`🔄 Approving payment: ${paymentId}...`);
 
@@ -152,8 +155,9 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    logMessage(`✅ Payment approved successfully.`);
-                    completePayment(paymentId);
+                    logMessage("✅ Payment approved successfully.");
+                    // NOTE: We do NOT call completePayment here because we don't have a txid yet.
+                    // The Pi SDK calls onReadyForServerCompletion once there's a txid.
                 } else {
                     logMessage(`❌ Payment approval failed: ${data.error}`);
                 }
@@ -163,9 +167,10 @@
             });
         }
 
+        // Complete a payment, requires paymentId and txid
         function completePayment(paymentId, txid) {
             if (!txid) {
-                logMessage(`❌ Error: Missing transaction ID (txid). Payment cannot be completed.`);
+                logMessage(`❌ Error: Missing transaction ID (txid). Payment cannot be completed yet.`);
                 return;
             }
 
@@ -182,7 +187,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    logMessage(`✅ Payment marked as completed.`);
+                    logMessage("✅ Payment marked as completed.");
                 } else {
                     logMessage(`❌ Payment completion failed: ${data.error}`);
                 }
@@ -192,6 +197,7 @@
             });
         }
 
+        // Check for pending/stuck payments
         function checkForPendingPayments() {
             logMessage("🔍 Checking for pending payments...");
 
@@ -199,7 +205,13 @@
                 .then(payment => {
                     if (payment && payment.identifier) {
                         logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
-                        completePayment(payment.identifier);
+                        // If there's a txid, attempt completion
+                        if (payment.transaction && payment.transaction.txid) {
+                            logMessage(`🔄 Attempting to complete with txid: ${payment.transaction.txid}`);
+                            completePayment(payment.identifier, payment.transaction.txid);
+                        } else {
+                            logMessage("⚠️ Payment has no txid yet, cannot complete. Will check again later.");
+                        }
                     } else {
                         logMessage("✅ No pending payments found.");
                     }
