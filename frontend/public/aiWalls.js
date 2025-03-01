@@ -11,7 +11,11 @@ let botScores = {
   "Sol": 0,
   "Math": 0
 };
-let lastBotResponse = {}; // Maps each wallName to { bot: <botName>, count: <number> }
+// For each wall, we track the last bot that responded and how many times consecutively.
+let lastBotResponse = {};
+
+// The fixed bonus awarded when a bot responds twice in a row.
+const BONUS_VALUE = 0.1;
 
 /**
  * Utility function: returns a random letter (A-Z)
@@ -30,7 +34,7 @@ function getRandomDelay(min, max) {
 
 /**
  * Updates the header on the resident wall for a given bot.
- * The header's id is "header-" + botName.
+ * The header element's id is "header-" + botName.
  */
 function updateWallHeader(botName) {
   const header = document.getElementById("header-" + botName);
@@ -41,7 +45,7 @@ function updateWallHeader(botName) {
 
 /**
  * Creates the UI for AI walls—a 2x2 grid—and appends it to the #aiWallsRoot div.
- * Each wall has a header (with the bot's name and score), a conversation area, and an input box.
+ * Each wall has a header (showing the bot's name and score), a conversation area, and an input box.
  */
 function createWallsUI() {
   const aiWallsRoot = document.getElementById("aiWallsRoot");
@@ -70,7 +74,7 @@ function createWallsUI() {
     wall.style.flexDirection = "column";
     wall.style.justifyContent = "space-between";
 
-    // Header with the wall's main bot name and its score
+    // Header with the wall's resident bot name and score
     const header = document.createElement("h3");
     header.id = "header-" + aiName;
     header.textContent = `${aiName} (Score: ${botScores[aiName].toFixed(2)} Pi)`;
@@ -90,7 +94,7 @@ function createWallsUI() {
     convo.id = `convo-${aiName}`;
     wall.appendChild(convo);
 
-    // Input area: a textbox and a send button
+    // Input area: textbox and send button
     const inputContainer = document.createElement("div");
     inputContainer.style.display = "flex";
     inputContainer.style.gap = "5px";
@@ -124,22 +128,20 @@ function createWallsUI() {
 
 /**
  * Resets the inactivity timer for a given wall.
- * If no new message is posted on that wall for 5 seconds, a random bot posts an auto response,
- * and then a chain of responses is triggered.
+ * If no new message is posted on that wall for 5 seconds,
+ * a random bot posts an auto response, then triggers chain responses.
  */
 function resetInactivityTimer(wallName) {
   if (inactivityTimers[wallName]) {
     clearTimeout(inactivityTimers[wallName]);
   }
   inactivityTimers[wallName] = setTimeout(() => {
-    // Choose a random bot to post the auto response.
+    // Choose a random bot for auto response
     const bot = aiList[Math.floor(Math.random() * aiList.length)];
     appendMessage(wallName, `${bot} (auto): ${getRandomLetter()}`);
-    // Trigger chain responses with probabilities: [0.9, 0.5, 0.8, 0.2]
     chainResponses(wallName, bot, [0.9, 0.5, 0.8, 0.2], 0);
-    // Reset the inactivity timer after the chain.
     resetInactivityTimer(wallName);
-  }, 5000); // 5 seconds inactivity
+  }, 5000);
 }
 
 /**
@@ -147,19 +149,17 @@ function resetInactivityTimer(wallName) {
  * Each chain response is delayed by 1 second.
  * @param {string} wallName - The wall where responses are posted.
  * @param {string} lastResponder - The bot that posted last.
- * @param {number[]} probabilities - An array of probabilities for each chain stage.
- * @param {number} index - The current stage index.
+ * @param {number[]} probabilities - Array of probabilities for each chain stage.
+ * @param {number} index - Current chain stage index.
  */
 function chainResponses(wallName, lastResponder, probabilities, index) {
   if (index >= probabilities.length) return;
   setTimeout(() => {
     if (Math.random() < probabilities[index]) {
-      // Choose a candidate bot (excluding the last responder)
       const candidates = aiList.filter(bot => bot !== lastResponder);
       if (candidates.length === 0) return;
       const responder = candidates[Math.floor(Math.random() * candidates.length)];
       appendMessage(wallName, `${responder} (chain): ${getRandomLetter()}`);
-      // Update consecutive response tracking for this wall.
       lastBotResponse[wallName] = { bot: responder, count: 1 };
       chainResponses(wallName, responder, probabilities, index + 1);
     }
@@ -182,8 +182,8 @@ function appendMessage(wallName, text) {
 }
 
 /**
- * Handles a user message in a given wall.
- * Resets the consecutive response tracking for that wall.
+ * Handles a user message on a given wall.
+ * Also resets consecutive response tracking for that wall.
  */
 function handleUserMessage(wallName) {
   const input = document.getElementById(`input-${wallName}`);
@@ -191,7 +191,7 @@ function handleUserMessage(wallName) {
   if (!message) return;
   appendMessage(wallName, `User: ${message}`);
   input.value = "";
-  lastBotResponse[wallName] = null; // Reset consecutive tracking for this wall.
+  lastBotResponse[wallName] = null;
   handleMessage(wallName, "User");
 }
 
@@ -199,21 +199,22 @@ function handleUserMessage(wallName) {
  * General message handler for both user and bot messages.
  * - If sender is "User": all bots are candidates.
  * - If sender is a bot: all other bots are candidates.
- * A primary responder is chosen to respond after 2 seconds,
- * and each remaining candidate has a 50% chance to respond after a random delay (3-8 seconds).
+ * A primary responder is chosen after 2 seconds, and each remaining candidate has a 50% chance to respond after 3-8 seconds.
  */
 function handleMessage(wallName, sender) {
   let candidates;
   if (sender === "User") {
-    candidates = [...aiList]; // All bots are candidates.
+    candidates = [...aiList];
   } else {
-    candidates = aiList.filter(bot => bot !== sender); // Exclude the sender.
+    candidates = aiList.filter(bot => bot !== sender);
   }
   if (candidates.length === 0) return;
+
   const primary = candidates[Math.floor(Math.random() * candidates.length)];
   setTimeout(() => {
     postAIResponse(primary, wallName);
   }, 2000);
+
   candidates.forEach(bot => {
     if (bot !== primary && Math.random() < 0.5) {
       const delay = getRandomDelay(3000, 8000);
@@ -226,34 +227,31 @@ function handleMessage(wallName, sender) {
 
 /**
  * Posts an AI response (a random letter) from the specified bot to the specified wall.
- * This function tracks consecutive responses. When a bot posts twice in a row,
- * it earns a bonus equal to 10% of the current accumulated Pi from the drip system.
- * The bot's global score is updated, and its resident wall header is updated accordingly.
+ * It tracks consecutive responses: if a bot posts twice in a row, it earns a fixed bonus.
  */
 function postAIResponse(botName, wallName) {
   const letter = getRandomLetter();
-  
+
   // Update consecutive response tracking for this wall.
   if (lastBotResponse[wallName] && lastBotResponse[wallName].bot === botName) {
     lastBotResponse[wallName].count += 1;
   } else {
     lastBotResponse[wallName] = { bot: botName, count: 1 };
   }
-  
-  // If the same bot has responded twice in a row, award bonus.
+
+  // When a bot responds twice in a row on the same wall, award bonus.
   if (lastBotResponse[wallName].count >= 2) {
-    const drip = parseFloat(localStorage.getItem("dripAmount")) || 0;
-    const bonus = 0.1 * drip; // 10% bonus of current drip amount.
-    botScores[botName] += bonus;
+    botScores[botName] += BONUS_VALUE;
+    // Update the resident wall header if this bot is the owner.
     updateWallHeader(botName);
-    // Reset consecutive count so bonus isn't repeatedly awarded.
+    // Reset the consecutive counter for that wall.
     lastBotResponse[wallName].count = 0;
   }
-  
+
   appendMessage(wallName, `${botName}: ${letter} (score: ${botScores[botName].toFixed(2)})`);
 }
 
-// Initialize the UI once the DOM content is loaded.
+// Initialize scoreboard and walls when DOM is loaded.
 window.addEventListener("DOMContentLoaded", () => {
   createWallsUI();
 });
