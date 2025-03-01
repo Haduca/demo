@@ -19,9 +19,16 @@ function getRandomDelay(min, max) {
 }
 
 /**
- * Creates a 2x2 grid of walls—one for each AI.
+ * Creates a 2x2 grid of walls—one for each AI—and appends it to #aiWallsRoot
  */
 function createWallsUI() {
+  // Find the placeholder div for AI walls
+  const aiWallsRoot = document.getElementById("aiWallsRoot");
+  if (!aiWallsRoot) {
+    console.warn("No #aiWallsRoot found in HTML. AI walls will not be displayed.");
+    return;
+  }
+
   const container = document.createElement("div");
   container.id = "aiWallsContainer";
   container.style.display = "grid";
@@ -29,7 +36,7 @@ function createWallsUI() {
   container.style.gridGap = "20px";
   container.style.width = "90%";
   container.style.maxWidth = "800px";
-  container.style.margin = "20px auto";
+  container.style.margin = "20px auto";  // space above/below
 
   aiList.forEach((aiName) => {
     const wall = document.createElement("div");
@@ -61,7 +68,7 @@ function createWallsUI() {
     convo.id = `convo-${aiName}`;
     wall.appendChild(convo);
 
-    // Input area: textbox and send button
+    // Input area
     const inputContainer = document.createElement("div");
     inputContainer.style.display = "flex";
     inputContainer.style.gap = "5px";
@@ -90,7 +97,7 @@ function createWallsUI() {
     container.appendChild(wall);
   });
 
-  document.body.appendChild(container);
+  aiWallsRoot.appendChild(container);
 }
 
 /**
@@ -121,30 +128,27 @@ function handleUserMessage(wallName) {
 
 /**
  * General message handler for both user and bot messages.
- * When a message is posted in a wall:
- * - If the sender is "User", available responder candidates are all bots.
- * - If the sender is a bot, available responder candidates are all bots except the one that just posted.
- * A primary responder is chosen randomly to respond after 2 seconds,
- * and each remaining candidate has a 50% chance to respond after a random delay (3-8 seconds).
+ * - If sender is "User", all bots are candidates.
+ * - If sender is a bot, all other bots are candidates (excluding the sender).
+ * A primary responder is chosen randomly (2s delay),
+ * and each remaining candidate has a 50% chance to respond after a random delay (3-8s).
  */
 function handleMessage(wallName, sender) {
   let responderCandidates;
   if (sender === "User") {
-    // All bots are candidates
-    responderCandidates = [...aiList];
+    responderCandidates = [...aiList]; // all bots
   } else {
-    // Exclude the bot that just posted
     responderCandidates = aiList.filter(bot => bot !== sender);
   }
   if (responderCandidates.length === 0) return;
 
-  // Choose a primary responder randomly from the candidates
+  // Primary responder
   const primaryResponder = responderCandidates[Math.floor(Math.random() * responderCandidates.length)];
   setTimeout(() => {
     postAIResponse(primaryResponder, wallName);
   }, 2000);
 
-  // For each remaining candidate, 50% chance to respond after a random delay (3-8 seconds)
+  // Other candidates, 50% chance each, 3-8s delay
   responderCandidates.forEach(bot => {
     if (bot !== primaryResponder && Math.random() < 0.5) {
       const delay = getRandomDelay(3000, 8000);
@@ -156,14 +160,14 @@ function handleMessage(wallName, sender) {
 }
 
 /**
- * Posts an AI response (a single random letter) from the specified bot to the specified wall.
+ * Posts an AI response (one random letter) from the specified bot to the specified wall.
  */
 function postAIResponse(botName, wallName) {
   const letter = getRandomLetter();
   appendMessage(wallName, `${botName}: ${letter}`);
 }
 
-// Initialize the walls UI once the DOM content is loaded.
+// Initialize the UI once the DOM content is loaded.
 window.addEventListener("DOMContentLoaded", () => {
   createWallsUI();
 });
