@@ -53,7 +53,7 @@
       text-align: left;
     }
 
-    /* Container for Pi Drip System (if needed) */
+    /* Container for Pi Drip System (drip.js) */
     #dripContainer {
       margin: 20px auto;
       width: 80%;
@@ -74,22 +74,22 @@
   <button onclick="sendPiToAI4Pi()">💰 Send Pi to AI4Pi</button>
   <div class="output" id="output">[Logs will appear here]</div>
 
-  <!-- Pi Drip System container (drip.js will create its UI here, if it does so) -->
+  <!-- Pi Drip System container (drip.js will create UI here) -->
   <div id="dripContainer"></div>
 
-  <!-- AI Walls container; the script aiWalls.js will append the 2x2 grid here -->
+  <!-- AI Walls container; aiWalls.js will append the 2x2 grid here -->
   <div id="aiWallsRoot"></div>
 
   <!-- 1) Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-  <!-- 2) Your main script for Pi Payment logic (if you have one, e.g. main.js) -->
+  <!-- 2) main.js: Your Pi login & payment logic -->
   <script src="main.js"></script>
 
-  <!-- 3) The Pi Drip script -->
+  <!-- 3) drip.js: Pi Drip system -->
   <script src="drip.js"></script>
 
-  <!-- 4) The AI Walls script -->
+  <!-- 4) aiWalls.js: 2x2 AI walls -->
   <script src="aiWalls.js"></script>
 </body>
 </html>
