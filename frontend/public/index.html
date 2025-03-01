@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI4Pi - Pi Transactions</title>
-
+  
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
+  
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -54,28 +54,29 @@
       text-align: left;
     }
   </style>
-
+  
   <script>
     let userData = null;
-    let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Ensure correct wallet address
-    const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Integrated API Key
-
+    const ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ";
+    const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr";
+    
     function logMessage(message) {
       const outputDiv = document.getElementById("output");
       outputDiv.innerHTML += `<br>> ${message}`;
       outputDiv.scrollTop = outputDiv.scrollHeight;
       console.log(message);
     }
-
+    
+    // Log in to Pi Network
     function loginUser() {
       if (typeof Pi === "undefined") {
         logMessage("❌ Pi SDK is not available.");
         return;
       }
-
+    
       logMessage("🔄 Initializing SDK for authentication...");
-
-      // Initialize Pi SDK
+    
+      // Initialize Pi SDK (v2.0)
       Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
         .then(() => {
           logMessage("✅ SDK Initialized. Attempting login...");
@@ -85,37 +86,36 @@
           if (auth && auth.user) {
             userData = auth.user;
             logMessage(`✅ Signed in as: ${auth.user.username}`);
-            // After login, check for stuck payments
-            return checkForPendingPayments();
           } else {
             logMessage("❌ Authentication failed, no user data received.");
           }
         })
         .catch(error => {
-          // If checkForPendingPayments() fails, it also ends up here
           logMessage(`❌ Error during authentication: ${error.message}`);
         });
     }
-
+    
+    // Send Pi to AI4Pi
     function sendPiToAI4Pi() {
       if (!userData) {
         logMessage("❌ You must log in before sending Pi.");
         return;
       }
-
+    
       const amount = parseFloat(document.getElementById("amountInput").value);
       if (isNaN(amount) || amount <= 0) {
         logMessage("❌ Invalid Pi amount. Please enter a valid number.");
         return;
       }
-
+    
       if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
         logMessage("⚠️ Transaction canceled by user.");
         return;
       }
-
+    
       logMessage(`🔄 Sending ${amount} Pi to AI4Pi...`);
-
+    
+      // Create Payment using Pi SDK v2.0
       Pi.createPayment(
         {
           amount: amount,
@@ -125,11 +125,11 @@
         },
         {
           onReadyForServerApproval: function(paymentId) {
-            logMessage(`✅ Payment request ready. Auto-approving...`);
+            logMessage("✅ Payment request ready. Auto-approving...");
             approvePayment(paymentId);
           },
           onReadyForServerCompletion: function(paymentId, txid) {
-            logMessage(`✅ Payment approved on chain. Finalizing transaction...`);
+            logMessage("✅ Payment approved on chain. Finalizing transaction...");
             completePayment(paymentId, txid);
           },
           onCancel: function(paymentId) {
@@ -141,11 +141,11 @@
         }
       );
     }
-
-    // Approve a payment (front-end call for demo)
+    
+    // Approve Payment
     function approvePayment(paymentId) {
       logMessage(`🔄 Approving payment: ${paymentId}...`);
-
+    
       fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
         method: "POST",
         headers: {
@@ -156,9 +156,8 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          logMessage("✅ Payment approved successfully.");
-          // We do NOT call completePayment here because we don't have a txid yet.
-          // The Pi SDK calls onReadyForServerCompletion once there's a txid.
+          logMessage("✅ Payment approved successfully (waiting for on-chain txid)...");
+          // Completion will happen once the txid is available
         } else {
           logMessage(`❌ Payment approval failed: ${data.error}`);
         }
@@ -167,28 +166,28 @@
         logMessage(`❌ API request failed: ${error.message}`);
       });
     }
-
-    // Complete a payment, requires paymentId and txid
+    
+    // Complete Payment (with txid)
     function completePayment(paymentId, txid) {
       if (!txid) {
-        logMessage(`❌ Error: Missing transaction ID (txid). Payment cannot be completed yet.`);
+        logMessage("❌ Missing transaction ID (txid). Cannot complete payment yet.");
         return;
       }
-
+    
       logMessage(`🔄 Completing payment: ${paymentId} with txid: ${txid}...`);
-
+    
       fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
         method: "POST",
         headers: {
           "Authorization": `Key ${apiKey}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ txid: txid }) // Ensure txid is sent properly
+        body: JSON.stringify({ txid: txid })
       })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          logMessage("✅ Payment marked as completed.");
+          logMessage(`✅ Payment ${paymentId} marked as completed.`);
         } else {
           logMessage(`❌ Payment completion failed: ${data.error}`);
         }
@@ -197,32 +196,34 @@
         logMessage(`❌ API request failed: ${error.message}`);
       });
     }
-
-    // Check for pending/stuck payments
-    // FIX: Replaced Pi.getPayment() with Pi.payment.getCurrentPayment() for Pi SDK v2.0
-    function checkForPendingPayments() {
-      logMessage("🔍 Checking for pending payments...");
-
-      return Pi.payment.getCurrentPayment()
-        .then(payment => {
-          if (payment && payment.identifier) {
-            logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
-            // If there's a txid, attempt completion
-            if (payment.transaction && payment.transaction.txid) {
-              logMessage(`🔄 Attempting to complete with txid: ${payment.transaction.txid}`);
-              completePayment(payment.identifier, payment.transaction.txid);
-            } else {
-              logMessage("⚠️ Payment has no txid yet, cannot complete. Will check again later.");
-            }
-          } else {
-            logMessage("✅ No pending payments found.");
-          }
-        })
-        .catch(error => {
-          // This error will bubble up to the .catch in loginUser() if called after login
-          logMessage(`❌ Error checking pending payments: ${error.message}`);
-          throw error;
-        });
+    
+    // Unstick Payment using provided details
+    function unstickPayment() {
+      // Provided payment details from your JSON:
+      const paymentId = "SM1ONeZStdnTOqnlyKK1F1Ohvbrk";
+      const txid = "dcfa716b67472eb5c32a1325a13f22424c11fd4d057265c53a6659eacd582a2c";
+    
+      logMessage(`🔄 Unsticking payment ${paymentId} with txid: ${txid}...`);
+    
+      fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Key ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ txid: txid })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          logMessage(`✅ Payment ${paymentId} marked as completed (unstuck).`);
+        } else {
+          logMessage(`❌ Payment unsticking failed: ${data.error}`);
+        }
+      })
+      .catch(error => {
+        logMessage(`❌ Error unsticking payment: ${error.message}`);
+      });
     }
   </script>
 </head>
@@ -231,6 +232,8 @@
   <button onclick="loginUser()">🔑 Log In with Pi Network</button>
   <input type="number" id="amountInput" placeholder="Enter Pi amount">
   <button onclick="sendPiToAI4Pi()">💰 Send Pi to AI4Pi</button>
+  <!-- Button to manually unstick payments -->
+  <button onclick="unstickPayment()">🔄 Unstick Payment</button>
   <div class="output" id="output">[Logs will appear here]</div>
 </body>
 </html>
