@@ -6,17 +6,71 @@ const aiList = ["Pi", "Moti", "Sol", "Math"];
 // Global objects for inactivity timers.
 let inactivityTimers = {};
 
-// Global cache for ZenQuotes is no longer used (we now use Quotable for Moti).
-// let zenQuotesCache = [];
+// Global variables for lightweight models for Moti and Math.
+let motiModel = null;
+let mathModel = null;
+
+// Placeholder URLs for the TF.js models (you must replace these with actual URLs)
+const MOTI_MODEL_URL = "https://storage.googleapis.com/tfjs-models/gpt2/model.json";
+const MATH_MODEL_URL = "https://storage.googleapis.com/tfjs-models/gpt2/model.json";
 
 /**
- * Fetches a response for a given bot by calling its designated API.
- * Returns a Promise that resolves to a string.
+ * Loads the Moti model if not already loaded.
+ */
+async function loadMotiModel() {
+  if (!motiModel) {
+    try {
+      motiModel = await tf.loadGraphModel(MOTI_MODEL_URL);
+      console.log("[DEBUG] Moti model loaded.");
+    } catch (err) {
+      console.error("[DEBUG] Error loading Moti model:", err);
+    }
+  }
+  return motiModel;
+}
+
+/**
+ * Loads the Math model if not already loaded.
+ */
+async function loadMathModel() {
+  if (!mathModel) {
+    try {
+      mathModel = await tf.loadGraphModel(MATH_MODEL_URL);
+      console.log("[DEBUG] Math model loaded.");
+    } catch (err) {
+      console.error("[DEBUG] Error loading Math model:", err);
+    }
+  }
+  return mathModel;
+}
+
+/**
+ * A pseudo-code function to generate text using a loaded model and a prompt.
+ * In a real implementation, you would tokenize the prompt, run it through the model,
+ * and decode the output tokens to text.
+ */
+async function generateText(model, prompt) {
+  // Pseudo-code: In an actual implementation, you'd use your tokenizer and model here.
+  // For demonstration, we simply return the prompt with some random variation.
+  const variations = [
+    prompt + " Stay strong and shine!",
+    prompt + " Believe in yourself!",
+    prompt + " Every moment counts!",
+    prompt + " Keep pushing forward!",
+    prompt + " The future is bright!"
+  ];
+  const choice = variations[Math.floor(Math.random() * variations.length)];
+  return choice;
+}
+
+/**
+ * Fetches a response for a given bot.
+ * For Pi and Sol, uses public APIs.
+ * For Moti and Math, uses the loaded TF.js model to generate text.
  */
 function getBotResponse(botName) {
   switch (botName) {
     case "Pi":
-      // JokeAPI v2: returns a joke.
       return fetch("https://v2.jokeapi.dev/joke/Any?type=single")
         .then(res => res.json())
         .then(data => {
@@ -28,19 +82,18 @@ function getBotResponse(botName) {
           return "Oops, couldn't fetch a joke.";
         });
     case "Moti":
-      // Use Quotable API for inspirational quotes.
-      return fetch("https://api.quotable.io/random?tags=inspirational")
-        .then(res => res.json())
-        .then(data => {
-          console.log("[DEBUG] Moti API response:", data);
-          return data.content + " — " + data.author;
-        })
-        .catch(err => {
-          console.error("[DEBUG] Moti API error:", err);
-          return "Keep pushing forward!";
-        });
+      return loadMotiModel().then(model => {
+        if (model) {
+          const prompt = "Motivational:";
+          return generateText(model, prompt);
+        } else {
+          return "Stay inspired!";
+        }
+      }).catch(err => {
+        console.error("[DEBUG] Moti model error:", err);
+        return "Keep pushing forward!";
+      });
     case "Sol":
-      // TheMealDB API for a random meal (returning meal name).
       return fetch("https://www.themealdb.com/api/json/v1/1/random.php")
         .then(res => res.json())
         .then(data => {
@@ -55,23 +108,17 @@ function getBotResponse(botName) {
           return "No meal suggestion available.";
         });
     case "Math":
-      // Random Data API for math facts.
-      return fetch("https://random-data-api.com/api/math/random_math")
-        .then(res => res.json())
-        .then(data => {
-          console.log("[DEBUG] Math API response:", data);
-          if (data.fact) {
-            return data.fact;
-          } else if (data.expression && data.result) {
-            return data.expression + " = " + data.result;
-          } else {
-            return "Math is fascinating!";
-          }
-        })
-        .catch(err => {
-          console.error("[DEBUG] Math API error:", err);
+      return loadMathModel().then(model => {
+        if (model) {
+          const prompt = "Math fact:";
+          return generateText(model, prompt);
+        } else {
           return "Math is fascinating!";
-        });
+        }
+      }).catch(err => {
+        console.error("[DEBUG] Math model error:", err);
+        return "Math is fascinating!";
+      });
     default:
       return Promise.resolve("Default response.");
   }
@@ -86,7 +133,7 @@ function getRandomDelay(min, max) {
 
 /**
  * Creates a 2x2 grid of walls—one for each bot—and appends it to #aiWallsRoot.
- * The conversation text is set smaller to display more text.
+ * Sets conversation font size smaller to display more text.
  */
 function createWallsUI() {
   const aiWallsRoot = document.getElementById("aiWallsRoot");
@@ -168,7 +215,7 @@ function createWallsUI() {
 
 /**
  * Global timer that triggers spontaneous bot responses.
- * Every 15 seconds, a random wall and random bot are chosen to generate a response.
+ * Every 15 seconds, a random wall and bot are chosen to generate a response.
  */
 function startGlobalBotChat() {
   setInterval(() => {
@@ -180,8 +227,8 @@ function startGlobalBotChat() {
 
 /**
  * Resets the inactivity timer for a given wall.
- * If no new message is posted on that wall for 8 seconds, a random bot posts an auto response,
- * and then a chain sequence is initiated.
+ * If no new message is posted on that wall for 8 seconds,
+ * a random bot posts an auto response and then initiates a chain sequence.
  */
 function resetInactivityTimer(wallName) {
   if (inactivityTimers[wallName]) {
@@ -214,7 +261,7 @@ function chainResponses(wallName, lastResponder, probabilities, index) {
 
 /**
  * Appends a message to the conversation area for a given wall.
- * Also resets the inactivity timer for that wall.
+ * Also resets that wall's inactivity timer.
  */
 function appendMessage(wallName, text) {
   const convo = document.getElementById(`convo-${wallName}`);
