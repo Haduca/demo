@@ -1,244 +1,220 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Pi Payment Flow Demo</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { font-size: 24px; }
-    button { margin: 5px; padding: 10px; }
-    #logs { margin-top: 20px; border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; }
-  </style>
-</head>
-<body>
-  <h1>Pi Payment Flow Demo</h1>
-  <button id="loginBtn">Log in with Pi Network</button>
-  <button id="sendBtn">Send Pi Payment</button>
-  <button id="approvePendingBtn">Check/Approve Pending Payment</button>
-  <div id="logs"></div>
-
-  <!-- Load Pi SDK first -->
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-  <script>
-    // Replace with your actual API key from the Pi Developer Portal
-    const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr";
-
-    // Initialize the Pi SDK with your App ID, Wallet ID, and sandbox flag.
-    Pi.init({
-      version: "2.0",
-      appId: "aiphub2360",      // Your App ID
-      walletId: "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ",  // Your Wallet ID
-      sandbox: true                   // Set to true for testing; false for production
-    });
-
-    // Utility function to log messages to the UI and console
-    function logMessage(message) {
-      console.log(message);
-      const logsDiv = document.getElementById("logs");
-      const p = document.createElement("p");
-      p.textContent = message;
-      logsDiv.appendChild(p);
-      logsDiv.scrollTop = logsDiv.scrollHeight;
-    }
-
-    // Login function using the Pi SDK
-    function login() {
-      Pi.authenticate(
-        { userRoles: ["username", "payments"] },
-        function(auth) {
-          logMessage("Logged in as: " + auth.user.username);
-        },
-        function(error) {
-          logMessage("Login error: " + error);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI4Pi - Pi Transactions</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script> <!-- Pi Network SDK -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
         }
-      );
-    }
-
-    // Function to send a new payment using Pi.createPayment
-    function sendPayment() {
-      Pi.createPayment({
-        amount: 1,
-        memo: "Payment to AI4Pi",
-        metadata: { test: "123" }
-      }, {
-        onReadyForServerApproval: function(paymentId) {
-          logMessage("onReadyForServerApproval: Payment ID = " + paymentId);
-          // Approve the payment
-          approvePayment(paymentId);
-        },
-        onReadyForServerCompletion: function(paymentId, txid) {
-          logMessage("onReadyForServerCompletion: Payment ID = " + paymentId + ", TXID = " + txid);
-          // Complete the payment
-          completePayment(paymentId, txid);
-        },
-        onCancel: function(paymentId) {
-          logMessage("Payment cancelled: " + paymentId);
-        },
-        onError: function(error, paymentId) {
-          logMessage("Payment error: " + error + ", Payment ID: " + paymentId);
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px;
         }
-      });
-    }
-
-    // Approve a payment (this demo does it from the frontend)
-    function approvePayment(paymentId) {
-      fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Key ${apiKey}`,
-          "Content-Type": "application/json"
+        button:hover {
+            background-color: #0056b3;
         }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          logMessage("✅ Payment " + paymentId + " approved successfully.");
-        } else {
-          logMessage("❌ Approval failed: " + data.error);
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            margin: 10px;
         }
-      })
-      .catch(error => {
-        logMessage("❌ Error approving payment: " + error.message);
-      });
-    }
-
-    // Complete a payment (this demo does it from the frontend)
-    function completePayment(paymentId, txid) {
-      fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Key ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ txid: txid })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          logMessage("✅ Payment " + paymentId + " completed successfully.");
-        } else {
-          logMessage("❌ Completion failed: " + data.error);
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            background: black;
+            color: limegreen;
+            font-family: monospace;
+            width: 80%;
+            max-width: 600px;
+            height: 250px;
+            overflow-y: auto;
+            border-radius: 5px;
+            text-align: left;
         }
-      })
-      .catch(error => {
-        logMessage("❌ Error completing payment: " + error.message);
-      });
-    }
+    </style>
+    <script>
+        let userData = null;
+        let ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Ensure correct wallet address
+        const apiKey = "7jtvfxfvsitryhsniutkrjzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Integrated API Key
 
-    // Check for pending (stuck/incomplete) payments and handle them
-    function checkForPendingPayments() {
-      logMessage("🔍 Checking for pending payments...");
-      Pi.getPayment()
-      .then(payment => {
-        if (payment && payment.identifier) {
-          logMessage("⚠️ Found a pending payment: " + payment.identifier);
-          // Auto-approve the pending payment
-          fetch(`https://api.minepi.com/v2/payments/${payment.identifier}/approve`, {
-            method: "POST",
-            headers: {
-              "Authorization": `Key ${apiKey}`,
-              "Content-Type": "application/json"
+        function logMessage(message) {
+            let outputDiv = document.getElementById("output");
+            outputDiv.innerHTML += `<br>> ${message}`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function loginUser() {
+            if (typeof Pi === "undefined") {
+                logMessage("❌ Pi SDK is not available.");
+                return;
             }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              logMessage("✅ Payment " + payment.identifier + " auto-approved.");
-              // If the payment has a txid, complete it
-              if (payment.transaction && payment.transaction.txid) {
-                fetch(`https://api.minepi.com/v2/payments/${payment.identifier}/complete`, {
-                  method: "POST",
-                  headers: {
-                    "Authorization": `Key ${apiKey}`,
-                    "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify({ txid: payment.transaction.txid })
+
+            logMessage("🔄 Initializing SDK for authentication...");
+
+            Pi.init({ version: "2.0", sandbox: true, appId: "aiphub2360" })
+                .then(() => {
+                    logMessage("✅ SDK Initialized. Attempting login...");
+                    return Pi.authenticate(["username", "payments"]);
                 })
-                .then(response => response.json())
-                .then(completeData => {
-                  if (completeData.success) {
-                    logMessage("✅ Payment " + payment.identifier + " completed successfully.");
-                  } else {
-                    logMessage("❌ Error completing payment: " + completeData.error);
-                  }
+                .then(auth => {
+                    if (auth && auth.user) {
+                        userData = auth.user;
+                        logMessage(`✅ Signed in as: ${auth.user.username}`);
+                        checkForPendingPayments(); // Fixes previous error
+                    } else {
+                        logMessage("❌ Authentication failed, no user data received.");
+                    }
                 })
                 .catch(error => {
-                  logMessage("❌ Error completing payment: " + error.message);
+                    logMessage(`❌ Error during authentication: ${error.message}`);
                 });
-              } else {
-                logMessage("⚠️ Payment has no txid yet. Will check again later.");
-              }
-            } else {
-              logMessage("❌ Auto-approval failed: " + data.error);
-            }
-          })
-          .catch(error => {
-            logMessage("❌ API request failed: " + error.message);
-          });
-        } else {
-          logMessage("✅ No pending payments found.");
         }
-      })
-      .catch(error => {
-        logMessage("❌ Error checking pending payments: " + error.message);
-      });
-    }
 
-    // Handle any incomplete payments automatically via Pi SDK's callback
-    Pi.onIncompletePaymentFound(function(payment) {
-      if (payment && payment.identifier) {
-        logMessage("⚠️ Incomplete payment found: " + payment.identifier);
-        fetch(`https://api.minepi.com/v2/payments/${payment.identifier}/approve`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Key ${apiKey}`,
-            "Content-Type": "application/json"
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            logMessage("✅ Incomplete payment " + payment.identifier + " approved successfully.");
-            if (payment.transaction && payment.transaction.txid) {
-              fetch(`https://api.minepi.com/v2/payments/${payment.identifier}/complete`, {
+        function sendPiToAI4Pi() {
+            if (!userData) {
+                logMessage("❌ You must log in before sending Pi.");
+                return;
+            }
+
+            let amount = parseFloat(document.getElementById("amountInput").value);
+            if (isNaN(amount) || amount <= 0) {
+                logMessage("❌ Invalid Pi amount. Please enter a valid number.");
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to send ${amount} Pi to AI4Pi?`)) {
+                logMessage("⚠️ Transaction canceled by user.");
+                return;
+            }
+
+            logMessage(`🔄 Sending ${amount} Pi to AI4Pi...`);
+
+            Pi.createPayment(
+                {
+                    amount: amount,
+                    memo: "Auto-approved transfer to AI4Pi",
+                    metadata: { transactionType: "userToAI4Pi" },
+                    to_address: ai4piWallet
+                },
+                {
+                    onIncompletePaymentFound: function(payment) {
+                        logMessage(`⚠️ Found incomplete payment: ${payment.identifier}`);
+                        resolvePendingPayment(payment.identifier);
+                    },
+                    onReadyForServerApproval: function(paymentId) {
+                        logMessage(`✅ Payment request ready. Auto-approving...`);
+                        approvePayment(paymentId);
+                    },
+                    onReadyForServerCompletion: function(paymentId, txid) {
+                        logMessage(`✅ Payment approved. Finalizing transaction...`);
+                        completePayment(paymentId, txid);
+                    },
+                    onCancel: function(paymentId) {
+                        logMessage(`⚠️ Payment canceled by user. Payment ID: ${paymentId}`);
+                    },
+                    onError: function(error) {
+                        logMessage(`❌ Payment error: ${error.message}`);
+                    }
+                }
+            );
+        }
+
+        function approvePayment(paymentId) {
+            logMessage(`🔄 Approving payment: ${paymentId}...`);
+
+            fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
                 method: "POST",
                 headers: {
-                  "Authorization": `Key ${apiKey}`,
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ txid: payment.transaction.txid })
-              })
-              .then(response => response.json())
-              .then(completeData => {
-                if (completeData.success) {
-                  logMessage("✅ Incomplete payment " + payment.identifier + " completed successfully.");
-                } else {
-                  logMessage("❌ Error completing incomplete payment: " + completeData.error);
+                    "Authorization": `Key ${apiKey}`,
+                    "Content-Type": "application/json"
                 }
-              })
-              .catch(error => {
-                logMessage("❌ Error completing incomplete payment: " + error.message);
-              });
-            } else {
-              logMessage("⚠️ Incomplete payment has no txid yet. Will check later.");
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    logMessage(`✅ Payment approved successfully.`);
+                    completePayment(paymentId);
+                } else {
+                    logMessage(`❌ Payment approval failed: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                logMessage(`❌ API request failed: ${error.message}`);
+            });
+        }
+
+        function completePayment(paymentId, txid) {
+            if (!txid) {
+                logMessage(`❌ Error: Missing transaction ID (txid). Payment cannot be completed.`);
+                return;
             }
-          } else {
-            logMessage("❌ Incomplete payment approval failed: " + data.error);
-          }
-        })
-        .catch(error => {
-          logMessage("❌ Error in incomplete payment approval: " + error.message);
-        });
-      }
-    });
 
-    // Auto-check for pending payments every 30 seconds
-    setInterval(checkForPendingPayments, 30000);
+            logMessage(`🔄 Completing payment: ${paymentId} with txid: ${txid}...`);
 
-    // Attach event listeners to buttons
-    document.getElementById("loginBtn").addEventListener("click", login);
-    document.getElementById("sendBtn").addEventListener("click", sendPayment);
-    document.getElementById("approvePendingBtn").addEventListener("click", checkForPendingPayments);
-  </script>
+            fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Key ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ txid: txid }) // Ensure txid is sent properly
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    logMessage(`✅ Payment marked as completed.`);
+                } else {
+                    logMessage(`❌ Payment completion failed: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                logMessage(`❌ API request failed: ${error.message}`);
+            });
+        }
+
+        function checkForPendingPayments() {
+            logMessage("🔍 Checking for pending payments...");
+
+            Pi.getPayment()
+                .then(payment => {
+                    if (payment && payment.identifier) {
+                        logMessage(`⚠️ Found a pending payment: ${payment.identifier}`);
+                        completePayment(payment.identifier);
+                    } else {
+                        logMessage("✅ No pending payments found.");
+                    }
+                })
+                .catch(error => {
+                    logMessage(`❌ Error checking pending payments: ${error.message}`);
+                });
+        }
+    </script>
+</head>
+<body>
+    <h1>AI4Pi - Pi Transactions</h1>
+    <button onclick="loginUser()">🔑 Log In with Pi Network</button>
+    <input type="number" id="amountInput" placeholder="Enter Pi amount">
+    <button onclick="sendPiToAI4Pi()">💰 Send Pi to AI4Pi</button>
+    <div class="output" id="output">[Logs will appear here]</div>
 </body>
 </html>
