@@ -91,7 +91,8 @@ function getBotResponse(botName, wallName) {
         const start = Math.floor(Math.random() * Math.max(1, words.length - 10));
         const snippet = words.slice(start, start + 10).join(" ");
         console.log("[DEBUG] Math bot context snippet:", snippet);
-        return Promise.resolve("${snippet}..."`);
+        // Simply return the snippet with an ellipsis.
+        return Promise.resolve(`${snippet}...`);
       } else {
         return Promise.resolve("I'm here to join the conversation!");
       }
