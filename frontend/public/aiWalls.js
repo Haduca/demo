@@ -14,6 +14,17 @@ let scores = {
   Math: 0
 };
 
+// Global Pi values for each bot.
+let piValues = {
+  Pi: 0,
+  Moti: 0,
+  Sol: 0,
+  Math: 0
+};
+
+// Total accumulated Pi from the Pi Drip system.
+let piDripAccumulated = 100; // Starting value, can be updated externally as needed.
+
 /**
  * Fetches a response for a given bot by calling its designated API.
  * Returns a Promise that resolves to a string.
@@ -34,12 +45,10 @@ function getBotResponse(botName) {
         });
     case "Moti":
       // Hipsum API for creative, hipster text.
-      // Using the 'hipster-centric' type with 1 paragraph.
       return fetch("https://hipsum.co/api/?type=hipster-centric&paras=1")
         .then(res => res.json())
         .then(data => {
           console.log("[DEBUG] Moti API response:", data);
-          // Data is an array of paragraphs; return the first.
           return data[0] || "Stay inspired!";
         })
         .catch(err => {
@@ -64,7 +73,6 @@ function getBotResponse(botName) {
     case "Math":
       // Custom aggregation: randomly choose between NumbersAPI and a curated list.
       if (Math.random() < 0.5) {
-        // Option 1: Use Numbers API for a random math fact.
         return fetch("http://numbersapi.com/random/math")
           .then(res => res.text())
           .then(text => {
@@ -76,7 +84,6 @@ function getBotResponse(botName) {
             return "Math is fascinating!";
           });
       } else {
-        // Option 2: Use a curated array of math facts.
         const mathFacts = [
           "Zero is the only number that cannot be represented in Roman numerals.",
           "The word 'hundred' comes from the Old Norse term 'hundrath', which actually means 120.",
@@ -101,8 +108,28 @@ function getRandomDelay(min, max) {
 }
 
 /**
+ * Updates the header for a given bot's wall to reflect its current score and Pi value.
+ */
+function updateHeader(botName) {
+  const header = document.getElementById(`header-${botName}`);
+  if (header) {
+    header.textContent = `${botName} (Score: ${scores[botName]}, Pi: ${piValues[botName].toFixed(2)})`;
+  }
+}
+
+/**
+ * Resets the scores for all bots to 0 and updates their headers.
+ */
+function resetAllScores() {
+  aiList.forEach(bot => {
+    scores[bot] = 0;
+    updateHeader(bot);
+  });
+}
+
+/**
  * Creates a 2x2 grid of walls—one for each bot—and appends it to #aiWallsRoot.
- * Adjusts the conversation text to a smaller font size.
+ * The header now displays the bot's name, current score, and accumulated Pi.
  */
 function createWallsUI() {
   const aiWallsRoot = document.getElementById("aiWallsRoot");
@@ -130,10 +157,10 @@ function createWallsUI() {
     wall.style.flexDirection = "column";
     wall.style.justifyContent = "space-between";
 
-    // Header with bot's name and initial score.
+    // Header with bot's name, score, and Pi value.
     const header = document.createElement("h3");
     header.id = "header-" + aiName;
-    header.textContent = `${aiName} (Score: ${scores[aiName]})`;
+    header.textContent = `${aiName} (Score: ${scores[aiName]}, Pi: ${piValues[aiName].toFixed(2)})`;
     header.style.margin = "0 0 10px 0";
     wall.appendChild(header);
 
@@ -231,7 +258,7 @@ function chainResponses(wallName, lastResponder, probabilities, index) {
 /**
  * Appends a message to the conversation area for a given wall.
  * Also resets that wall's inactivity timer.
- * This function now accepts a 'sender' parameter to help track consecutive messages.
+ * If the sender is a bot and posts twice in a row, update score and check reward.
  */
 function appendMessage(wallName, text, sender) {
   const convo = document.getElementById(`convo-${wallName}`);
@@ -242,20 +269,27 @@ function appendMessage(wallName, text, sender) {
   p.style.margin = "5px 0";
   convo.appendChild(p);
   convo.scrollTop = convo.scrollHeight;
-  
-  // If the sender is a bot, check if the previous message was from the same bot.
+
+  // Check for consecutive bot messages.
   if (aiList.includes(sender)) {
     const messages = convo.getElementsByTagName("p");
     if (messages.length >= 2) {
-      // Get the second-to-last message's sender.
       const prevSender = messages[messages.length - 2].getAttribute("data-sender");
       if (prevSender === sender) {
         // Increment the score for this bot.
         scores[sender]++;
-        // Update the designated header for the bot.
-        const header = document.getElementById(`header-${sender}`);
-        if (header) {
-          header.textContent = `${sender} (Score: ${scores[sender]})`;
+        updateHeader(sender);
+        // If the score reaches 5, award the reward.
+        if (scores[sender] >= 5) {
+          // Calculate reward as 5% of the current piDripAccumulated.
+          const reward = piDripAccumulated * 0.05;
+          piValues[sender] += reward;
+          piDripAccumulated -= reward;
+          console.log(`[DEBUG] ${sender} earned a reward of ${reward.toFixed(2)} Pi. New piDripAccumulated: ${piDripAccumulated.toFixed(2)}`);
+          // Update header for the rewarded bot.
+          updateHeader(sender);
+          // Reset scores for all bots.
+          resetAllScores();
         }
       }
     }
@@ -278,10 +312,9 @@ function handleUserMessage(wallName) {
 
 /**
  * General message handler for both user and bot messages.
- * - If sender is "User": all bots are candidates.
- * - If sender is a bot: all other bots are candidates.
- * A primary responder is chosen after 11 seconds,
- * and each other candidate has a 50% chance to respond after a random delay between 12 and 15 seconds.
+ * If sender is "User": all bots are candidates.
+ * If sender is a bot: all other bots are candidates.
+ * A primary responder is chosen after 11 seconds, and each other candidate has a 50% chance to respond after a random delay.
  */
 function handleMessage(wallName, sender) {
   let candidates;
