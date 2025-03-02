@@ -6,6 +6,14 @@ const aiList = ["Pi", "Moti", "Sol", "Math"];
 // Global objects for inactivity timers.
 let inactivityTimers = {};
 
+// Global score tracker for each bot.
+let scores = {
+  Pi: 0,
+  Moti: 0,
+  Sol: 0,
+  Math: 0
+};
+
 /**
  * Fetches a response for a given bot by calling its designated API.
  * Returns a Promise that resolves to a string.
@@ -122,10 +130,10 @@ function createWallsUI() {
     wall.style.flexDirection = "column";
     wall.style.justifyContent = "space-between";
 
-    // Header with bot's name.
+    // Header with bot's name and initial score.
     const header = document.createElement("h3");
     header.id = "header-" + aiName;
-    header.textContent = `${aiName}`;
+    header.textContent = `${aiName} (Score: ${scores[aiName]})`;
     header.style.margin = "0 0 10px 0";
     wall.appendChild(header);
 
@@ -223,15 +231,36 @@ function chainResponses(wallName, lastResponder, probabilities, index) {
 /**
  * Appends a message to the conversation area for a given wall.
  * Also resets that wall's inactivity timer.
+ * This function now accepts a 'sender' parameter to help track consecutive messages.
  */
-function appendMessage(wallName, text) {
+function appendMessage(wallName, text, sender) {
   const convo = document.getElementById(`convo-${wallName}`);
   if (!convo) return;
   const p = document.createElement("p");
   p.textContent = text;
+  p.setAttribute("data-sender", sender);
   p.style.margin = "5px 0";
   convo.appendChild(p);
   convo.scrollTop = convo.scrollHeight;
+  
+  // If the sender is a bot, check if the previous message was from the same bot.
+  if (aiList.includes(sender)) {
+    const messages = convo.getElementsByTagName("p");
+    if (messages.length >= 2) {
+      // Get the second-to-last message's sender.
+      const prevSender = messages[messages.length - 2].getAttribute("data-sender");
+      if (prevSender === sender) {
+        // Increment the score for this bot.
+        scores[sender]++;
+        // Update the designated header for the bot.
+        const header = document.getElementById(`header-${sender}`);
+        if (header) {
+          header.textContent = `${sender} (Score: ${scores[sender]})`;
+        }
+      }
+    }
+  }
+  
   resetInactivityTimer(wallName);
 }
 
@@ -242,7 +271,7 @@ function handleUserMessage(wallName) {
   const input = document.getElementById(`input-${wallName}`);
   const message = input.value.trim();
   if (!message) return;
-  appendMessage(wallName, `User: ${message}`);
+  appendMessage(wallName, `User: ${message}`, "User");
   input.value = "";
   handleMessage(wallName, "User");
 }
@@ -284,7 +313,7 @@ function handleMessage(wallName, sender) {
 function postAIResponse(wallName, botName, tag) {
   getBotResponse(botName).then(responseText => {
     let displayTag = tag ? ` ${tag}` : "";
-    appendMessage(wallName, `${botName}${displayTag}: ${responseText}`);
+    appendMessage(wallName, `${botName}${displayTag}: ${responseText}`, botName);
   });
 }
 
