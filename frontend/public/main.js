@@ -2,7 +2,7 @@
 
 // Basic variables for Pi logic
 let userData = null;
-const apiKey = "7jtvfxfvsitryhsniutkrzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual Pi Dev Portal key
+const apiKey = "YOUR_PI_DEV_PORTAL_KEY"; // Replace with your actual Pi Dev Portal key
 const ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Replace with your actual wallet address
 
 /**
@@ -35,10 +35,6 @@ function loginUser() {
       if (auth && auth.user) {
         userData = auth.user;
         logMessage(`✅ Signed in as: ${auth.user.username}`);
-        // Optionally update wallet display upon login.
-        if (typeof window.updateWalletDisplay === "function") {
-          window.updateWalletDisplay();
-        }
       } else {
         logMessage("❌ Authentication failed, no user data received.");
       }
@@ -85,12 +81,10 @@ function sendPiToAI4Pi() {
     },
     {
       onReadyForServerApproval: function(paymentId) {
-        logMessage("✅ Payment request ready. Forcing completion using hard-coded IDs...");
-        // Force complete the payment using the provided Payment ID and TXID
-        completePayment("387ff48c-fd79-49c6-9925-a257cc6161e7", "5KXqfQscaQsYvRHGSiH2LusaZC53");
+        logMessage("✅ Payment request ready. Auto-approving...");
+        approvePayment(paymentId);
       },
       onReadyForServerCompletion: function(paymentId, txid) {
-        // This callback might not be used if we're force completing.
         logMessage("✅ Payment approved on chain. Finalizing transaction...");
         completePayment(paymentId, txid);
       },
@@ -154,10 +148,6 @@ function completePayment(paymentId, txid) {
     .then(data => {
       if (data.status && data.status.developer_completed === true) {
         logMessage(`✅ Payment ${paymentId} marked as completed.`);
-        // Optionally, update the wallet display here.
-        if (typeof window.updateWalletDisplay === "function") {
-          window.updateWalletDisplay();
-        }
       } else {
         logMessage(`❌ Payment completion response: ${JSON.stringify(data)}`);
       }
@@ -166,3 +156,18 @@ function completePayment(paymentId, txid) {
       logMessage(`❌ API request failed: ${error.message}`);
     });
 }
+
+/**
+ * Force-complete a transaction with hard-coded Payment ID and TXID (optional).
+ * If you want to forcibly complete an existing transaction, you can call this.
+ */
+function forceCompleteTransaction() {
+  const paymentId = "387ff48c-fd79-49c6-9925-a257cc6161e7";
+  const txid = "5KXqfQscaQsYvRHGSiH2LusaZC53";
+
+  logMessage(`🔄 Force completing payment: ${paymentId} with txid: ${txid}...`);
+  completePayment(paymentId, txid);
+}
+
+// Expose the forceCompleteTransaction function globally so you can call it without F12 console, e.g., from a button onclick.
+window.forceCompleteTransaction = forceCompleteTransaction;
