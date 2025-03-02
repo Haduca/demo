@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- This meta tag ensures the page scales correctly on mobile devices -->
+  <!-- Ensure proper mobile scaling -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI4Pi - Pi Transactions</title>
-  <!-- Basic styling; you can adjust as needed -->
   <style>
     /* Prevent horizontal scrolling */
     html, body {
@@ -54,17 +53,11 @@
       border-radius: 5px;
       text-align: left;
     }
-    /* Container for Pi Drip System (drip.js) */
+    /* Container for Pi Drip System */
     #dripContainer {
       margin: 20px auto;
       width: 80%;
       max-width: 600px;
-    }
-    /* Container for the AI walls */
-    #aiWallsRoot {
-      margin: 20px auto;
-      width: 90%;
-      max-width: 800px;
     }
     /* Wallet display styling */
     #walletDisplay {
@@ -75,39 +68,57 @@
       width: 80%;
       max-width: 600px;
     }
+    /* Container for the AI walls */
+    #aiWallsRoot {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 800px;
+      text-align: center;
+    }
+    /* aiWallsContainer styling */
+    #aiWallsContainer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 20px;
+      width: 90%;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+    /* Each wall styling; inline height in aiWalls.js is 300px */
+    .aiWall {
+      border: 2px solid #007BFF;
+      border-radius: 5px;
+      padding: 10px;
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    /* For smaller screens, switch to one column and let walls size naturally */
+    @media (max-width: 600px) {
+      #aiWallsContainer {
+        grid-template-columns: 1fr !important;
+      }
+      .aiWall {
+        height: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- Your existing Pi UI -->
   <h1>AI4Pi - Pi Transactions</h1>
   <button onclick="loginUser()">🔑 Log In with Pi Network</button>
   <input type="number" id="amountInput" placeholder="Enter Pi amount">
   <button onclick="sendPiToAI4Pi()">💰 Send Pi to AI4Pi</button>
   <div class="output" id="output">[Logs will appear here]</div>
-
-  <!-- Wallet display (this will show the true balance after a deposit) -->
   <div id="walletDisplay">Wallet Balance: Loading...</div>
-
-  <!-- Pi Drip System container (drip.js will create UI here) -->
   <div id="dripContainer"></div>
-
-  <!-- AI Walls container; aiWalls.js will append the 2x2 grid here -->
   <div id="aiWallsRoot"></div>
-
   <!-- Scripts in proper order -->
-  <!-- 1) Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-  
-  <!-- 2) main.js: Your Pi login & payment logic -->
   <script src="main.js"></script>
-  
-  <!-- 3) wallet.js: Wallet integration -->
   <script src="wallet.js"></script>
-  
-  <!-- 4) drip.js: Pi Drip system -->
   <script src="drip.js"></script>
-  
-  <!-- 5) aiWalls.js: 2x2 AI walls -->
   <script src="aiWalls.js"></script>
 </body>
 </html>
