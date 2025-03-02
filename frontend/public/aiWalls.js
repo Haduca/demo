@@ -119,8 +119,10 @@ function getBotResponse(botName, wallName) {
         context = contextMessages.join(" ");
       }
       if (context.trim().length > 0) {
+        // Remove any bot names (e.g., "Pi:", "Moti:", "Sol:", "Math:") from the context.
+        const filteredContext = context.replace(/\b(Pi|Moti|Sol|Math):/g, "");
         // Use our helper to generate a new sentence.
-        const newSentence = generateSentenceFromContext(context);
+        const newSentence = generateSentenceFromContext(filteredContext);
         console.log("[DEBUG] Math bot generated sentence:", newSentence);
         return Promise.resolve(newSentence);
       } else {
@@ -206,7 +208,7 @@ function createWallsUI() {
     convo.style.marginBottom = "10px";
     convo.style.border = "1px solid #ccc";
     convo.style.borderRadius = "3px";
-    convo.style.fontSize = "12px";
+    convo.style.fontSize = "12px"; 
     convo.id = `convo-${aiName}`;
     wall.appendChild(convo);
 
@@ -300,6 +302,7 @@ function appendMessage(wallName, text, sender) {
   p.style.margin = "5px 0";
   convo.appendChild(p);
   convo.scrollTop = convo.scrollHeight;
+  
   // Check for consecutive bot messages.
   if (aiList.includes(sender)) {
     const messages = convo.getElementsByTagName("p");
@@ -320,6 +323,7 @@ function appendMessage(wallName, text, sender) {
       }
     }
   }
+  
   resetInactivityTimer(wallName);
 }
 
@@ -367,7 +371,6 @@ function handleMessage(wallName, sender) {
  */
 function postAIResponse(wallName, botName, tag) {
   getBotResponse(botName, wallName).then(responseText => {
-    // Always display without any tag.
     appendMessage(wallName, `${botName}: ${responseText}`, botName);
   });
 }
