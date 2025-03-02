@@ -26,6 +26,39 @@ let piValues = {
 };
 
 /**
+ * Helper function to generate a sentence from conversation context using a simple
+ * Subject + Verb + Object structure. It uses words from the provided context.
+ */
+function generateSentenceFromContext(context) {
+  // Split context into words and filter out empties.
+  const words = context.split(/\s+/).filter(word => word.trim() !== "");
+  // Pre-defined list of common verbs.
+  const commonVerbs = ["is", "are", "has", "have", "runs", "jumps", "says", "goes", "feels", "seems", "loves", "hates", "wants"];
+  
+  // Candidate subjects: words starting with an uppercase letter.
+  const candidateSubjects = words.filter(word => /^[A-Z]/.test(word));
+  // Candidate verbs: words that are in our commonVerbs list.
+  const candidateVerbs = words.filter(word => commonVerbs.includes(word.toLowerCase()));
+  // Candidate objects: words that consist solely of letters.
+  const candidateObjects = words.filter(word => /^[A-Za-z]+$/.test(word));
+  
+  // Select random elements, with fallback defaults.
+  const subject = candidateSubjects.length > 0 ? candidateSubjects[Math.floor(Math.random() * candidateSubjects.length)] : "Someone";
+  const verb = candidateVerbs.length > 0 ? candidateVerbs[Math.floor(Math.random() * candidateVerbs.length)] : "seems";
+  const object = candidateObjects.length > 0 ? candidateObjects[Math.floor(Math.random() * candidateObjects.length)] : "something";
+  
+  // Construct sentence.
+  let sentence = subject + " " + verb + " " + object;
+  // Capitalize first letter.
+  sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+  // Ensure proper ending punctuation.
+  if (!/[.!?]$/.test(sentence)) {
+    sentence += ".";
+  }
+  return sentence;
+}
+
+/**
  * Fetches a response for a given bot by calling its designated API.
  * Now accepts a second parameter (wallName) to allow Math to analyze the conversation context.
  * Returns a Promise that resolves to a string.
@@ -78,21 +111,18 @@ function getBotResponse(botName, wallName) {
       let context = "";
       if (convo) {
         const messages = convo.getElementsByTagName("p");
-        // Gather the last 10 messages to form context.
         const contextMessages = [];
-        for (let i = Math.max(0, messages.length - 10); i < messages.length; i++) {
+        // Gather all messages.
+        for (let i = 0; i < messages.length; i++) {
           contextMessages.push(messages[i].textContent);
         }
         context = contextMessages.join(" ");
       }
       if (context.trim().length > 0) {
-        // Extract a snippet of about 10 words from the conversation.
-        const words = context.split(/\s+/);
-        const start = Math.floor(Math.random() * Math.max(1, words.length - 10));
-        const snippet = words.slice(start, start + 10).join(" ");
-        console.log("[DEBUG] Math bot context snippet:", snippet);
-        // Simply return the snippet with an ellipsis.
-        return Promise.resolve(`${snippet}...`);
+        // Use our helper to generate a new sentence.
+        const newSentence = generateSentenceFromContext(context);
+        console.log("[DEBUG] Math bot generated sentence:", newSentence);
+        return Promise.resolve(newSentence);
       } else {
         return Promise.resolve("I'm here to join the conversation!");
       }
@@ -176,7 +206,7 @@ function createWallsUI() {
     convo.style.marginBottom = "10px";
     convo.style.border = "1px solid #ccc";
     convo.style.borderRadius = "3px";
-    convo.style.fontSize = "12px"; // Smaller text.
+    convo.style.fontSize = "12px";
     convo.id = `convo-${aiName}`;
     wall.appendChild(convo);
 
@@ -219,7 +249,7 @@ function startGlobalBotChat() {
   setInterval(() => {
     const randomWall = aiList[Math.floor(Math.random() * aiList.length)];
     const randomBot = aiList[Math.floor(Math.random() * aiList.length)];
-    postAIResponse(randomWall, randomBot, "(global)");
+    postAIResponse(randomWall, randomBot, "");
   }, 20000 * speedFactor);
 }
 
@@ -234,7 +264,7 @@ function resetInactivityTimer(wallName) {
   }
   inactivityTimers[wallName] = setTimeout(() => {
     const bot = aiList[Math.floor(Math.random() * aiList.length)];
-    postAIResponse(wallName, bot, "(auto)");
+    postAIResponse(wallName, bot, "");
     chainResponses(wallName, bot, [0.9, 0.5, 0.8, 0.2], 0);
     resetInactivityTimer(wallName);
   }, 13000 * speedFactor);
@@ -251,7 +281,7 @@ function chainResponses(wallName, lastResponder, probabilities, index) {
       const candidates = aiList.filter(bot => bot !== lastResponder);
       if (candidates.length === 0) return;
       const responder = candidates[Math.floor(Math.random() * candidates.length)];
-      postAIResponse(wallName, responder, "(chain)");
+      postAIResponse(wallName, responder, "");
       chainResponses(wallName, responder, probabilities, index + 1);
     }
   }, 11000 * speedFactor);
@@ -260,7 +290,6 @@ function chainResponses(wallName, lastResponder, probabilities, index) {
 /**
  * Appends a message to the conversation area for a given wall.
  * Also resets that wall's inactivity timer.
- * If the sender is a bot and posts twice in a row, update score and check reward.
  */
 function appendMessage(wallName, text, sender) {
   const convo = document.getElementById(`convo-${wallName}`);
@@ -271,34 +300,26 @@ function appendMessage(wallName, text, sender) {
   p.style.margin = "5px 0";
   convo.appendChild(p);
   convo.scrollTop = convo.scrollHeight;
-
   // Check for consecutive bot messages.
   if (aiList.includes(sender)) {
     const messages = convo.getElementsByTagName("p");
     if (messages.length >= 2) {
       const prevSender = messages[messages.length - 2].getAttribute("data-sender");
       if (prevSender === sender) {
-        // Increment the score for this bot.
         scores[sender]++;
         updateHeader(sender);
-        // If the score reaches 5, award the reward.
         if (scores[sender] >= 5) {
-          // Get the current drip amount using the getter from drip.js.
           const currentDrip = window.getPiDripAccumulated();
-          // Calculate reward as 5% of the current drip value.
           const reward = currentDrip * 0.05;
           piValues[sender] += reward;
-          // Update the drip amount using the setter function.
           window.setPiDripAccumulated(currentDrip - reward);
           console.log(`[DEBUG] ${sender} earned a reward of ${reward.toFixed(2)} Pi. New drip: ${window.getPiDripAccumulated().toFixed(2)}`);
           updateHeader(sender);
-          // Reset scores for all bots.
           resetAllScores();
         }
       }
     }
   }
-  
   resetInactivityTimer(wallName);
 }
 
@@ -316,10 +337,7 @@ function handleUserMessage(wallName) {
 
 /**
  * General message handler for both user and bot messages.
- * If sender is "User": all bots are candidates.
- * If sender is a bot: all other bots are candidates.
- * A primary responder is chosen after 11 seconds (adjusted by speedFactor),
- * and each other candidate has a 50% chance to respond after a random delay.
+ * All bots are candidates for a response, with a primary responder chosen after 11 seconds.
  */
 function handleMessage(wallName, sender) {
   let candidates;
@@ -345,13 +363,12 @@ function handleMessage(wallName, sender) {
 
 /**
  * Posts an AI response from a given bot to a given wall.
- * The tag parameter indicates if the response is auto, chain, or global.
- * The response text is obtained from getBotResponse(botName, wallName).
+ * No extra tags are appended to the bot's name.
  */
 function postAIResponse(wallName, botName, tag) {
   getBotResponse(botName, wallName).then(responseText => {
-    let displayTag = tag ? ` ${tag}` : "";
-    appendMessage(wallName, `${botName}${displayTag}: ${responseText}`, botName);
+    // Always display without any tag.
+    appendMessage(wallName, `${botName}: ${responseText}`, botName);
   });
 }
 
