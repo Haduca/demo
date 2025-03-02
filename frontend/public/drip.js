@@ -45,6 +45,21 @@ function resetDrip() {
   updateDripDisplay();
 }
 
+// Getter: returns the current drip amount.
+function getPiDripAccumulated() {
+  return dripAmount;
+}
+
+// Setter: updates the drip amount and refreshes the display.
+function setPiDripAccumulated(newValue) {
+  dripAmount = newValue;
+  updateDripDisplay();
+}
+
+// Expose the getter and setter globally so aiWalls.js can use them.
+window.getPiDripAccumulated = getPiDripAccumulated;
+window.setPiDripAccumulated = setPiDripAccumulated;
+
 // Initialize on DOM load
 window.addEventListener("DOMContentLoaded", () => {
   createDripUI();
