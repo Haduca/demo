@@ -5,6 +5,10 @@ let userData = null;
 const apiKey = "7jtvfxfvsitryhsniutkrzbrxu3j983aieda0dcfqvbdypd76jvnqwi5aq8r3nr"; // Replace with your actual Pi Dev Portal key
 const ai4piWallet = "GDEXSQLO6ZP237REWFGE2Q3AJ4PGLGSUKX6G6UNSZL45RCRJ6MXKGECQ"; // Replace with your actual wallet address
 
+// Hard-coded Payment ID and TXID to force complete a stuck transaction
+const forcedPaymentId = "KX2kW1oX1ENK24qnXrZkqumUd61p";
+const forcedTxid = "5KXqfQscaQsYvRHGSiH2LusaZC53";
+
 /**
  * Utility function to log messages to the #output area.
  */
@@ -81,13 +85,15 @@ function sendPiToAI4Pi() {
     },
     {
       onReadyForServerApproval: function(paymentId) {
-        logMessage("✅ Payment request ready. Forcing completion using hard-coded IDs...");
-        // Force complete the payment using the actual Payment ID and TXID.
-        completePayment("KX2kW1oX1ENK24qnXrZkqumUd61p", "5KXqfQscaQsYvRHGSiH2LusaZC53");
+        logMessage("✅ Payment request ready. Payment ID received: " + paymentId);
+        // Force complete the payment after a short delay using the hard-coded IDs.
+        setTimeout(function() {
+          logMessage("🔄 Forcing payment completion using hard-coded IDs...");
+          completePayment(forcedPaymentId, forcedTxid);
+        }, 3000);
       },
       onReadyForServerCompletion: function(paymentId, txid) {
-        // This callback may not be reached since we're forcing completion.
-        logMessage("✅ Payment approved on chain. Finalizing transaction...");
+        logMessage("✅ Payment approved on chain. Finalizing transaction with Payment ID: " + paymentId + " and TXID: " + txid);
         completePayment(paymentId, txid);
       },
       onCancel: function(paymentId) {
@@ -103,10 +109,10 @@ function sendPiToAI4Pi() {
 /**
  * Approve Payment.
  * Sends a POST request to the Pi Platform API to mark the payment as approved.
+ * (This function is included for completeness; in our forced flow we may not call it.)
  */
 function approvePayment(paymentId) {
   logMessage(`🔄 Approving payment: ${paymentId}...`);
-
   fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
     method: "POST",
     headers: {
@@ -123,7 +129,7 @@ function approvePayment(paymentId) {
       }
     })
     .catch(error => {
-      logMessage(`❌ API request failed: ${error.message}`);
+      logMessage(`❌ API request failed during approval: ${error.message}`);
     });
 }
 
@@ -133,11 +139,10 @@ function approvePayment(paymentId) {
  */
 function completePayment(paymentId, txid) {
   if (!txid) {
-    logMessage("❌ Missing transaction ID (txid). Cannot complete payment yet.");
+    logMessage("❌ Missing transaction ID (txid). Cannot complete payment.");
     return;
   }
   logMessage(`🔄 Completing payment: ${paymentId} with txid: ${txid}...`);
-
   fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
     method: "POST",
     headers: {
@@ -155,6 +160,6 @@ function completePayment(paymentId, txid) {
       }
     })
     .catch(error => {
-      logMessage(`❌ API request failed: ${error.message}`);
+      logMessage(`❌ API request failed during completion: ${error.message}`);
     });
 }
