@@ -22,9 +22,6 @@ let piValues = {
   Math: 0
 };
 
-// Total accumulated Pi from the Pi Drip system.
-let piDripAccumulated = 100; // Starting value, can be updated externally as needed.
-
 /**
  * Fetches a response for a given bot by calling its designated API.
  * Returns a Promise that resolves to a string.
@@ -281,12 +278,14 @@ function appendMessage(wallName, text, sender) {
         updateHeader(sender);
         // If the score reaches 5, award the reward.
         if (scores[sender] >= 5) {
-          // Calculate reward as 5% of the current piDripAccumulated.
-          const reward = piDripAccumulated * 0.05;
+          // Get the current drip amount using the getter from drip.js.
+          const currentDrip = window.getPiDripAccumulated();
+          // Calculate reward as 5% of the current drip value.
+          const reward = currentDrip * 0.05;
           piValues[sender] += reward;
-          piDripAccumulated -= reward;
-          console.log(`[DEBUG] ${sender} earned a reward of ${reward.toFixed(2)} Pi. New piDripAccumulated: ${piDripAccumulated.toFixed(2)}`);
-          // Update header for the rewarded bot.
+          // Update the drip amount using the setter function.
+          window.setPiDripAccumulated(currentDrip - reward);
+          console.log(`[DEBUG] ${sender} earned a reward of ${reward.toFixed(2)} Pi. New drip: ${window.getPiDripAccumulated().toFixed(2)}`);
           updateHeader(sender);
           // Reset scores for all bots.
           resetAllScores();
