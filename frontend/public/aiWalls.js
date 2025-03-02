@@ -44,17 +44,18 @@ function getBotResponse(botName) {
           return "Oops, couldn't fetch a joke.";
         });
     case "Moti":
-      // Hipsum API for creative, hipster text.
-      return fetch("https://hipsum.co/api/?type=hipster-centric&paras=1")
-        .then(res => res.json())
-        .then(data => {
-          console.log("[DEBUG] Moti API response:", data);
-          return data[0] || "Stay inspired!";
-        })
-        .catch(err => {
-          console.error("[DEBUG] Moti API error:", err);
-          return "Keep pushing forward!";
-        });
+  return fetch("/data/story.json")
+    .then(res => res.json())
+    .then(sentences => {
+      const randomIndex = Math.floor(Math.random() * sentences.length);
+      const sentence = sentences[randomIndex];
+      console.log("[DEBUG] Moti story sentence:", sentence);
+      return sentence;
+    })
+    .catch(err => {
+      console.error("[DEBUG] Moti story fetch error:", err);
+      return "Stay inspired!";
+    });
     case "Sol":
       // TheMealDB API for a random meal (returning the meal name).
       return fetch("https://www.themealdb.com/api/json/v1/1/random.php")
