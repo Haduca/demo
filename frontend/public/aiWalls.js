@@ -1,5 +1,8 @@
 // aiWalls.js
 
+// Constant for speeding up text production by 2.5x
+const speedFactor = 1 / 2.5; // equivalent to 0.4
+
 // List of bots (and their walls)
 const aiList = ["Pi", "Moti", "Sol", "Math"];
 
@@ -208,19 +211,19 @@ function createWallsUI() {
 
 /**
  * Global timer that triggers spontaneous bot responses.
- * Every 20 seconds, a random wall and random bot are chosen to generate a response.
+ * Every 20 seconds (adjusted by speedFactor), a random wall and random bot are chosen to generate a response.
  */
 function startGlobalBotChat() {
   setInterval(() => {
     const randomWall = aiList[Math.floor(Math.random() * aiList.length)];
     const randomBot = aiList[Math.floor(Math.random() * aiList.length)];
     postAIResponse(randomWall, randomBot, "(global)");
-  }, 20000);
+  }, 20000 * speedFactor);
 }
 
 /**
  * Resets the inactivity timer for a given wall.
- * If no new message is posted on that wall for 13 seconds,
+ * If no new message is posted on that wall for 13 seconds (adjusted by speedFactor),
  * a random bot posts an auto response and then initiates a chain sequence.
  */
 function resetInactivityTimer(wallName) {
@@ -232,12 +235,12 @@ function resetInactivityTimer(wallName) {
     postAIResponse(wallName, bot, "(auto)");
     chainResponses(wallName, bot, [0.9, 0.5, 0.8, 0.2], 0);
     resetInactivityTimer(wallName);
-  }, 13000);
+  }, 13000 * speedFactor);
 }
 
 /**
  * Recursively triggers chain responses after an auto response.
- * Each chain response is delayed by 11 seconds.
+ * Each chain response is delayed by 11 seconds (adjusted by speedFactor).
  */
 function chainResponses(wallName, lastResponder, probabilities, index) {
   if (index >= probabilities.length) return;
@@ -249,7 +252,7 @@ function chainResponses(wallName, lastResponder, probabilities, index) {
       postAIResponse(wallName, responder, "(chain)");
       chainResponses(wallName, responder, probabilities, index + 1);
     }
-  }, 11000);
+  }, 11000 * speedFactor);
 }
 
 /**
@@ -313,7 +316,8 @@ function handleUserMessage(wallName) {
  * General message handler for both user and bot messages.
  * If sender is "User": all bots are candidates.
  * If sender is a bot: all other bots are candidates.
- * A primary responder is chosen after 11 seconds, and each other candidate has a 50% chance to respond after a random delay.
+ * A primary responder is chosen after 11 seconds (adjusted by speedFactor),
+ * and each other candidate has a 50% chance to respond after a random delay.
  */
 function handleMessage(wallName, sender) {
   let candidates;
@@ -326,10 +330,10 @@ function handleMessage(wallName, sender) {
   const primary = candidates[Math.floor(Math.random() * candidates.length)];
   setTimeout(() => {
     postAIResponse(wallName, primary, "");
-  }, 11000);
+  }, 11000 * speedFactor);
   candidates.forEach(bot => {
     if (bot !== primary && Math.random() < 0.5) {
-      const delay = getRandomDelay(12000, 15000);
+      const delay = getRandomDelay(12000, 15000) * speedFactor;
       setTimeout(() => {
         postAIResponse(wallName, bot, "");
       }, delay);
