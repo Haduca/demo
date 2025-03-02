@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Ensure proper mobile scaling -->
+  <!-- Ensure proper scaling on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI4Pi - Pi Transactions</title>
   <style>
@@ -13,7 +13,7 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 10px;
       background-color: #f4f4f4;
       text-align: center;
     }
@@ -48,21 +48,21 @@
       font-family: monospace;
       width: 80%;
       max-width: 600px;
-      height: 200px;
+      height: 100px;
       overflow-y: auto;
       border-radius: 5px;
       text-align: left;
     }
     /* Container for Pi Drip System */
     #dripContainer {
-      margin: 20px auto;
+      margin: 10px auto;
       width: 80%;
       max-width: 600px;
     }
     /* Wallet display styling */
     #walletDisplay {
       font-family: Arial, sans-serif;
-      font-size: 18px;
+      font-size: 16px;
       color: #007BFF;
       margin: 10px auto;
       width: 80%;
@@ -75,16 +75,14 @@
       max-width: 800px;
       text-align: center;
     }
-    /* aiWallsContainer styling */
+    /* AI Walls grid container: always a 2×2 grid */
     #aiWallsContainer {
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-gap: 20px;
-      width: 90%;
-      max-width: 800px;
-      margin: 20px auto;
+      width: 100%;
     }
-    /* Each wall styling; inline height in aiWalls.js is 300px */
+    /* Each wall styling */
     .aiWall {
       border: 2px solid #007BFF;
       border-radius: 5px;
@@ -94,18 +92,34 @@
       flex-direction: column;
       justify-content: space-between;
     }
-    /* For smaller screens, switch to one column and let walls size naturally */
+    /* Adjust UI elements on smaller screens while preserving the 2×2 grid */
     @media (max-width: 600px) {
-      #aiWallsContainer {
-        grid-template-columns: 1fr !important;
+      h1 {
+        font-size: 20px;
+      }
+      button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+      input[type="number"] {
+        width: 150px;
+        font-size: 14px;
+      }
+      .output {
+        height: 80px;
+        font-size: 12px;
+      }
+      #walletDisplay {
+        font-size: 14px;
       }
       .aiWall {
-        height: auto !important;
+        height: 250px;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Your existing Pi UI -->
   <h1>AI4Pi - Pi Transactions</h1>
   <button onclick="loginUser()">🔑 Log In with Pi Network</button>
   <input type="number" id="amountInput" placeholder="Enter Pi amount">
@@ -113,7 +127,9 @@
   <div class="output" id="output">[Logs will appear here]</div>
   <div id="walletDisplay">Wallet Balance: Loading...</div>
   <div id="dripContainer"></div>
+  <!-- AI Walls container; aiWalls.js will append the 2×2 grid here -->
   <div id="aiWallsRoot"></div>
+
   <!-- Scripts in proper order -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <script src="main.js"></script>
