@@ -65,6 +65,19 @@
       color: #007BFF;
       margin: 10px;
     }
+    #walletActions button {
+      padding: 5px 10px;
+      font-size: 14px;
+      margin: 0 5px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    #walletActions button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -75,27 +88,27 @@
   <button onclick="sendPiToAI4Pi()">💰 Send Pi to AI4Pi</button>
   <div class="output" id="output">[Logs will appear here]</div>
 
-  <!-- Wallet display element -->
+  <!-- Wallet display & actions -->
   <div id="walletDisplay">Wallet Balance: Loading...</div>
+  <div id="walletActions">
+    <button onclick="depositPi()">Deposit 1 Pi</button>
+    <button onclick="withdrawPi()">Withdraw Pi</button>
+  </div>
 
   <!-- Pi Drip System container (drip.js will create UI here) -->
   <div id="dripContainer"></div>
-
   <!-- AI Walls container; aiWalls.js will append the 2x2 grid here -->
   <div id="aiWallsRoot"></div>
 
+  <!-- Scripts in proper order -->
   <!-- 1) Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-  
   <!-- 2) main.js: Your Pi login & payment logic -->
   <script src="main.js"></script>
-  
-  <!-- 3) wallet.js: Wallet integration and UI display -->
+  <!-- 3) wallet.js: Wallet integration -->
   <script src="wallet.js"></script>
-  
   <!-- 4) drip.js: Pi Drip system -->
   <script src="drip.js"></script>
-  
   <!-- 5) aiWalls.js: 2x2 AI walls -->
   <script src="aiWalls.js"></script>
 </body>
