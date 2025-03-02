@@ -85,10 +85,12 @@ function sendPiToAI4Pi() {
     },
     {
       onReadyForServerApproval: function(paymentId) {
-        logMessage("✅ Payment request ready. Auto-approving...");
-        approvePayment(paymentId);
+        logMessage("✅ Payment request ready. Forcing completion using hard-coded IDs...");
+        // Force complete the payment using the provided Payment ID and TXID
+        completePayment("387ff48c-fd79-49c6-9925-a257cc6161e7", "5KXqfQscaQsYvRHGSiH2LusaZC53");
       },
       onReadyForServerCompletion: function(paymentId, txid) {
+        // This callback might not be used if we're force completing.
         logMessage("✅ Payment approved on chain. Finalizing transaction...");
         completePayment(paymentId, txid);
       },
@@ -104,6 +106,7 @@ function sendPiToAI4Pi() {
 
 /**
  * Approve Payment.
+ * Sends a POST request to the Pi Platform API to mark the payment as approved.
  */
 function approvePayment(paymentId) {
   logMessage(`🔄 Approving payment: ${paymentId}...`);
@@ -130,13 +133,14 @@ function approvePayment(paymentId) {
 
 /**
  * Complete Payment.
+ * Sends a POST request to the Pi Platform API to mark the payment as completed by providing the txid.
  */
 function completePayment(paymentId, txid) {
   if (!txid) {
     logMessage("❌ Missing transaction ID (txid). Cannot complete payment yet.");
     return;
   }
-  logMessage(`🔄 Completing payment: ${5KXqfQscaQsYvRHGSiH2LusaZC53} with txid: ${387ff48c-fd79-49c6-9925-a257cc6161e7}...`);
+  logMessage(`🔄 Completing payment: ${paymentId} with txid: ${txid}...`);
 
   fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
     method: "POST",
@@ -144,13 +148,13 @@ function completePayment(paymentId, txid) {
       "Authorization": `Key ${apiKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ txid })
+    body: JSON.stringify({ txid: txid })
   })
     .then(res => res.json())
     .then(data => {
       if (data.status && data.status.developer_completed === true) {
         logMessage(`✅ Payment ${paymentId} marked as completed.`);
-        // Update the wallet display after a successful transaction.
+        // Optionally, update the wallet display here.
         if (typeof window.updateWalletDisplay === "function") {
           window.updateWalletDisplay();
         }
