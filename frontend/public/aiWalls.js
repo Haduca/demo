@@ -54,18 +54,32 @@ function getBotResponse(botName) {
           return "No meal suggestion available.";
         });
     case "Math":
-      // Loripsum API for placeholder text (as a stand-in for math facts).
-      // Loripsum returns plain text.
-      return fetch("https://loripsum.net/api/1/short/plaintext")
-        .then(res => res.text())
-        .then(text => {
-          console.log("[DEBUG] Math API response:", text);
-          return text || "Math is fascinating!";
-        })
-        .catch(err => {
-          console.error("[DEBUG] Math API error:", err);
-          return "Math is fascinating!";
-        });
+      // Custom aggregation: randomly choose between NumbersAPI and a curated list.
+      if (Math.random() < 0.5) {
+        // Option 1: Use Numbers API for a random math fact.
+        return fetch("http://numbersapi.com/random/math")
+          .then(res => res.text())
+          .then(text => {
+            console.log("[DEBUG] NumbersAPI response:", text);
+            return text || "Math is fascinating!";
+          })
+          .catch(err => {
+            console.error("[DEBUG] NumbersAPI error:", err);
+            return "Math is fascinating!";
+          });
+      } else {
+        // Option 2: Use a curated array of math facts.
+        const mathFacts = [
+          "Zero is the only number that cannot be represented in Roman numerals.",
+          "The word 'hundred' comes from the Old Norse term 'hundrath', which actually means 120.",
+          "A 'jiffy' is an actual unit of time: 1/100th of a second.",
+          "A circle has 360 degrees because ancient astronomers divided the circle into 360 parts.",
+          "Pi is irrational, meaning its decimal representation never repeats or terminates."
+        ];
+        const randomFact = mathFacts[Math.floor(Math.random() * mathFacts.length)];
+        console.log("[DEBUG] Custom math fact selected:", randomFact);
+        return Promise.resolve(randomFact);
+      }
     default:
       return Promise.resolve("Default response.");
   }
