@@ -27,9 +27,10 @@ let piValues = {
 
 /**
  * Fetches a response for a given bot by calling its designated API.
+ * Now accepts a second parameter (wallName) to allow Math to analyze the conversation context.
  * Returns a Promise that resolves to a string.
  */
-function getBotResponse(botName) {
+function getBotResponse(botName, wallName) {
   switch (botName) {
     case "Pi":
       // JokeAPI v2 for jokes.
@@ -44,18 +45,18 @@ function getBotResponse(botName) {
           return "Oops, couldn't fetch a joke.";
         });
     case "Moti":
-  return fetch("/data/story.json")
-    .then(res => res.json())
-    .then(sentences => {
-      const randomIndex = Math.floor(Math.random() * sentences.length);
-      const sentence = sentences[randomIndex];
-      console.log("[DEBUG] Moti story sentence:", sentence);
-      return sentence;
-    })
-    .catch(err => {
-      console.error("[DEBUG] Moti story fetch error:", err);
-      return "Stay inspired!";
-    });
+      return fetch("/data/story.json")
+        .then(res => res.json())
+        .then(sentences => {
+          const randomIndex = Math.floor(Math.random() * sentences.length);
+          const sentence = sentences[randomIndex];
+          console.log("[DEBUG] Moti story sentence:", sentence);
+          return sentence;
+        })
+        .catch(err => {
+          console.error("[DEBUG] Moti story fetch error:", err);
+          return "Stay inspired!";
+        });
     case "Sol":
       // TheMealDB API for a random meal (returning the meal name).
       return fetch("https://www.themealdb.com/api/json/v1/1/random.php")
@@ -71,31 +72,30 @@ function getBotResponse(botName) {
           console.error("[DEBUG] Sol API error:", err);
           return "No meal suggestion available.";
         });
-    case "Math":
-      // Custom aggregation: randomly choose between NumbersAPI and a curated list.
-      if (Math.random() < 0.5) {
-        return fetch("http://numbersapi.com/random/math")
-          .then(res => res.text())
-          .then(text => {
-            console.log("[DEBUG] NumbersAPI response:", text);
-            return text || "Math is fascinating!";
-          })
-          .catch(err => {
-            console.error("[DEBUG] NumbersAPI error:", err);
-            return "Math is fascinating!";
-          });
-      } else {
-        const mathFacts = [
-          "Zero is the only number that cannot be represented in Roman numerals.",
-          "The word 'hundred' comes from the Old Norse term 'hundrath', which actually means 120.",
-          "A 'jiffy' is an actual unit of time: 1/100th of a second.",
-          "A circle has 360 degrees because ancient astronomers divided the circle into 360 parts.",
-          "Pi is irrational, meaning its decimal representation never repeats or terminates."
-        ];
-        const randomFact = mathFacts[Math.floor(Math.random() * mathFacts.length)];
-        console.log("[DEBUG] Custom math fact selected:", randomFact);
-        return Promise.resolve(randomFact);
+    case "Math": {
+      // Retrieve the conversation context from the current wall.
+      const convo = document.getElementById(`convo-${wallName}`);
+      let context = "";
+      if (convo) {
+        const messages = convo.getElementsByTagName("p");
+        // Gather the last 10 messages to form context.
+        const contextMessages = [];
+        for (let i = Math.max(0, messages.length - 10); i < messages.length; i++) {
+          contextMessages.push(messages[i].textContent);
+        }
+        context = contextMessages.join(" ");
       }
+      if (context.trim().length > 0) {
+        // Extract a snippet of about 10 words from the conversation.
+        const words = context.split(/\s+/);
+        const start = Math.floor(Math.random() * Math.max(1, words.length - 10));
+        const snippet = words.slice(start, start + 10).join(" ");
+        console.log("[DEBUG] Math bot context snippet:", snippet);
+        return Promise.resolve(`Reflecting on our conversation: "${snippet}..."`);
+      } else {
+        return Promise.resolve("I'm here to join the conversation!");
+      }
+    }
     default:
       return Promise.resolve("Default response.");
   }
@@ -345,10 +345,10 @@ function handleMessage(wallName, sender) {
 /**
  * Posts an AI response from a given bot to a given wall.
  * The tag parameter indicates if the response is auto, chain, or global.
- * The response text is obtained from getBotResponse(botName).
+ * The response text is obtained from getBotResponse(botName, wallName).
  */
 function postAIResponse(wallName, botName, tag) {
-  getBotResponse(botName).then(responseText => {
+  getBotResponse(botName, wallName).then(responseText => {
     let displayTag = tag ? ` ${tag}` : "";
     appendMessage(wallName, `${botName}${displayTag}: ${responseText}`, botName);
   });
