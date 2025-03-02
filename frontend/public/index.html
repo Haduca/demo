@@ -1,252 +1,95 @@
-// aiWalls.js
-
-// Constant for speeding up text production by 2.5x
-const speedFactor = 1 / 2.5; // equivalent to 0.4
-
-// List of bots (and their walls)
-const aiList = ["Pi", "Moti", "Sol", "Math"];
-
-// Global objects for inactivity timers.
-let inactivityTimers = {};
-
-// Global score tracker for each bot.
-let scores = {
-  Pi: 0,
-  Moti: 0,
-  Sol: 0,
-  Math: 0
-};
-
-// Global Pi values for each bot.
-let piValues = {
-  Pi: 0,
-  Moti: 0,
-  Sol: 0,
-  Math: 0
-};
-
-/**
- * Helper function to generate a sentence from conversation context using a simple
- * Subject + Verb + Object structure. It uses words from the provided context.
- */
-function generateSentenceFromContext(context) {
-  // Split context into words and filter out empties.
-  const words = context.split(/\s+/).filter(word => word.trim() !== "");
-  // Pre-defined list of common verbs.
-  const commonVerbs = ["is", "are", "has", "have", "runs", "jumps", "says", "goes", "feels", "seems", "loves", "hates", "wants"];
-  
-  // Candidate subjects: words starting with an uppercase letter.
-  const candidateSubjects = words.filter(word => /^[A-Z]/.test(word));
-  // Candidate verbs: words that are in our commonVerbs list.
-  const candidateVerbs = words.filter(word => commonVerbs.includes(word.toLowerCase()));
-  // Candidate objects: words that consist solely of letters.
-  const candidateObjects = words.filter(word => /^[A-Za-z]+$/.test(word));
-  
-  // Select random elements, with fallback defaults.
-  const subject = candidateSubjects.length > 0 ? candidateSubjects[Math.floor(Math.random() * candidateSubjects.length)] : "Someone";
-  const verb = candidateVerbs.length > 0 ? candidateVerbs[Math.floor(Math.random() * candidateVerbs.length)] : "seems";
-  const object = candidateObjects.length > 0 ? candidateObjects[Math.floor(Math.random() * candidateObjects.length)] : "something";
-  
-  // Construct sentence.
-  let sentence = subject + " " + verb + " " + object;
-  // Capitalize first letter.
-  sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
-  // Ensure proper ending punctuation.
-  if (!/[.!?]$/.test(sentence)) {
-    sentence += ".";
-  }
-  return sentence;
-}
-
-/**
- * Fetches a response for a given bot by calling its designated API.
- * Now accepts a second parameter (wallName) to allow Math to analyze the conversation context.
- * Returns a Promise that resolves to a string.
- */
-function getBotResponse(botName, wallName) {
-  switch (botName) {
-    case "Pi":
-      // JokeAPI v2 for jokes.
-      return fetch("https://v2.jokeapi.dev/joke/Any?type=single")
-        .then(res => res.json())
-        .then(data => {
-          console.log("[DEBUG] Pi API response:", data);
-          return data.joke || "No joke available.";
-        })
-        .catch(err => {
-          console.error("[DEBUG] Pi API error:", err);
-          return "Oops, couldn't fetch a joke.";
-        });
-    case "Moti":
-      return fetch("/data/story.json")
-        .then(res => res.json())
-        .then(sentences => {
-          const randomIndex = Math.floor(Math.random() * sentences.length);
-          const sentence = sentences[randomIndex];
-          console.log("[DEBUG] Moti story sentence:", sentence);
-          return sentence;
-        })
-        .catch(err => {
-          console.error("[DEBUG] Moti story fetch error:", err);
-          return "Stay inspired!";
-        });
-    case "Sol":
-      // TheMealDB API for a random meal (returning the meal name).
-      return fetch("https://www.themealdb.com/api/json/v1/1/random.php")
-        .then(res => res.json())
-        .then(data => {
-          if (data.meals && data.meals.length > 0) {
-            console.log("[DEBUG] Sol API response:", data.meals[0]);
-            return "Try: " + data.meals[0].strMeal;
-          }
-          return "No meal suggestion available.";
-        })
-        .catch(err => {
-          console.error("[DEBUG] Sol API error:", err);
-          return "No meal suggestion available.";
-        });
-    case "Math": {
-      // Retrieve the conversation context from the current wall.
-      const convo = document.getElementById(`convo-${wallName}`);
-      let context = "";
-      if (convo) {
-        const messages = convo.getElementsByTagName("p");
-        const contextMessages = [];
-        // Gather all messages.
-        for (let i = 0; i < messages.length; i++) {
-          contextMessages.push(messages[i].textContent);
-        }
-        context = contextMessages.join(" ");
-      }
-      if (context.trim().length > 0) {
-        // Use our helper to generate a new sentence.
-        const newSentence = generateSentenceFromContext(context);
-        console.log("[DEBUG] Math bot generated sentence:", newSentence);
-        return Promise.resolve(newSentence);
-      } else {
-        return Promise.resolve("I'm here to join the conversation!");
-      }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI4Pi - Pi Transactions</title>
+  <!-- Basic styling; you can adjust as needed -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+      text-align: center;
     }
-    default:
-      return Promise.resolve("Default response.");
-  }
-}
 
-/**
- * Returns a random delay between min and max (in milliseconds).
- */
-function getRandomDelay(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+    h1 {
+      margin-bottom: 10px;
+    }
 
-/**
- * Updates the header for a given bot's wall to reflect its current score and Pi value.
- */
-function updateHeader(botName) {
-  const header = document.getElementById(`header-${botName}`);
-  if (header) {
-    header.textContent = `${botName} (Score: ${scores[botName]}, Pi: ${piValues[botName].toFixed(2)})`;
-  }
-}
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
 
-/**
- * Resets the scores for all bots to 0 and updates their headers.
- */
-function resetAllScores() {
-  aiList.forEach(bot => {
-    scores[bot] = 0;
-    updateHeader(bot);
-  });
-}
+    input[type="number"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 200px;
+      margin: 5px;
+    }
 
-/**
- * Creates a 2x2 grid of walls—one for each bot—and appends it to #aiWallsRoot.
- * The header now displays the bot's name, current score, and accumulated Pi.
- */
-function createWallsUI() {
-  const aiWallsRoot = document.getElementById("aiWallsRoot");
-  if (!aiWallsRoot) {
-    console.warn("No #aiWallsRoot found in HTML. AI walls won't be displayed.");
-    return;
-  }
-  const container = document.createElement("div");
-  container.id = "aiWallsContainer";
-  container.style.display = "grid";
-  container.style.gridTemplateColumns = "1fr 1fr";
-  container.style.gridGap = "20px";
-  container.style.width = "90%";
-  container.style.maxWidth = "800px";
-  container.style.margin = "20px auto";
+    /* Log area */
+    .output {
+      margin: 10px auto;
+      padding: 10px;
+      background: black;
+      color: limegreen;
+      font-family: monospace;
+      width: 80%;
+      max-width: 600px;
+      height: 200px;
+      overflow-y: auto;
+      border-radius: 5px;
+      text-align: left;
+    }
 
-  aiList.forEach((aiName) => {
-    const wall = document.createElement("div");
-    wall.className = "aiWall";
-    wall.style.border = "2px solid #007BFF";
-    wall.style.borderRadius = "5px";
-    wall.style.padding = "10px";
-    wall.style.height = "300px";
-    wall.style.display = "flex";
-    wall.style.flexDirection = "column";
-    wall.style.justifyContent = "space-between";
+    /* Container for Pi Drip System (drip.js) */
+    #dripContainer {
+      margin: 20px auto;
+      width: 80%;
+      max-width: 600px;
+    }
 
-    // Header with bot's name, score, and Pi value.
-    const header = document.createElement("h3");
-    header.id = "header-" + aiName;
-    header.textContent = `${aiName} (Score: ${scores[aiName]}, Pi: ${piValues[aiName].toFixed(2)})`;
-    header.style.margin = "0 0 10px 0";
-    wall.appendChild(header);
+    /* Container for the AI walls */
+    #aiWallsRoot {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Your existing Pi UI -->
+  <h1>AI4Pi - Pi Transactions</h1>
+  <button onclick="loginUser()">🔑 Log In with Pi Network</button>
+  <input type="number" id="amountInput" placeholder="Enter Pi amount">
+  <button onclick="sendPiToAI4Pi()">💰 Send Pi to AI4Pi</button>
+  <div class="output" id="output">[Logs will appear here]</div>
 
-    // Conversation area.
-    const convo = document.createElement("div");
-    convo.className = "conversation";
-    convo.style.flexGrow = "1";
-    convo.style.overflowY = "auto";
-    convo.style.backgroundColor = "#f9f9f9";
-    convo.style.padding = "5px";
-    convo.style.marginBottom = "10px";
-    convo.style.border = "1px solid #ccc";
-    convo.style.borderRadius = "3px";
-    convo.style.fontSize = "12px";
-    convo.id = `convo-${aiName}`;
-    wall.appendChild(convo);
+  <!-- Pi Drip System container (drip.js will create UI here) -->
+  <div id="dripContainer"></div>
 
-    // Input area: textbox and send button.
-    const inputContainer = document.createElement("div");
-    inputContainer.style.display = "flex";
-    inputContainer.style.gap = "5px";
+  <!-- AI Walls container; aiWalls.js will append the 2x2 grid here -->
+  <div id="aiWallsRoot"></div>
 
-    const inputBox = document.createElement("input");
-    inputBox.type = "text";
-    inputBox.placeholder = "Type here...";
-    inputBox.style.flexGrow = "1";
-    inputBox.id = `input-${aiName}`;
+  <!-- 1) Pi SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-    const sendButton = document.createElement("button");
-    sendButton.textContent = "Send";
-    sendButton.addEventListener("click", () => {
-      handleUserMessage(aiName);
-    });
-    inputBox.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        handleUserMessage(aiName);
-      }
-    });
+  <!-- 2) main.js: Your Pi login & payment logic -->
+  <script src="main.js"></script>
 
-    inputContainer.appendChild(inputBox);
-    inputContainer.appendChild(sendButton);
-    wall.appendChild(inputContainer);
+  <!-- 3) drip.js: Pi Drip system -->
+  <script src="drip.js"></script>
 
-    container.appendChild(wall);
-  });
-  aiWallsRoot.appendChild(container);
-}
-
-/**
- * Global timer that triggers spontaneous bot responses.
- * Every 20 seconds (adjusted by speedFactor), a random wall and random bot are chosen to generate a response.
- */
-function startGlobalBotChat() {
-  setInterval(() => {
-    const randomWall = aiList[Math.floor(Math.random() * aiList.length)];
-    const randomBot = aiList[Math.floor(Math.random() * aiList.length)];
-    postAIRespo
+  <!-- 4) aiWalls.js: 2x2 AI walls -->
+  <script src="aiWalls.js"></script>                       
+</body>
+</html>
