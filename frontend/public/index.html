@@ -2,9 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- This meta tag ensures the page scales correctly on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI4Pi - Pi Transactions</title>
   <!-- Basic styling; you can adjust as needed -->
   <style>
+    /* Prevent horizontal scrolling */
+    html, body {
+      overflow-x: hidden;
+    }
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -56,14 +62,18 @@
     }
     /* Container for the AI walls */
     #aiWallsRoot {
-      margin-top: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 800px;
     }
     /* Wallet display styling */
     #walletDisplay {
       font-family: Arial, sans-serif;
       font-size: 18px;
       color: #007BFF;
-      margin: 10px;
+      margin: 10px auto;
+      width: 80%;
+      max-width: 600px;
     }
   </style>
 </head>
