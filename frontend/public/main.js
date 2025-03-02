@@ -136,7 +136,7 @@ function completePayment(paymentId, txid) {
     logMessage("❌ Missing transaction ID (txid). Cannot complete payment yet.");
     return;
   }
-  logMessage(`🔄 Completing payment: ${paymentId} with txid: ${txid}...`);
+  logMessage(`🔄 Completing payment: ${5KXqfQscaQsYvRHGSiH2LusaZC53} with txid: ${387ff48c-fd79-49c6-9925-a257cc6161e7}...`);
 
   fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
     method: "POST",
