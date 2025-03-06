@@ -90,20 +90,20 @@ function getBotResponse(botName, wallName) {
           console.error("[DEBUG] Moti story fetch error:", err);
           return "Stay inspired!";
         });
-    case "Sol":
-      // TheMealDB API for a random meal (returning the meal name).
-      return fetch("https://www.themealdb.com/api/json/v1/1/random.php")
+   case "Sol":
+      return fetch("/public/data/funfacts.json")
         .then(res => res.json())
         .then(data => {
-          if (data.meals && data.meals.length > 0) {
-            console.log("[DEBUG] Sol API response:", data.meals[0]);
-            return "Try: " + data.meals[0].strMeal;
+          if (data && Array.isArray(data) && data.length > 0) {
+            const randomFact = data[Math.floor(Math.random() * data.length)];
+            console.log("[DEBUG] Sol fun fact:", randomFact);
+            return "Fun Fact: " + randomFact;
           }
-          return "No meal suggestion available.";
+          return "No fun facts available.";
         })
         .catch(err => {
           console.error("[DEBUG] Sol API error:", err);
-          return "No meal suggestion available.";
+          return "No fun facts available.";
         });
     case "Math": {
       // Retrieve the conversation context from the current wall.
