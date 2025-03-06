@@ -91,19 +91,19 @@ function getBotResponse(botName, wallName) {
           return "Stay inspired!";
         });
    case "Sol":
-      return fetch("/public/data/funfacts.json")
+      // TheMealDB API for a random meal (returning the meal name).
+      return fetch("https://www.themealdb.com/api/json/v1/1/random.php")
         .then(res => res.json())
         .then(data => {
-          if (data && Array.isArray(data) && data.length > 0) {
-            const randomFact = data[Math.floor(Math.random() * data.length)];
-            console.log("[DEBUG] Sol fun fact:", randomFact);
-            return "Fun Fact: " + randomFact;
+          if (data.meals && data.meals.length > 0) {
+            console.log("[DEBUG] Sol API response:", data.meals[0]);
+            return "Try: " + data.meals[0].strMeal;
           }
-          return "No fun facts available.";
+          return "No meal suggestion available.";
         })
         .catch(err => {
           console.error("[DEBUG] Sol API error:", err);
-          return "No fun facts available.";
+          return "No meal suggestion available.";
         });
     case "Math": {
       // Retrieve the conversation context from the current wall.
